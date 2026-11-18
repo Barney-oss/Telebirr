@@ -292,7 +292,7 @@ function numberHTML(){
   if(!d){
     var fav='<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Favorites</span><div style="display:flex;gap:12px">'+FAVS.map(function(id){var c=byId(id);return '<button type="button" data-act="pick" data-id="'+c.id+'" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none;background:transparent;border:0;padding:0">'+avatar(c,52,15)+'<span style="font-size:12px;font-weight:600">'+c.name.split(' ')[0]+'</span></button>'}).join('')+
       '<div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none"><span style="width:52px;height:52px;border-radius:26px;border:1.5px dashed var(--link);display:flex;align-items:center;justify-content:center;color:var(--link)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span style="font-size:12px;font-weight:600;color:var(--link)">Add</span></div></div></div>';
-    var sent='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Sent before</h2><span style="font-size:14px;font-weight:600;color:var(--link)">See all</span></div>'+
+    var sent='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Sent before</h2><button type="button" data-act="history" style="font-size:14px;font-weight:600;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 0 0 12px;margin:-12px 0">See all</button></div>'+
       RECENT.map(function(id,i){return (i?'<div class="divider"></div>':'')+contactRow(byId(id),'pick',0)}).join('')+'</div>';
     body=fav+field+sent;
   }else if(m.length){
@@ -304,6 +304,14 @@ function numberHTML(){
     body=field+'<div class="card"><h2 style="margin:0;font-size:16px;font-weight:700">No contact starts with '+fmtNum(d)+'</h2><span class="mut" style="font-size:13px;line-height:18px">Keep typing the full 10-digit number to send to someone new.</span></div>';
   }
   return topbar('Send money','back-home')+tabs()+'<div class="scroll"><div class="body">'+body+'</div></div>'+keypad('num');
+}
+
+
+function historyHTML(){
+  var G=[['Today',[['ak','10:42 AM','1,500'],['st','8:15 AM','300']]],['Yesterday',[['yt','6:30 PM','2,000'],['mg','1:05 PM','450']]],['Mon, 16 Nov',[['da','9:20 AM','800']]]];
+  var chips=['Today','Yesterday','This week','Last 30 days','Last 3 months','Custom'].map(function(c){var on=c==='This week';return '<span style="flex:none;display:flex;align-items:center;height:36px;padding:0 14px;border-radius:18px;font-size:14px;white-space:nowrap;'+(on?'background:var(--avbg);border:1.5px solid var(--avbd);color:var(--avtx);font-weight:700':'background:var(--field);border:1.5px solid var(--fieldbd);color:var(--muted);font-weight:600')+'">'+c+'</span>'}).join('');
+  var cards=G.map(function(g){return '<div class="card"><div style="margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">'+g[0]+'</h2></div>'+g[1].map(function(it,i){var c=byId(it[0]);return (i?'<div class="divider"></div>':'')+'<button type="button" class="row" data-act="pick" data-id="'+c.id+'">'+avatar(c,40,13)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:600">'+c.name+'</span><span class="mut" style="font-size:13px">'+it[1]+'</span></span><span style="font-size:15px;font-weight:600">'+it[2]+' ETB</span></button>'}).join('')+'</div>'}).join('');
+  return topbar('Sent before','back-number')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:8px 0 24px"><div aria-hidden="true" style="display:flex;gap:8px;overflow:hidden;padding:0 16px">'+chips+'</div><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px">'+cards+'</div></div></div>';
 }
 
 function amountHTML(){
@@ -358,7 +366,7 @@ function doneHTML(){
 var phone=$('#phone');
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,amount:amountHTML,pin:pinHTML,done:doneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,amount:amountHTML,pin:pinHTML,done:doneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -400,6 +408,7 @@ document.addEventListener('click',function(e){
   else if(a==='eye'){var kk=t.getAttribute('data-k');S.show[kk]=!S.show[kk];render(false)}
   else if(a==='send'){resetFlow();go('number')}
   else if(a==='back-home'){resetFlow();go('home')}
+  else if(a==='history'){S.screen='history';render(true)}
   else if(a==='back-number'){S.contact=null;S.amount='';S.screen='number';render(false)}
   else if(a==='back-amount'){go('amount')}
   else if(a==='key')pressKey(t.getAttribute('data-k'));
