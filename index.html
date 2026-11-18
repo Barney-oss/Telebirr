@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>telebirr redesign: Send money prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'DM Sans',system-ui,sans-serif;color:var(--text);background:var(--pagebg);transition:background .2s}
+button{font:inherit;color:inherit;cursor:pointer}
+:root,[data-theme="light"]{
+  --pagebg:#E9EDE4;--panel:#FFFFFF;--panelbd:#D9DED2;
+  --bg:#FBFBFC;--homebg:#F7FAF2;--text:#1B1B1F;--muted:#62626A;
+  --card:#FFFFFF;--cardsh:0 4px 16px rgba(27,27,31,.07),0 1px 3px rgba(27,27,31,.05);--cardbd:transparent;
+  --line:#E6E6EA;--avbg:#EEF8E2;--avbd:#B4DA82;--avtx:#1C2E12;--ink:#1C2E12;
+  --green:#8DC73F;--greenInk:#2F6B12;--link:#0187D0;--blue:#0187D0;
+  --keybg:#F4F5F7;--key:#FFFFFF;--keysh:0 1px 2px rgba(27,27,31,.10);
+  --field:#FFFFFF;--fieldbd:#E3E5E9;--tabsh:0 1px 3px rgba(27,27,31,.08);--tabbd:transparent;
+  --softbg:#EEF8E2;--softbd:#B4DA82;--softink:#2F6B12;--totalbg:rgba(141,199,63,.10);
+  --err:#C62828;--iconbtn:#FFFFFF;--dot:#C9C9CF;
+  --tile:#EEF8E2;--tilebd:#B4DA82;--tileink:#1C2E12;--soft2:#F5F5F7;--soft2dot:#EDEDF0;
+  --navbg:#FFFFFF;--navstroke:transparent;--navshadow:rgba(27,27,31,.08);--navactive:#EEF8E2;--navtx:#62626A;--navtxA:#1C2E12;--navfill:#B4DA82;--navink:#62626A;
+  --balbg:radial-gradient(120% 100% at 0% 0%,#C6EF8E 0%,rgba(198,239,142,0) 55%),radial-gradient(70% 60% at 100% 0%,rgba(1,135,208,.10) 0%,rgba(1,135,208,0) 70%),radial-gradient(90% 90% at 100% 100%,#4FA52B 0%,rgba(79,165,43,0) 60%),linear-gradient(140deg,#A5DB5E 0%,#8DC73F 50%,#6DBB2C 100%);
+  --balink:#1C2E12;--balsub:rgba(28,46,18,.72);--balsh:0 8px 22px rgba(62,125,22,.22),inset 0 1px 0 rgba(255,255,255,.55);--balbd:transparent;
+  --pill:#C3E39A;--pillbd:#D2EAB2;--vt:rgba(255,255,255,.38);--vtbd:rgba(28,46,18,.18);--ringop:.26;
+}
+[data-theme="dark"]{
+  --pagebg:#0B0F0C;--panel:#171E18;--panelbd:#2B352C;
+  --bg:#070A08;--homebg:#070A08;--text:#F2F5EE;--muted:#9FAA98;
+  --card:#171E18;--cardsh:0 6px 18px rgba(0,0,0,.45);--cardbd:#3A4A3F;
+  --line:#2B352C;--avbg:#1F2D17;--avbd:#3A5A22;--avtx:#E6F2D5;--ink:#E6F2D5;
+  --green:#8DC73F;--greenInk:#B6E07F;--link:#4DB3F0;--blue:#0187D0;
+  --keybg:#0E130F;--key:#242E25;--keysh:none;
+  --field:#171E18;--fieldbd:#3A4A3F;--tabsh:none;--tabbd:#3A4A3F;
+  --softbg:#1F2D17;--softbd:#3A5A22;--softink:#B6E07F;--totalbg:rgba(141,199,63,.08);
+  --err:#FF8A80;--iconbtn:#171E18;--dot:#3A453B;
+  --tile:#1F2D17;--tilebd:#3A5A22;--tileink:#E6F2D5;--soft2:#222B23;--soft2dot:#323D33;
+  --navbg:#2A372A;--navstroke:rgba(255,255,255,.12);--navshadow:rgba(0,0,0,.45);--navactive:#38561F;--navtx:#E2E8DC;--navtxA:#E6F2D5;--navfill:#6FA83B;--navink:#E2E8DC;
+  --balbg:radial-gradient(110% 90% at 0% 0%,rgba(141,199,63,.38) 0%,rgba(141,199,63,0) 60%),radial-gradient(80% 70% at 100% 100%,rgba(79,165,43,.35) 0%,rgba(79,165,43,0) 65%),linear-gradient(145deg,#23441A 0%,#1B3714 55%,#152B10 100%);
+  --balink:#F2F5EE;--balsub:rgba(242,245,238,.78);--balsh:0 8px 22px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10);--balbd:#3A4A3F;
+  --pill:rgba(255,255,255,.10);--pillbd:rgba(255,255,255,.16);--vt:rgba(255,255,255,.12);--vtbd:rgba(255,255,255,.22);--ringop:.10;
+}
+.stage{min-height:100dvh;display:flex;align-items:center;justify-content:center;gap:40px;padding:24px}
+.side{width:260px;display:flex;flex-direction:column;gap:18px}
+.side h1{margin:0;font-size:22px;line-height:28px;font-weight:700}
+.side p{margin:0;font-size:14px;line-height:20px;color:var(--muted)}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--panelbd);border-radius:24px;padding:3px;gap:2px;align-self:flex-start}
+.seg button{border:1.5px solid transparent;background:transparent;height:40px;padding:0 18px;border-radius:20px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#1C2E12;font-weight:700}
+.seg button:focus-visible,.key:focus-visible,.btn:focus-visible,.row:focus-visible,.back:focus-visible,.tile-send:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+.note{font-size:12px;line-height:17px;color:var(--muted);border-top:1px dashed var(--panelbd);padding-top:14px}
+.lbl{font-size:12px;font-weight:600;color:var(--muted)}
+.phone{width:390px;height:min(844px,calc(100dvh - 48px));min-height:620px;border-radius:44px;box-shadow:0 0 0 10px #1B1B1F,0 30px 80px rgba(0,0,0,.28);overflow:hidden;position:relative;background:var(--bg);flex:none}
+@media (max-width:760px){
+  .stage{flex-direction:column;justify-content:flex-start;gap:12px;padding:12px 0 0}
+  .side{width:100%;padding:0 16px;gap:10px}
+  .side h1{font-size:17px;line-height:22px}.side p,.note{display:none}
+  .phone{width:100%;height:calc(100dvh - 128px);min-height:0;border-radius:0;box-shadow:none}
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);animation:fade .18s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}.hint{animation:none!important}}
+.scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:60px;flex:none}
+.back{width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;margin-left:-4px;padding:0}
+.topbar h1{margin:0;font-size:18px;font-weight:700;flex:1}
+.tabs{margin:8px 16px 0;background:var(--card);border-radius:24px;padding:3px;display:flex;gap:2px;box-shadow:var(--tabsh);border:1px solid var(--tabbd);flex:none}
+.tabs span{flex:1;display:flex;align-items:center;justify-content:center;height:40px;border-radius:20px;font-size:14px;font-weight:600;color:var(--muted);border:1.5px solid transparent}
+.tabs span.on{background:var(--green);border-color:var(--green);color:#1C2E12;font-weight:700}
+.body{display:flex;flex-direction:column;gap:12px;padding:12px 16px 24px}
+.card{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--cardsh);border:1px solid var(--cardbd)}
+.av{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--avbg);border:1.5px solid var(--avbd);color:var(--avtx);font-weight:700;flex:none}
+.input{display:flex;align-items:center;gap:10px;height:56px;padding:0 10px 0 16px;border-radius:16px;background:var(--field);border:1.5px solid var(--link)}
+.input.ok{border-color:var(--green)}
+.input .val{flex:1;font-size:18px;font-weight:600;letter-spacing:.4px;white-space:nowrap;overflow:hidden}
+.caret{display:inline-block;width:2px;background:var(--link);margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.caret{animation:none}}
+.row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 0;border:0;background:transparent;width:100%;text-align:left}
+.rise{animation:rise .28s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rise{animation:none}}
+.divider{height:1px;background:var(--line)}
+.dash{border-top:1.5px dashed var(--line)}
+.pad{background:var(--keybg);border-radius:28px 28px 0 0;padding:14px 16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;height:266px;flex:none;align-content:start}
+.key{height:52px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--key);box-shadow:var(--keysh);font-size:24px;font-weight:500;color:var(--text);border:0;padding:0}
+.key:active{transform:scale(.97)}
+.key.acc{background:var(--avbg);border:1.5px solid var(--avbd);box-shadow:none}
+.key[disabled],.pad.inert .key{cursor:default;pointer-events:none}
+.btnwrap{padding:8px 16px 12px;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:var(--blue);color:#fff;border:0}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+.err{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:18px;color:var(--err);font-weight:600}
+.mut{color:var(--muted)}
+/* home */
+.home{min-height:100%;display:flex;flex-direction:column;background:var(--homebg)}
+.home *{pointer-events:none}
+.home .tile-send{pointer-events:auto;cursor:pointer}
+.home .carousel{pointer-events:auto}
+.hpad{display:flex;flex-direction:column;gap:14px;padding:12px 16px 20px;flex:1}
+.hrow{display:flex;align-items:center;gap:12px;min-height:56px}
+.ibtn{width:44px;height:44px;border-radius:22px;background:var(--iconbtn);display:flex;align-items:center;justify-content:center;color:var(--text)}
+.bal{background:var(--balbg);border-radius:28px;padding:28px 20px 22px;display:flex;flex-direction:column;align-items:center;color:var(--balink);position:relative;z-index:0;overflow:hidden;border:1px solid var(--balbd);box-shadow:var(--balsh)}
+.bal .rings{position:absolute;right:0;bottom:0;z-index:-1}
+.bal .logo{position:absolute;top:18px;left:20px;font-weight:800;font-size:19px;letter-spacing:-.4px;opacity:.92}
+.pillbox{display:flex;flex-direction:column;gap:2px;background:var(--pill);border:1px solid var(--pillbd);border-radius:14px;padding:8px 12px}
+.hcard{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--cardsh);border:1px solid var(--cardbd)}
+.hcard h2{margin:0;font-size:16px;font-weight:700}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 12px}
+.tileb{display:flex;align-items:center;justify-content:center;width:100%;height:56px;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px;color:var(--tileink)}
+.tcol{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.tcol span.t{font-size:12px;line-height:15px;font-weight:600;text-align:center;min-height:30px}
+.wide{grid-column:span 2;display:flex;align-items:center;justify-content:center;gap:10px;height:52px;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px;color:var(--tileink);font-size:12px;font-weight:600;padding:0 10px}
+.tile-send{border:1.5px solid var(--tilebd);font-family:inherit;position:relative}
+.hint{animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(1,135,208,.45)}70%{box-shadow:0 0 0 12px rgba(1,135,208,0)}100%{box-shadow:0 0 0 0 rgba(1,135,208,0)}}
+.hnav{margin-top:auto;position:sticky;bottom:0;z-index:5;display:flex;justify-content:space-around;align-items:flex-start;height:72px;padding:14px 6px 0;flex:none;isolation:isolate}
+.hnav svg.bgshape{position:absolute;left:0;top:0;z-index:-1;overflow:visible;filter:drop-shadow(0 -4px 12px var(--navshadow))}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;padding:7px 0 4px;border-radius:22px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx);position:relative}
+.ni.on{background:var(--navactive);color:var(--navtxA);font-weight:700}
+.nf{fill:var(--navfill)}
+.sec{font-size:12px;font-weight:600;color:var(--muted)}
+.banner{flex:0 0 100%;scroll-snap-align:center;border-radius:20px;overflow:hidden;aspect-ratio:358/132;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 22px;color:#fff}
+img.banner{display:block;height:auto;aspect-ratio:auto;object-fit:cover;padding:0;border-radius:20px}
+@media (max-height:800px){.pad{height:auto;gap:6px;padding:10px 16px 14px}.key{height:44px;font-size:22px}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body data-theme="light">
+<div class="stage">
+  <aside class="side">
+    <h1>telebirr redesign<br>Send money prototype</h1>
+    <p>Tap <b>Send money</b> on the home screen to start. Type a number like <b>0911 2</b> to see matching contacts, then change the amount to see the fee update.</p>
+    <div class="seg" role="group" aria-label="Appearance">
+      <button type="button" data-act="theme" data-theme-val="light" aria-pressed="true">Light</button>
+      <button type="button" data-act="theme" data-theme-val="dark" aria-pressed="false">Dark</button>
+    </div>
+    <div class="note">Unofficial concept, not affiliated with Ethio telecom. All names, numbers and balances are made up. Fees follow Ethio telecom's published P2P tariff.</div>
+  </aside>
+  <main class="phone" id="phone" aria-label="Prototype phone screen"></main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+'use strict';
+var QR_FALLBACK="M0 0.5h7m2 0h7m1 0h2m1 0h1m1 0h7m-29 1h1m5 0h1m2 0h1m1 0h8m3 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m3 0h1m1 0h1m4 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m1 0h1m2 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h3m1 0h1m2 0h2m3 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h1m2 0h2m5 0h1m1 0h1m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h3m1 0h1m1 0h1m1 0h1m2 0h2m-21 1h1m1 0h5m3 0h1m5 0h1m2 0h1m2 0h5m-27 1h1m1 0h1m4 0h2m2 0h1m1 0h3m2 0h2m1 0h5m1 0h2m-29 1h2m1 0h1m1 0h12m1 0h1m2 0h1m3 0h1m-26 1h2m2 0h1m2 0h3m1 0h1m1 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h1m-28 1h4m2 0h3m1 0h2m2 0h2m1 0h3m6 0h1m1 0h1m-29 1h1m1 0h2m1 0h1m3 0h1m2 0h1m2 0h2m2 0h6m2 0h2m-27 1h3m1 0h1m2 0h1m1 0h2m4 0h2m4 0h1m2 0h1m-26 1h3m1 0h1m1 0h2m2 0h1m2 0h1m1 0h1m1 0h1m4 0h1m1 0h1m-22 1h1m1 0h1m1 0h4m7 0h2m5 0h1m-27 1h1m4 0h1m1 0h1m1 0h1m1 0h5m2 0h3m1 0h3m1 0h3m-29 1h1m2 0h2m1 0h2m2 0h2m1 0h3m1 0h2m2 0h1m1 0h1m1 0h1m-26 1h1m1 0h1m2 0h1m2 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h2m2 0h2m1 0h1m-28 1h1m2 0h5m1 0h1m1 0h1m2 0h2m1 0h2m1 0h7m-19 1h2m5 0h1m3 0h2m3 0h1m3 0h1m-29 1h7m2 0h2m1 0h1m2 0h1m1 0h4m1 0h1m1 0h1m1 0h1m-27 1h1m5 0h1m1 0h1m3 0h1m1 0h3m2 0h2m3 0h2m2 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m3 0h1m4 0h7m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h3m1 0h1m1 0h1m-21 1h1m1 0h3m1 0h1m1 0h4m2 0h2m1 0h2m1 0h1m1 0h3m1 0h2m-28 1h1m5 0h1m3 0h1m1 0h1m2 0h2m2 0h2m2 0h2m2 0h1m-28 1h7m1 0h1m5 0h5m2 0h1m1 0h1m2 0h1";
+var CONTACTS=[
+ {id:'ak',name:'Abebe Kebede',ini:'AK',num:'0911234567'},
+ {id:'st',name:'Selam Tesfaye',ini:'ST',num:'0911258301'},
+ {id:'yt',name:'Yonas Tadesse',ini:'YT',num:'0911200745'},
+ {id:'mg',name:'Mekdes Girma',ini:'MG',num:'0922118440'},
+ {id:'hb',name:'Hanna Bekele',ini:'HB',num:'0933507612'},
+ {id:'da',name:'Dawit Alemu',ini:'DA',num:'0944316289'},
+ {id:'th',name:'Tigist Haile',ini:'TH',num:'0965720118'},
+ {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
+];
+var FAVS=['ak','st','mg'], RECENT=['ak','st'];
+var S={theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0};
+
+/* ---------- helpers ---------- */
+function $(s){return document.querySelector(s)}
+function byId(id){for(var i=0;i<CONTACTS.length;i++)if(CONTACTS[i].id===id)return CONTACTS[i];return null}
+function fmtNum(d){ // 0911234567 -> 0911 234 567
+  var o=d.slice(0,4); if(d.length>4)o+=' '+d.slice(4,7); if(d.length>7)o+=' '+d.slice(7,10); return o }
+function money(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function amountVal(){var v=parseFloat(S.amount); return isNaN(v)?0:v}
+function amountDisplay(){
+  var p=S.amount.split('.'); var i=p[0]===''?'0':p[0];
+  i=i.replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return p.length>1? i+'.'+p[1] : i }
+/* Ethio telecom P2P tariff (telebirr to telebirr) */
+function fee(a){ if(a<=0)return 0; if(a<=100)return 1; if(a<=500)return 2; if(a<=1500)return 4; if(a<=5000)return 6; return 8 }
+function pad2(n){return (n<10?'0':'')+n}
+function nowStr(){var d=new Date();return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
+function mkTxn(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',o='DK';for(var i=0;i<8;i++)o+=c.charAt(Math.floor(Math.random()*c.length));return o}
+function recipientName(){return S.contact?S.contact.name:fmtNum(S.digits)}
+function recipientNum(){return S.contact?fmtNum(S.contact.num):fmtNum(S.digits)}
+function validNum(d){return d.length===10&&/^0[79]/.test(d)}
+
+/* ---------- icons ---------- */
+var I={
+ back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+ check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+ person:function(px){return '<svg width="'+px+'" height="'+px+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="translate(0.8 0.8)"><circle transform="translate(2.4 2.4)" cx="10" cy="7.6" r="3.6" fill="#8DC73F" stroke="none"/><path transform="translate(2.4 2.4)" d="M3.5 17c.7-3.4 3.4-5 6.5-5s5.8 1.6 6.5 5z" fill="#8DC73F" stroke="none"/><circle cx="10" cy="7.6" r="3.6"/><path d="M3.5 17c.7-3.4 3.4-5 6.5-5s5.8 1.6 6.5 5"/></g></svg>'},
+ bksp:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>',
+ finger:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a7.5 7.5 0 0 0-7.5 7.5v1.5M19.5 12V11A7.5 7.5 0 0 0 12 3.5M8 20c-.9-1.6-1.5-3.4-1.5-5.5V11a5.5 5.5 0 0 1 11 0v3.5c0 1.4.2 2.6.6 3.8M12 20.5c-.9-1.2-1.5-2.8-1.5-4.8V11a1.5 1.5 0 0 1 3 0v4.7c0 1.6.3 2.8.9 4"/></svg>',
+ warn:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:0"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.01"/></svg>',
+ dl:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect transform="translate(2.4 2.4)" x="3.5" y="10.5" width="14" height="8" rx="3" fill="#8DC73F" stroke="none"/><path d="M10.5 3v9.5M6.8 9l3.7 3.7L14.2 9M3.5 13.5v1.5A3.5 3.5 0 0 0 7 18.5h7a3.5 3.5 0 0 0 3.5-3.5v-1.5"/></svg>',
+ share:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect transform="translate(2.4 2.4)" x="3" y="8" width="15" height="11" rx="3.5" fill="#8DC73F" stroke="none"/><path d="M10.5 13V3M7 6.5l3.5-3.5L14 6.5M7 9H6a2.5 2.5 0 0 0-2.5 2.5v5A2.5 2.5 0 0 0 6 19h9a2.5 2.5 0 0 0 2.5-2.5v-5A2.5 2.5 0 0 0 15 9h-1"/></svg>',
+ okbig:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2F6B12" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg>'
+};
+function avatar(c,size,fs){
+  var st='width:'+size+'px;height:'+size+'px;font-size:'+fs+'px';
+  return '<span class="av" style="'+st+'">'+(c?c.ini:I.person(Math.round(size*.55)))+'</span>';
+}
+
+/* ---------- keypad ---------- */
+function keypad(kind){
+  var h='<div class="pad'+(kind==='pin'?' inert" aria-hidden="true':'')+'">';
+  for(var i=1;i<=9;i++)h+='<button type="button" class="key" data-act="key" data-k="'+i+'" aria-label="'+i+'">'+i+'</button>';
+  if(kind==='amount') h+='<button type="button" class="key acc" data-act="key" data-k="." aria-label="Decimal point">.</button>';
+  else if(kind==='pin') h+='<span class="key acc">'+I.finger+'</span>';
+  else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
+  h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
+  if(kind==='pin') h+='<span class="key acc">'+I.bksp+'</span>';
+  else h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
+  return h+'</div>';
+}
+function topbar(title,backAct){
+  return '<div class="topbar"><button type="button" class="back" data-act="'+backAct+'" aria-label="Back">'+I.back+'</button><h1>'+title+'</h1></div>';
+}
+function tabs(){return '<div class="tabs" aria-hidden="true"><span class="on">To individual</span><span>To group</span></div>'}
+
+/* ---------- screens ---------- */
+function homeHTML(){
+  var rings='';for(var r=8;r<=192;r+=8)rings+='<circle cx="200" cy="200" r="'+r+'"/>';
+  var eye='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.6" fill="currentColor" fill-opacity=".7" stroke="none"/></svg>';
+  var eyeS=eye.replace('width="18" height="18"','width="15" height="15"');
+  function sv(inner,w){return '<svg width="'+(w||24)+'" height="24" viewBox="'+(w?'1 0 '+w+' 24':'0 0 24 24')+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g stroke-width="1.8">'+inner+'</g></svg>'}
+  var iSend=sv('<path transform="translate(3.4 3.4)" d="M17 1.5 11 18.5l-2.5-6.5-6.5-2.5z" fill="#8DC73F" stroke="#8DC73F"/><path d="M17 1.5 11 18.5l-2.5-6.5-6.5-2.5zM17 1.5 8.5 12"/>',20.6);
+  var iAir=sv('<rect x="7.4" y="5.4" width="12" height="17" rx="5" fill="#8DC73F" stroke="none"/><rect x="4" y="2" width="12" height="17" rx="5"/><path d="M8.5 15.2h3"/>',17.6).replace('viewBox="1 0 17.6 24"','viewBox="3 0 17.6 24"');
+  var iCash=sv('<rect x="5.4" y="8.4" width="17.6" height="12" rx="6" fill="#8DC73F" stroke="none"/><rect x="2" y="5" width="17.6" height="12" rx="6"/><circle cx="10.8" cy="11" r="2.5"/>');
+  var iLoan=sv('<rect transform="translate(3.4 3.4)" x="2.5" y="2.5" width="16" height="16" rx="5" fill="#8DC73F" stroke="none"/><rect x="2.5" y="2.5" width="16" height="16" rx="5"/><path d="M7.5 13.5l6-6"/><circle cx="7.8" cy="8.3" r="1.2"/><circle cx="13.2" cy="12.7" r="1.2"/>');
+  var iBank=sv('<path transform="translate(3.4 3.4)" d="M2.5 9.5a7.5 6.5 0 0 1 15 0z" fill="#8DC73F" stroke="none"/><path d="M2.5 9.5a7.5 6.5 0 0 1 15 0zM5.5 12.5V17M10 12.5V17M14.5 12.5V17M2.5 20h15"/>');
+  var iShop=sv('<path transform="translate(3.4 3.4)" d="M2.5 8.5 4 3.5h12l1.5 5a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0z" fill="#8DC73F" stroke="none"/><path d="M2.5 8.5 4 3.5h12l1.5 5a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0zM4 11v8q0 1.5 1.5 1.5h9q1.5 0 1.5-1.5v-8M8.5 20.5v-4a1.5 1.5 0 0 1 3 0v4"/>');
+  // stand-in shortcut icons (original image files are not in this page yet)
+  var iBill='<img src="assets/icon-paybills.png" alt="" width="34" height="34" style="display:block;object-fit:contain">';
+  var iZem='<img src="assets/icon-zemen.png" alt="" width="34" height="34" style="display:block;object-fit:contain">';
+  var iPark='<img src="assets/icon-parking.png" alt="" width="34" height="34" style="display:block;object-fit:contain">';
+  function tcol(ic,l){return '<div class="tcol"><span class="tileb">'+ic+'</span><span class="t">'+l+'</span></div>'}
+  var dm=''; ['Pay bills','Transport &amp; parking','Shop &amp; gift','Education','Travel &amp; tickets','Entertainment'].forEach(function(t){
+    dm+='<div style="background:var(--soft2);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:92px"><span style="font-size:14px;font-weight:600">'+t+'</span><span style="display:flex">'+[0,1,2].map(function(k){return '<span style="width:24px;height:24px;border-radius:12px;background:var(--soft2dot);border:2px solid var(--soft2);margin-left:'+(k?-6:0)+'px"></span>'}).join('')+'</span></div>'});
+  function nav(on,label,ic){return '<div class="ni'+(on?' on':'')+'">'+(on?'<span style="position:absolute;top:3px;left:50%;margin-left:-9px;width:18px;height:4px;border-radius:2px;background:#8DC73F"></span>':'')+ic+'<span>'+label+'</span></div>'}
+  var navI='stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"';
+  var nHome='<svg '+navI+' style="color:var(--navtxA)"><g transform="translate(0.8 0.8)"><path transform="translate(2.4 2.4)" d="M3 10.4 9.2 4.7a1.2 1.2 0 0 1 1.6 0L17 10.4V16a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z" fill="#8DC73F" stroke="none"/><path d="M3 10.4 9.2 4.7a1.2 1.2 0 0 1 1.6 0L17 10.4V16a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM7.5 19v-3a2.5 2.5 0 0 1 5 0v3"/></g></svg>';
+  var nPay='<svg '+navI+' style="color:var(--navink)"><g transform="translate(0.8 1.3)"><rect class="nf" transform="translate(2.4 2.4)" x="3" y="4" width="15" height="12" rx="4" stroke="none"/><rect x="3" y="4" width="15" height="12" rx="4"/><path d="M3 9h15M7 13h3"/></g></svg>';
+  var nApps='<svg '+navI+' style="color:var(--navink)"><g transform="translate(-0.2 -0.2)"><rect class="nf" transform="translate(3.8 3.8)" x="3" y="3" width="15" height="15" rx="4.5" stroke="none"/><rect x="3" y="3" width="6.5" height="6.5" rx="2.6"/><rect x="11.5" y="3" width="6.5" height="6.5" rx="2.6"/><rect x="3" y="11.5" width="6.5" height="6.5" rx="2.6"/><rect x="11.5" y="11.5" width="6.5" height="6.5" rx="2.6"/></g></svg>';
+  var nAcc='<svg '+navI+' style="color:var(--navink)"><g transform="translate(0.8 0.8)"><circle class="nf" cx="12.9" cy="9.4" r="3.6" stroke="none"/><path class="nf" transform="translate(2.4 2.4)" d="M3.5 17.5c.7-3.4 3.4-5 7-5s6.3 1.6 7 5z" stroke="none"/><circle cx="10.5" cy="7" r="3.6"/><path d="M3.5 17.5c.7-3.4 3.4-5 7-5s6.3 1.6 7 5"/></g></svg>';
+  var scan='<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</span>';
+  return '<div class="scroll" id="sc"><div class="home"><div class="hpad">'+
+   '<div class="hrow"><span class="av" style="width:44px;height:44px;font-size:14px">HA</span><div style="flex:1;display:flex;flex-direction:column"><span class="mut" style="font-size:13px">Good afternoon,</span><span style="font-size:17px;font-weight:700">Nardos</span></div><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5"/></svg></span><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></span></div>'+
+   '<div class="bal"><svg class="rings" aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="rgBR" cx="200" cy="200" r="200" gradientUnits="userSpaceOnUse"><stop offset="0.35" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rmBR"><rect width="200" height="200" fill="url(#rgBR)"/></mask></defs><g mask="url(#rmBR)" fill="none" stroke="#ffffff" style="stroke-opacity:var(--ringop)" stroke-width="0.9">'+rings+'</g></svg>'+
+   '<span class="logo" aria-label="telebirr">telebirr</span>'+
+   '<span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--balsub)">Your balance<span style="width:28px;height:28px;margin:-4px 0;display:flex;align-items:center;justify-content:center">'+eye+'</span></span>'+
+   '<span style="font-variant-numeric:lining-nums tabular-nums;font-size:54px;font-weight:500;letter-spacing:5px;line-height:48px;opacity:.9">******</span>'+
+   '<div style="align-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px">'+
+   ['Endekise','Reward'].map(function(l){return '<div class="pillbox"><span style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:600">'+l+'<span style="width:28px;height:28px;margin:-6px -8px -6px 0;display:flex;align-items:center;justify-content:center">'+eyeS+'</span></span><span style="font-size:24px;line-height:22px;font-weight:500;letter-spacing:2px;opacity:.9">*****</span></div>'}).join('')+'</div>'+
+   '<span style="display:flex;align-items:center;gap:6px;min-height:30px;margin-top:16px;font-size:14px;font-weight:700;padding:0 12px 0 16px;border-radius:15px;background:var(--vt);border:1px solid var(--vtbd)">View transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></div>'+
+   '<div class="hcard" style="margin-top:8px;padding-top:22px;gap:16px"><h2>Main actions</h2><div class="grid4">'+
+   '<button type="button" class="wide tile-send hint" data-act="send" aria-label="Send money, start the prototype">'+iSend+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text)">Send money</span></button>'+
+   '<div class="wide">'+iAir+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text);white-space:nowrap">Airtime &amp; data</span></div>'+
+   tcol(iCash,'Cash')+tcol(iLoan,'Loans')+tcol(iBank,'To bank')+tcol(iShop,'Merchant')+'</div></div>'+
+   '<div class="hcard"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>My shortcuts</h2><span class="mut" style="font-size:13px">Your own services, one tap away</span></div><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:16px 12px">'+
+   tcol(iBill,'Pay bills')+tcol(iZem,'Zemen')+tcol(iPark,'Parking')+
+   '<div class="tcol"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></div></div></div>'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><div class="carousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px">'+
+   '<img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"><img class="banner" src="assets/banner-zemen.png" alt="Zemen Gebeya, where Ethiopia shops digitally"></div>'+
+   '<div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
+   '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>Do more with telebirr</h2><span class="mut" style="font-size:13px">Pay, book, shop and learn in one place.</span></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'+dm+'</div><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px"><span class="mut" style="font-size:13px">Can\'t find what you need?</span><span style="display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:#0187D0;color:#fff">Browse all services</span></div></div>'+
+   '</div><nav class="hnav" aria-label="Main (not part of this prototype)"><svg class="bgshape" aria-hidden="true" width="100%" height="72" viewBox="0 0 390 72" preserveAspectRatio="none"><path d="M0 38 C0 22.54 12.54 10 28 10 L140 10 C160 10 168 -5 195 -5 C222 -5 230 10 250 10 L362 10 C377.46 10 390 22.54 390 38 L390 72 L0 72 Z" fill="var(--navbg)" stroke="var(--navstroke)" stroke-width="1"/></svg>'+
+   nav(true,'Home',nHome)+nav(false,'Pay',nPay)+scan+nav(false,'Apps',nApps)+nav(false,'Account',nAcc)+'</nav></div></div>';
+}
+
+function matchesFor(d){return CONTACTS.filter(function(c){return c.num.indexOf(d)===0})}
+function boldPrefix(num,k){ // bold the first k digits of formatted number
+  var f=fmtNum(num),out='',seen=0,i,ch;
+  var a='',b='';
+  for(i=0;i<f.length;i++){ch=f.charAt(i); if(seen<k){a+=ch; if(ch!==' ')seen++} else b+=ch}
+  return '<b style="color:var(--text);font-weight:700">'+a+'</b>'+b }
+function contactRow(c,act,k,sub){
+  return '<button type="button" class="row" data-act="'+act+'" data-id="'+c.id+'">'+avatar(c,40,13)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:600">'+c.name+'</span><span class="mut" style="font-size:13px">'+(sub||(k?boldPrefix(c.num,k):fmtNum(c.num)))+'</span></span></button>'}
+
+function numberHTML(){
+  var d=S.digits, ok=validNum(d), m=d?matchesFor(d):[];
+  var shown=d?fmtNum(d)+'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'<span class="caret" style="height:22px;vertical-align:-4px"></span><span class="mut" style="font-weight:500;margin-left:4px">Phone number</span>';
+  var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Send to</span><div class="input'+(ok?' ok':'')+'"><span class="val">'+shown+'</span>'+
+    (ok?'<span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span>':'<span aria-hidden="true" style="width:36px;height:36px;border-radius:12px;background:var(--avbg);border:1.5px solid var(--avbd);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)">'+I.person(20)+'</span>')+'</div></div>';
+  var body;
+  if(!d){
+    var fav='<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Favorites</span><div style="display:flex;gap:12px">'+FAVS.map(function(id){var c=byId(id);return '<button type="button" data-act="pick" data-id="'+c.id+'" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none;background:transparent;border:0;padding:0">'+avatar(c,52,15)+'<span style="font-size:12px;font-weight:600">'+c.name.split(' ')[0]+'</span></button>'}).join('')+
+      '<div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none"><span style="width:52px;height:52px;border-radius:26px;border:1.5px dashed var(--link);display:flex;align-items:center;justify-content:center;color:var(--link)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span style="font-size:12px;font-weight:600;color:var(--link)">Add</span></div></div></div>';
+    var sent='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Sent before</h2><span style="font-size:14px;font-weight:600;color:var(--link)">See all</span></div>'+
+      RECENT.map(function(id,i){return (i?'<div class="divider"></div>':'')+contactRow(byId(id),'pick',0)}).join('')+'</div>';
+    body=fav+field+sent;
+  }else if(m.length){
+    body=field+'<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Matches</h2><span class="mut" style="font-size:12px">'+m.length+(m.length===1?' person':' people')+'</span></div>'+
+      m.map(function(c,i){return (i?'<div class="divider"></div>':'')+contactRow(c,'pick',d.length)}).join('')+'</div>';
+  }else if(ok){
+    body=field+'<div class="card"><div style="margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Not in your contacts</h2></div><button type="button" class="row" data-act="pick-new"><span class="av" style="width:40px;height:40px;color:var(--ink)">'+I.person(22)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Send to '+fmtNum(d)+'</span><span class="mut" style="font-size:13px">New recipient</span></span></button></div>';
+  }else{
+    body=field+'<div class="card"><h2 style="margin:0;font-size:16px;font-weight:700">No contact starts with '+fmtNum(d)+'</h2><span class="mut" style="font-size:13px;line-height:18px">Keep typing the full 10-digit number to send to someone new.</span></div>';
+  }
+  return topbar('Send money','back-home')+tabs()+'<div class="scroll"><div class="body">'+body+'</div></div>'+keypad('num');
+}
+
+function amountHTML(){
+  var a=amountVal(), f=fee(a), tot=a+f, over=a>0&&tot>S.balance;
+  S.rise=S.risePending;S.risePending=false;
+  var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Send to</span><div class="input ok"><span class="val">'+recipientNum()+'</span><span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span></div></div>';
+  var who='<div id="who" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:32px;height:32px;font-size:12px;font-weight:800;background:transparent;border:2px solid #8DC73F;color:var(--avtx)">'+(S.contact?S.contact.ini:I.person(18))+'</span><span style="flex:1;font-size:16px;font-weight:700;min-width:0">'+(S.contact?S.contact.name:'New recipient')+'</span><span style="font-size:12px;font-weight:600;color:var(--softink)">Sending to</span></div>';
+  var card='<div class="card'+(S.rise?' rise':'')+'" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">You send</span><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">Available</span><span style="font-size:14px;font-weight:600'+(over?';color:var(--err)':'')+'">'+money(S.balance)+' ETB</span></div></div>'+
+    '<div class="dash"></div><div style="display:flex;flex-direction:column;gap:8px"><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Fee</span><span style="font-weight:600;color:var(--text)">'+(a>0?money(f)+' ETB':'0.00 ETB')+'</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8DC73F"></span>Total to pay</span><span style="font-size:20px;font-weight:700">'+money(tot)+' ETB</span></div>'+
+    (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB, so lower the amount.</span></div>':'')+'</div></div>';
+  var reason='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Payment reason</span><div style="display:flex;align-items:center;height:46px;padding:0 16px;border-radius:14px;background:var(--field);border:1.5px solid var(--fieldbd)"><span style="flex:1;font-size:16px;font-weight:500">Personal transfer</span></div></div>';
+  return topbar('Send money','back-number')+tabs()+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+field+who+card+reason+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="next"'+((a<=0||over)?' disabled':'')+'>Next</button></div>'+keypad('amount');
+}
+
+function pinHTML(){
+  var a=amountVal(), f=fee(a), tot=a+f; S.total=tot;
+  var dots='';for(var i=0;i<6;i++)dots+='<span style="width:26px;height:26px;border-radius:13px;background:#8DC73F;border:2px solid #8DC73F"></span>';
+  return topbar('Confirm payment','back-amount')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:12px 16px 16px;min-height:100%">'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientNum()+'</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">Includes '+money(f)+' ETB fee</span></div>'+
+   '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">Personal transfer</span></div></div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Your PIN</span><div style="display:flex;gap:16px" role="img" aria-label="PIN already entered for this demo">'+dots+'</div>'+
+   '<button type="button" class="btn" data-act="pay" style="margin-top:4px"'+(S.paying?' disabled':'')+'>'+(S.paying?'Processing...':'Pay '+money(tot)+' ETB')+'</button>'+
+   '<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+}
+
+function qrSVG(text,px){
+  try{
+    var q=qrcode(0,'M'); q.addData(text); q.make();
+    var n=q.getModuleCount(),d='',r,c;
+    for(r=0;r<n;r++)for(c=0;c<n;c++)if(q.isDark(r,c))d+='M'+c+' '+r+'h1v1h-1z';
+    return '<svg viewBox="0 0 '+n+' '+n+'" width="'+px+'" height="'+px+'" shape-rendering="crispEdges" role="img" aria-label="QR code to confirm payment '+text+'"><path d="'+d+'" fill="#1B1B1F"/></svg>';
+  }catch(e){
+    return '<svg viewBox="0 0 29 29" width="'+px+'" height="'+px+'" shape-rendering="crispEdges" role="img" aria-label="QR code to confirm payment '+text+'"><path stroke="#1B1B1F" d="'+QR_FALLBACK+'"/></svg>';
+  }
+}
+function doneHTML(){
+  function col(l,v){return '<div style="display:flex;flex-direction:column;gap:2px"><span class="lbl">'+l+'</span><span style="font-size:14px;line-height:18px;font-weight:600">'+v+'</span></div>'}
+  return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px 0;height:60px;flex:none;color:var(--ink)" aria-hidden="true"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link)">'+I.dl+'Download</span><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link)">'+I.share+'Share</span></div>'+
+  '<div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">'+
+  '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px"><div style="display:flex;align-items:center;gap:12px"><span style="width:30px;height:30px;border-radius:15px;background:var(--avbg);'+(S.theme==='dark'?'border:1.5px solid #4F7A2E;box-shadow:0 0 14px 2px rgba(141,199,63,.36),0 0 26px 4px rgba(141,199,63,.14);':'box-shadow:0 0 0 5px rgba(141,199,63,.14),0 4px 14px rgba(141,199,63,.32);')+'display:flex;align-items:center;justify-content:center;flex:none;color:var(--greenInk)">'+I.okbig.replace('stroke="#2F6B12"','stroke="currentColor"')+'</span><span style="font-size:17px;line-height:22px;font-weight:700;color:var(--greenInk)">Successful</span></div>'+
+  '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+  '<div class="card" style="border-radius:24px;gap:14px"><div style="display:flex;align-items:center;gap:12px">'+avatar(S.contact,44,15)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span class="lbl">Sent to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+recipientName()+'</span></span></div><div class="dash"></div>'+
+  '<div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Reason','Personal transfer')+col('Transaction number',S.txn)+'<span class="mut" style="font-size:12px;line-height:16px">Scan to this QR code to confirm this payment</span></div>'+
+  '<span style="flex:none;width:124px;height:124px;padding:12px;border-radius:16px;background:#FFFFFF;border:1.5px solid #E6E6EA;display:flex">'+qrSVG(S.txn,100)+'</span></div></div>'+
+  '<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;border-radius:20px;overflow:hidden"><img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"></div><div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
+  '</div></div><div class="btnwrap" style="padding:8px 16px 28px"><button type="button" class="btn" data-act="finish">Finished</button></div>';
+}
+
+/* ---------- render ---------- */
+var phone=$('#phone');
+function render(anim){
+  var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
+  var html={home:homeHTML,number:numberHTML,amount:amountHTML,pin:pinHTML,done:doneHTML}[S.screen]();
+  phone.innerHTML=html;
+  var el=phone.firstElementChild;
+  // wrap into a screen container so the fade only runs on screen changes
+  var wrap=document.createElement('div'); wrap.className='screen'; if(!anim)wrap.style.animation='none';
+  while(phone.firstChild)wrap.appendChild(phone.firstChild);
+  phone.appendChild(wrap); phone.dataset.s=S.screen;
+  var nsc=phone.querySelector('.scroll'); if(nsc&&same&&!anim)nsc.scrollTop=top;
+  if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
+}
+function go(screen){S.screen=screen;render(true)}
+function resetFlow(){S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false}
+
+function pressKey(k){
+  if(S.screen==='number'){
+    if(k==='b'){S.digits=S.digits.slice(0,-1)}
+    else if(/\d/.test(k)&&S.digits.length<10){S.digits+=k}
+    render(false);
+  }else if(S.screen==='amount'){
+    var s=S.fresh?'':S.amount;
+    if(k==='b'){s=(S.fresh?S.amount:s).slice(0,-1)}
+    else if(k==='.'){if(s.indexOf('.')<0)s=(s===''?'0':s)+'.'}
+    else if(/\d/.test(k)){
+      var p=s.split('.');
+      if(p.length>1){if(p[1].length<2)s+=k}
+      else if(p[0].length<6){s=(p[0]==='0'?'':p[0])+k}
+    }
+    S.fresh=false; S.amount=s; render(false);
+  }
+}
+function setTheme(t){
+  S.theme=t; document.body.setAttribute('data-theme',t);
+  document.querySelectorAll('[data-act="theme"]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-theme-val')===t?'true':'false')});
+  render(false);
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]'); if(!t||t.disabled)return;
+  var a=t.getAttribute('data-act');
+  if(a==='theme')setTheme(t.getAttribute('data-theme-val'));
+  else if(a==='send'){resetFlow();go('number')}
+  else if(a==='back-home'){resetFlow();go('home')}
+  else if(a==='back-number'){S.contact=null;S.amount='';S.screen='number';render(false)}
+  else if(a==='back-amount'){go('amount')}
+  else if(a==='key')pressKey(t.getAttribute('data-k'));
+  else if(a==='pick'){var c=byId(t.getAttribute('data-id'));S.contact=c;S.digits=c.num;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
+  else if(a==='pick-new'){S.contact=null;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
+  else if(a==='next'){go('pin')}
+  else if(a==='pay'){
+    if(S.paying)return; S.paying=true; render(false);
+    setTimeout(function(){
+      S.balance=Math.round((S.balance-S.total)*100)/100; S.txn=mkTxn(); S.time=nowStr(); S.paying=false; go('done');
+    },900);
+  }
+  else if(a==='finish'){resetFlow();go('home')}
+});
+window.addEventListener('keydown',function(e){
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(S.screen!=='number'&&S.screen!=='amount')return;
+  if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
+  else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
+  else if(e.key==='.'&&S.screen==='amount'){pressKey('.');e.preventDefault()}
+  else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
+});
+render(true);
+// small test hook so the flow can be checked from the console
+window.__proto={state:S,fee:fee,render:render,go:go};
+})();
+</script>
+</body>
+</html>
