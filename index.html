@@ -55,10 +55,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .lbl{font-size:12px;font-weight:600;color:var(--muted)}
 .phone{width:390px;height:min(844px,calc(100dvh - 48px));min-height:620px;border-radius:44px;box-shadow:0 0 0 10px #1B1B1F,0 30px 80px rgba(0,0,0,.28);overflow:hidden;position:relative;background:var(--bg);flex:none}
 @media (max-width:760px){
-  .stage{flex-direction:column;justify-content:flex-start;gap:12px;padding:12px 0 0}
-  .side{width:100%;padding:0 16px;gap:10px}
-  .side h1{font-size:17px;line-height:22px}.side p,.note{display:none}
-  .phone{width:100%;height:calc(100dvh - 128px);min-height:0;border-radius:0;box-shadow:none}
+  .stage{flex-direction:column;justify-content:flex-start;align-items:stretch;gap:0;padding:0}
+  .side{width:100%;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;height:48px;flex:none}
+  .side h1{font-size:0;line-height:18px;white-space:nowrap}.side h1 .t2{font-size:14px}.side p,.note{display:none}
+  .seg{padding:2px}.seg button{height:32px;padding:0 14px;font-size:13px}
+  .phone{width:100%;height:calc(100dvh - 48px);min-height:0;border-radius:0;box-shadow:none}
 }
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);animation:fade .18s ease-out}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -136,7 +137,7 @@ img.banner{display:block;height:auto;aspect-ratio:auto;object-fit:cover;padding:
 <body data-theme="light">
 <div class="stage">
   <aside class="side">
-    <h1>telebirr redesign<br>Send money prototype</h1>
+    <h1>telebirr redesign<br><span class="t2">Send money prototype</span></h1>
     <p>Tap <b>Send money</b> on the home screen to start. Type a number like <b>0911 2</b> to see matching contacts, then change the amount to see the fee update.</p>
     <div class="seg" role="group" aria-label="Appearance">
       <button type="button" data-act="theme" data-theme-val="light" aria-pressed="true">Light</button>
