@@ -1,0 +1,16 @@
+{
+  "name": "telebirr redesign (concept)",
+  "short_name": "telebirr",
+  "description": "Unofficial concept redesign of telebirr by Hasset (Nardos).",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBFBFC",
+  "theme_color": "#8DC73F",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
