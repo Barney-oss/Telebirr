@@ -13,7 +13,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;color:var(--text);background:var
 button{font:inherit;color:inherit;cursor:pointer}
 :root,[data-theme="light"]{
   --pagebg:#E9EDE4;--panel:#FFFFFF;--panelbd:#D9DED2;
-  --bg:#FBFBFC;--homebg:#F7FAF2;--text:#1B1B1F;--muted:#62626A;
+  --bg:#FBFBFC;--homebg:#FBFBFC;--text:#1B1B1F;--muted:#62626A;
   --card:#FFFFFF;--cardsh:0 4px 16px rgba(27,27,31,.07),0 1px 3px rgba(27,27,31,.05);--cardbd:transparent;
   --line:#E6E6EA;--avbg:#EEF8E2;--avbd:#B4DA82;--avtx:#1C2E12;--ink:#1C2E12;
   --green:#8DC73F;--greenInk:#2F6B12;--link:#0187D0;--blue:#0187D0;
@@ -101,6 +101,38 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn[disabled]{opacity:.42;cursor:not-allowed}
 .err{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:18px;color:var(--err);font-weight:600}
 .mut{color:var(--muted)}
+
+/* airtime & data */
+.ico .f{fill:var(--icfill)}
+:root,[data-theme="light"]{--bt:#0078BA;--selbd:#3E7D16}
+[data-theme="dark"]{--bt:#2BA3E6;--selbd:#8DC73F}
+.tabs button{flex:1;display:flex;align-items:center;justify-content:center;height:40px;border-radius:20px;font-size:14px;font-weight:600;color:var(--muted);border:1.5px solid transparent;background:transparent;padding:0}
+.tabs button.on{background:var(--green);border-color:var(--green);color:#1C2E12;font-weight:700}
+.pill{height:36px;padding:0 16px;border-radius:18px;border:1.5px solid var(--tilebd);background:var(--card);font-size:14px;font-weight:600}
+.pill.on{background:var(--green);border-color:var(--green);color:#1C2E12;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:34px;padding:0 14px;border-radius:17px;border:1.5px solid var(--tilebd);background:var(--card);font-size:13px;font-weight:600}
+.chip.on,.sz.on,.mt.on{background:var(--tile);border-color:var(--selbd)}
+.chip.on{font-weight:700}
+.sz{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);padding:0 4px}
+.tag{margin-left:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--tile);color:var(--greenInk)}
+.buy{height:36px;padding:0 18px;border-radius:18px;border:1.5px solid var(--bt);color:var(--bt);background:transparent;font-size:14px;font-weight:700;flex:none}
+.prow{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 0}
+.lnk{margin-left:auto;background:transparent;border:0;color:var(--link);font-size:13px;font-weight:600;padding:8px 0 8px 12px}
+.hbtn{width:40px;height:40px;border-radius:20px;background:var(--tile);border:1.5px solid var(--tilebd);display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+.tl{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border-radius:18px;background:var(--card);border:1.5px solid var(--tilebd)}
+.tsm,.tbig{display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd);flex:none}
+.tsm{width:36px;height:36px;border-radius:12px}
+.tbig{width:52px;height:52px;border-radius:17px}
+.hero{display:flex;align-items:center;gap:14px;width:100%;padding:14px;border-radius:22px;background:var(--card);border:1.5px solid var(--tilebd)}
+.mt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;position:relative;padding:12px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--card)}
+.mk{position:absolute;right:10px;top:10px;width:22px;height:22px;border-radius:11px;box-sizing:border-box;border:1.5px solid var(--dot);display:flex;align-items:center;justify-content:center}
+.mk.on{background:var(--green);border-color:var(--green)}
+.pinbtn{display:flex;gap:16px;background:transparent;border:0;padding:4px;border-radius:20px}
+.pinbtn[disabled]{cursor:default}
+.tl2{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text);background:transparent;border:0;padding:0}
+.hcard.vrow{flex-direction:row;align-items:center;width:100%;text-align:left}
+.home .tile-air{pointer-events:auto;cursor:pointer;font-family:inherit}
 /* home */
 .home{min-height:100%;display:flex;flex-direction:column;background:var(--homebg)}
 .home *{pointer-events:none}
@@ -261,7 +293,7 @@ function homeHTML(){
    '<span style="display:flex;align-items:center;gap:6px;min-height:30px;margin-top:12px;font-size:14px;font-weight:700;padding:0 12px 0 16px;border-radius:15px;background:var(--vt);border:1px solid var(--vtbd)">View transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></div>'+
    '<div class="hcard" style="padding:16px"><div class="grid4" style="gap:12px">'+
    '<button type="button" class="wide tile-send hint" data-act="send" aria-label="Send money, start the prototype">'+iSend+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text)">Send money</span></button>'+
-   '<div class="wide">'+iAir+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text);white-space:nowrap">Airtime &amp; data</span></div>'+
+   '<button type="button" class="wide tile-send tile-air" data-act="airtime" aria-label="Airtime and data">'+iAir+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button>'+
    tcol(iCash,'Cash')+tcol(iLoan,'Loans')+tcol(iBank,'To bank')+tcol(iShop,'Merchant')+'</div></div>'+
    '<div class="hcard"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>My shortcuts</h2><span class="mut" style="font-size:13px">Your own services, one tap away</span></div><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:16px 12px">'+
    tcol(iBill,'Pay bills')+tcol(iZem,'Zemen')+tcol(iPark,'Parking')+
@@ -362,11 +394,158 @@ function doneHTML(){
   '</div></div><div class="btnwrap" style="padding:8px 16px 28px"><button type="button" class="btn" data-act="finish">Finished</button></div>';
 }
 
+/* ---------- Airtime & data ---------- */
+var IC={
+ data:'<path d="M4 8Q4 3.5 8.5 3.5h7Q20 3.5 20 8v2H4Z" class="f" stroke="none"/><rect x="4" y="3.5" width="16" height="17" rx="5"/><path d="M12 8v8M9 13l3 3 3-3"/>',
+ calls:'<path d="M3.5 5.5Q3.5 4 5 4h2.6l1.6 4-1.9 1.3Q9 13 12.7 15.7L14 13.8l4 1.6V19q0 1.5-1.5 1.5C9 20.5 3.5 14 3.5 5.5Z" class="f"/><path d="M14 3.5h6.5v5H17l-2 2Z"/>',
+ bundles:'<path d="M3.5 8 12 3.5 20.5 8 12 12.5Z" class="f" stroke="none"/><path d="M3.5 8 12 3.5 20.5 8v8.5L12 21l-8.5-4.5Z"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5V21"/>',
+ social:'<path d="M3.5 12a8.5 8.5 0 0 1 8.5-8.5V12Z" class="f" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M10 8.8v6.4l5.2-3.2Z"/>',
+ intl:'<path d="M3.5 12a8.5 8.5 0 0 1 8.5-8.5c-3 3-3 14 0 17A8.5 8.5 0 0 1 3.5 12Z" class="f" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c-3 3-3 14 0 17M12 3.5c3 3 3 14 0 17"/>',
+ offers:'<path d="M12 3.5 14.6 9l6 .8-4.4 4.1 1.1 6L12 17l-5.3 2.9 1.1-6L3.4 9.8l6-.8Z" class="f" stroke-linejoin="round"/>',
+ heart:'<path d="M12 20S4 15 4 9.5A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 8 2C20 15 12 20 12 20Z" class="f"/>',
+ heart0:'<path d="M12 20S4 15 4 9.5A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 8 2C20 15 12 20 12 20Z" style="fill:none;stroke:var(--muted)"/>',
+ clock:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M12 7.5V12l3 2"/>',
+ fire:'<path d="M12 3.5Q17.5 8 17.5 13.5a5.5 5.5 0 0 1-11 0Q6.5 10.5 9 8.5 9.5 11 11 11.5 11 7.5 12 3.5Z" class="f"/>',
+ 'new':'<path d="M12 3.5 14 9l5.5 2-5.5 2-2 5.5L10 13 4.500 11 10 9Z" class="f"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/>',
+ scan:'<path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M4 12h16"/>',
+ chev:'<path d="M9 5l7 7-7 7"/>'
+};
+function ico(n,px){return '<svg width="'+px+'" height="'+px+'" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ico">'+IC[n]+'</svg>'}
+function mut(n,px){return '<svg width="'+px+'" height="'+px+'" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
+
+var EXP={Hourly:'In 1 hour',Daily:'Today, 11:59 PM',Weekly:'In 7 days',Monthly:'In 30 days',Long:'In 90 days',Night:'Tonight, 6:00 AM'};
+function mkSet(chip,arr,sub,inc){return arr.map(function(a){return {n:a[0],p:a[1],sub:sub,e:EXP[chip]||a[2]||'In 7 days',inc:inc?inc(a[0]):null}})}
+var CAT={
+ data:{t:'Data',ph:'Search in Data',cols:3,label:'Pick a size',chips:['Hourly','Daily','Weekly','Monthly','Long'],def:1,sel:3,
+  sets:[[['60 MB',3],['120 MB',5],['250 MB',9],['500 MB',15],['1 GB',25],['1.5 GB',35]],
+        [['120 MB',5],['360 MB',15],['720 MB',25],['1.2 GB',37],['2.4 GB',70],['3.6 GB',95]],
+        [['1 GB',60],['3 GB',140],['5 GB',220],['8 GB',320],['12 GB',450],['15 GB',550]],
+        [['5 GB',250],['10 GB',420],['20 GB',700],['40 GB',1100],['60 GB',1500],['100 GB',2200]],
+        [['30 GB',1800],['60 GB',3200],['120 GB',5500],['200 GB',8000],['300 GB',11000],['500 GB',16000]]]},
+ calls:{t:'Calls & SMS',ph:'Search calls and SMS',cols:3,label:'Pick a package',chips:['Daily','Weekly','Monthly','Night'],def:0,sel:1,
+  sets:[[['10 min',12],['30 min',30],['60 min',55],['36 SMS',3],['100 SMS',8],['250 SMS',20]],
+        [['60 min',90],['150 min',200],['300 min',350],['200 SMS',25],['500 SMS',55],['1000 SMS',100]],
+        [['200 min',280],['500 min',600],['1000 min',1100],['1000 SMS',150],['3000 SMS',400],['5000 SMS',600]],
+        [['30 min',10],['60 min',18],['120 min',30],['200 min',45],['300 min',60],['500 min',90]]]},
+ bundles:{t:'Bundles',ph:'Search bundles',cols:2,label:'Pick a bundle',chips:['Daily','Weekly','Monthly'],def:0,sel:0,
+  sets:[[['1 GB + 20 min',45],['2 GB + 50 min',85],['5 GB + 100 min',190],['10 GB + 200 min',350]],
+        [['3 GB + 100 min',180],['8 GB + 250 min',400],['15 GB + 500 min',700],['30 GB + 1000 min',1200]],
+        [['10 GB + 300 min',500],['25 GB + 700 min',1000],['50 GB + 1500 min',1800],['100 GB + 3000 min',3200]]],
+  inc:function(n){var p=n.split(' + ');return p[0]+' data, '+p[1]+' calls'}},
+ social:{t:'Social & streaming',ph:'Search social and streaming',cols:2,label:'Pick a package',chips:['Social','Video','Music','TV'],def:0,sel:0,
+  sets:[[['Social 500 MB',20],['Social 2 GB',60],['Social 5 GB',130],['Social 10 GB',220]],
+        [['Video 1 GB',40],['Video 4 GB',120],['Video 10 GB',260],['Video 20 GB',450]],
+        [['Music 1 GB',30],['Music 3 GB',70],['Music 8 GB',150],['Music 15 GB',250]],
+        [['TV 1 day',40],['TV 7 days',180],['TV 30 days',600],['TV 90 days',1500]]],
+  inc:function(){return 'Chat and social apps'}},
+ intl:{t:'International',ph:'Search a country',cols:2,label:'Pick a package',chips:['Roaming','Calls','Data'],def:0,sel:0,
+  sets:[[['Saudi Arabia 1 GB',450],['Kenya 1 GB',380],['UAE 1 GB',420],['USA 1 GB',600]],
+        [['Saudi Arabia 30 min',300],['Kenya 30 min',250],['UAE 30 min',280],['USA 30 min',400]],
+        [['Saudi Arabia 5 GB',1500],['Kenya 5 GB',1200],['UAE 5 GB',1400],['USA 5 GB',2000]]],
+  inc:function(n){return 'Valid in '+n.split(' ').slice(0,-2).join(' ')}},
+ offers:{t:'Offers & for you',ph:'Search offers',cols:2,label:'Offers for you',chips:['For you','Weekend','Students','Business'],def:0,sel:0,
+  sets:[[['Weekend 4 GB',60],['Student 6 GB',100],['Night 2 GB',15],['Business 20 GB',500]],
+        [['Weekend 4 GB',60],['Weekend 10 GB',130],['Weekend 100 min',90],['Weekend bundle',190]],
+        [['Student 6 GB',100],['Student 15 GB',220],['Student 200 min',120],['Student bundle',280]],
+        [['Business 20 GB',500],['Business 50 GB',1100],['Business 100 GB',1900],['Business 1000 min',800]]]}
+};
+var CATKEYS=['data','calls','bundles','social','intl','offers'];
+var BROWSE_SUB={data:'Internet, 5G, extenders',calls:'Voice, night, SMS',bundles:'Voice + data, unlimited',social:'Social, DSTV',intl:'Roaming, calls, Umrah',offers:'Weekend, students, business'};
+function typeItems(){var c=CAT[S.pk.type],ch=c.chips[S.pk.chip];return mkSet(ch,c.sets[S.pk.chip],ch+(S.pk.type==='data'?' data':''),c.inc).map(function(x){x.k=S.pk.type;return x})}
+var FAVSEED=[{n:'1.2 GB',p:37,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line:'Daily · until midnight'},{n:'3 GB',p:140,sub:'Weekly data',e:'In 7 days',k:'data',line:'Weekly · 7 days'}];
+var FREQ=[{n:'720 MB',p:25,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line:'Daily · bought 8 times'},{n:'4.8 GB',p:200,sub:'Weekly data',e:'In 7 days',k:'data',line:'Weekly · bought 5 times'},{n:'2.4 GB',p:150,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · bought 3 times'}];
+var POP=[{n:'1.2 GB',p:37,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line:'Daily · until midnight',tag:'Data'},{n:'3 GB',p:140,sub:'Weekly data',e:'In 7 days',k:'data',line:'Weekly · 7 days',tag:'Data'},{n:'Night pack',p:20,sub:'Night calls',e:'Tonight, 6:00 AM',k:'calls',line:'Calls · 10 PM to 6 AM',tag:'Calls'},{n:'12 GB',p:550,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · 30 days',tag:'Data'}];
+var NEWP=[{n:'5G Boost 20 GB',p:500,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · 30 days',tag:'New'},{n:'Student 6 GB',p:100,sub:'Weekly offer',e:'In 7 days',k:'offers',line:'Weekly · 7 days',tag:'New'},{n:'Weekend 4 GB',p:60,sub:'Weekend offer',e:'Sunday, 11:59 PM',k:'offers',line:'Sat and Sun',tag:'New'}];
+S.pk={tab:'freq',type:'data',chip:1,sel:3,favs:FAVSEED.slice(),method:'bal',item:null,from:'pkg',air:50,reward:86.4,err:''};
+function itemKey(it){return it.n+'|'+it.sub}
+function isFav(it){for(var i=0;i<S.pk.favs.length;i++)if(itemKey(S.pk.favs[i])===itemKey(it))return true;return false}
+function toggleFav(it){var f=S.pk.favs;for(var i=0;i<f.length;i++)if(itemKey(f[i])===itemKey(it)){f.splice(i,1);return}f.push({n:it.n,p:it.p,sub:it.sub,e:it.e,k:it.k,line:it.sub+' · '+it.e})}
+function openConfirm(it,from){S.pk.item=it;S.pk.from=from;S.pk.method='bal';S.pk.err='';S.paying=false;go('confirm')}
+
+function tgl(on){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on===0?'on':'')+'" data-act="tab-air">Airtime</button><button type="button" class="'+(on===1?'on':'')+'" data-act="tab-pkg">Packages</button></div>'}
+function numfield(){return '<div class="input" style="border-color:var(--tilebd);margin:0"><span class="val">+251 982 254 883</span><span style="height:32px;padding:0 14px;border-radius:16px;display:flex;align-items:center;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none">Change</span></div>'}
+function searchbar(ph){return '<div class="input" style="height:48px;border-radius:24px;border-color:var(--tilebd);padding:0 16px;margin:0;flex:none">'+ico('search',20)+'<span class="mut" style="font-size:14px">'+ph+'</span></div>'}
+function btn56(label,act){return '<div class="btnwrap" style="padding:12px 16px 24px"><button type="button" class="btn" style="height:56px;border-radius:28px;font-size:18px;box-shadow:0 8px 16px rgba(1,135,208,.30)" data-act="'+act+'">'+label+'</button></div>'}
+function buyRow(it,i,fromTab,tag){
+  return '<div class="prow"'+(i?' style="border-top:1px solid var(--line)"':'')+'><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:17px;font-weight:800;line-height:21px;display:flex;align-items:center">'+it.n+(tag?'<span class="tag">'+tag+'</span>':'')+'</span><span class="mut" style="font-size:12px">'+it.line+'</span></span><span style="font-size:15px;font-weight:800">'+it.p+' ETB</span><button type="button" class="buy" data-act="buy" data-src="'+fromTab+'" data-i="'+i+'">Buy</button></div>'}
+function listCard(title,icon,rows,more){
+  return '<div class="hcard" style="padding:0 16px 4px;gap:0"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);padding:12px 0 2px">'+(icon?ico(icon,16):'')+title+(more?'<button type="button" class="lnk" data-act="favs">See all</button>':'')+'</span>'+rows+'</div>'}
+function pkgHTML(){
+  var p=S.pk,tabs=[['freq','Frequent'],['browse','Browse'],['pop','Popular'],['new','New']];
+  var pills='<div style="display:flex;gap:8px;flex:none">'+tabs.map(function(t){return '<button type="button" class="pill'+(p.tab===t[0]?' on':'')+'" data-act="ptab" data-k="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+  var body='';
+  if(p.tab==='freq'){
+    var fav=p.favs.map(function(it,i){return buyRow(it,i,'fav')}).join('');
+    var fr=FREQ.map(function(it,i){return buyRow(it,i,'freq')}).join('');
+    body=(p.favs.length?listCard('Favorites','heart',fav,true):'')+listCard('You buy often','',fr)
+  }else if(p.tab==='pop'){body=listCard('Popular this week','fire',POP.map(function(it,i){return buyRow(it,i,'pop',it.tag)}).join(''))}
+  else if(p.tab==='new'){body=listCard('New packages','new',NEWP.map(function(it,i){return buyRow(it,i,'new',it.tag)}).join(''))}
+  else{
+    var d=CAT.data,small=CATKEYS.slice(1).map(function(k){return '<button type="button" class="tl" data-act="type" data-k="'+k+'"><span class="tsm">'+ico(k,22)+'</span><span style="font-size:14px;font-weight:700;line-height:17px;text-align:left">'+CAT[k].t+'</span></button>'}).join('');
+    body='<div style="display:flex;align-items:baseline;justify-content:space-between"><h2 style="margin:0;font-size:16px;font-weight:700">Browse by type</h2><span class="mut" style="font-size:12px">6 types</span></div>'+
+     '<button type="button" class="hero" data-act="type" data-k="data"><span class="tbig">'+ico('data',30)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:17px;font-weight:700">Data</span><span class="mut" style="font-size:12px">Most bought. From 5 ETB a day</span></span>'+mut('chev',20)+'</button>'+
+     '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'+small+'</div>';
+  }
+  return topbar('Airtime &amp; data','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+tgl(1)+numfield()+searchbar('Search packages, e.g. 3 GB')+pills+body+'</div></div>';
+}
+function typeHTML(){
+  var p=S.pk,c=CAT[p.type],items=typeItems(),cur=items[p.sel]||items[0];
+  var chips='<div class="chips">'+c.chips.map(function(n,i){return '<button type="button" class="chip'+(i===p.chip?' on':'')+'" data-act="chip" data-k="'+i+'">'+n+'</button>'}).join('')+'</div>';
+  var tall=c.cols===3?76:68,fs=c.cols===3?19:16;
+  var grid='<div style="display:grid;grid-template-columns:repeat('+c.cols+',minmax(0,1fr));gap:8px">'+items.map(function(it,i){return '<button type="button" class="sz'+(i===p.sel?' on':'')+'" style="height:'+tall+'px" data-act="sel" data-k="'+i+'"><span style="font-size:'+fs+'px;font-weight:800;line-height:'+(fs+4)+'px">'+it.n+'</span><span style="font-size:12px;font-weight:600;opacity:.8">'+it.p+' ETB</span></button>'}).join('')+'</div>';
+  function row(a,b){return '<span style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span class="mut">'+a+'</span><span style="font-weight:600;text-align:right">'+b+'</span></span>'}
+  var fav=isFav(cur);
+  var det='<div class="hcard" style="border-radius:20px"><span style="display:flex;align-items:center;gap:10px"><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:24px;font-weight:800;line-height:28px">'+cur.n+'</span><span class="mut" style="font-size:13px">'+cur.sub+'</span></span><button type="button" class="hbtn" data-act="fav" aria-pressed="'+fav+'" aria-label="'+(fav?'Remove from':'Add to')+' favorites">'+ico(fav?'heart':'heart0',20)+'</button></span><div class="divider"></div>'+(cur.inc?row('Includes',cur.inc):'')+row('Expires',cur.e)+'<span style="display:flex;justify-content:space-between;align-items:baseline"><span class="mut" style="font-size:14px">Price</span><span style="font-size:24px;font-weight:800;color:var(--bt)">'+cur.p+' ETB</span></span></div>';
+  return topbar(c.t,'back-pkg')+'<div class="scroll"><div class="body" style="padding-top:4px">'+searchbar(c.ph)+chips+'<span class="lbl">'+c.label+'</span>'+grid+det+'</div></div>'+btn56('Next','next-type');
+}
+function airHTML(){
+  var a=S.pk.air;
+  var qs=[10,20,50,100,200,500].map(function(n){return '<button type="button" class="sz'+(n===a?' on':'')+'" style="height:56px;flex-direction:row;gap:4px" data-act="air" data-k="'+n+'"><span style="font-size:18px;font-weight:800">'+n+'</span><span style="font-size:12px;font-weight:600;opacity:.8">ETB</span></button>'}).join('');
+  return topbar('Airtime &amp; data','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+tgl(0)+numfield()+
+   '<div class="hcard" style="border-radius:24px;padding:18px 20px;gap:6px"><span class="lbl">Amount</span><span style="display:flex;align-items:baseline;gap:8px"><span style="font-size:44px;line-height:50px;font-weight:800;letter-spacing:-.5px">'+a+'</span><span class="caret" style="height:36px;align-self:center;margin-left:-4px"></span><span class="mut" style="font-size:18px;font-weight:700">ETB</span></span><span class="mut" style="font-size:12px">From 5 to 1,000 ETB</span></div>'+
+   '<span class="lbl">Quick amounts</span><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'+qs+'</div>'+
+   '<button type="button" class="hcard vrow" data-act="voucher"><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">Recharge with a voucher</span><span class="mut" style="font-size:12px">Scan or type your scratch card code</span></span>'+mut('chev',20)+'</button></div></div>'+btn56('Next','next-air');
+}
+function voucherHTML(){
+  return topbar('Recharge with voucher','back-air')+'<div class="scroll"><div class="body" style="padding-top:4px">'+
+   '<div class="hcard" style="border-radius:24px;padding:18px 20px;gap:8px"><span class="lbl">Voucher code</span><span style="display:flex;align-items:center;font-size:26px;font-weight:700;letter-spacing:2px;height:44px">1234 5678 9012<span class="caret" style="height:28px;margin-left:2px"></span></span><span class="mut" style="font-size:12px">Scratch the card to reveal the code</span></div>'+
+   '<span style="align-self:flex-start;height:44px;padding:0 18px;border-radius:22px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;background:var(--card);border:1.5px solid var(--tilebd)">'+ico('scan',20)+'Scan with camera</span>'+
+   '<div class="hcard" style="padding:4px 16px;border-radius:20px"><div style="display:flex;justify-content:space-between;min-height:44px;align-items:center"><span class="mut" style="font-size:14px">Recharging</span><span style="font-size:14px;font-weight:600">+251 982 254 883</span></div></div></div></div>'+btn56('Recharge','recharge');
+}
+function favsHTML(){
+  var f=S.pk.favs;
+  var rows=f.map(function(it,i){return '<div class="prow"'+(i?' style="border-top:1px solid var(--line)"':'')+'><button type="button" class="hbtn" style="background:transparent;border:0;width:28px" data-act="unfav" data-i="'+i+'" aria-label="Remove '+it.n+' from favorites">'+ico('heart',20)+'</button><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:17px;font-weight:800;line-height:21px">'+it.n+'</span><span class="mut" style="font-size:12px">'+it.line+'</span></span><span style="font-size:15px;font-weight:800">'+it.p+' ETB</span><button type="button" class="buy" data-act="buy" data-src="fav" data-i="'+i+'">Buy</button></div>'}).join('');
+  return topbar('Favorites','back-pkg')+'<div class="scroll"><div class="body" style="padding-top:4px">'+(f.length?'<div class="hcard" style="padding:0 16px;gap:0">'+rows+'</div>':'<div style="text-align:center;padding:40px 24px" class="mut">No favorites yet</div>')+'<span class="mut" style="font-size:12px;text-align:center">Tap the heart on any package to add it here</span></div></div>';
+}
+function confirmHTML(){
+  var p=S.pk,it=p.item,bal=money(S.balance),rew=money(p.reward);
+  function meth(k,name,amt){var on=p.method===k;return '<button type="button" class="mt'+(on?' on':'')+'" data-act="method" data-k="'+k+'" aria-pressed="'+on+'"><span style="font-size:15px;font-weight:700">'+name+'</span><span class="mut" style="font-size:12px">'+amt+' ETB</span><span class="mk'+(on?' on':'')+'">'+(on?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':'')+'</span></button>'}
+  var dots='';for(var i=0;i<6;i++)dots+='<span style="width:26px;height:26px;border-radius:13px;box-sizing:border-box;'+(i<3?'background:#8DC73F;border:2px solid #8DC73F':'border:2px solid var(--dot)')+'"></span>';
+  return topbar('Confirm payment','back-from')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="width:52px;height:52px;border-radius:17px">'+ico(it.k||'data',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+it.n+(it.kind?'':' '+it.sub.split(' ')[0])+'</span><span class="mut" style="font-size:14px">+251 982 254 883</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(it.p)+' ETB</span><span class="mut" style="font-size:13px">No fee'+(it.e?' · expires '+it.e.charAt(0).toLowerCase()+it.e.slice(1):'')+'</span></div>'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Pay with</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+meth('bal','Balance',bal)+meth('rew','Reward',rew)+'</div>'+(p.err?'<span class="err">'+I.warn+p.err+'</span>':'')+'</div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span><button type="button" class="pinbtn hint" data-act="pay2" aria-label="PIN already entered for this demo, tap to pay"'+(S.paying?' disabled':'')+'>'+dots+'</button><span style="font-size:13px;font-weight:500;color:var(--muted)">'+(S.paying?'Processing...':'Forgot PIN?')+'</span></div></div></div></div>'+keypad('pin');
+}
+function pkgDoneHTML(){
+  var p=S.pk,it=p.item,credit=it.kind==='voucher';
+  function line(a,b,i,bold){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+a+'</span><span style="font-size:'+(bold?16:14)+'px;font-weight:'+(bold?800:600)+'">'+b+'</span></div>'}
+  var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
+  var fav=isFav(it);
+  return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px 0;height:60px;flex:none;color:var(--text)">'+
+   '<button type="button" class="tl2" data-act="fav2">'+ico(fav?'heart':'heart0',22)+'Favorite</button><span class="tl2" style="pointer-events:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.6" style="fill:var(--icfill)"/><circle cx="18" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6"/></svg>Share</span></div>'+
+   '<div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">'+(credit?'+':'-')+money(it.p)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px"><span class="tbig" style="width:48px;height:48px;border-radius:16px">'+ico(it.k||'data',26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:18px;font-weight:700">'+it.n+(it.kind?'':' '+it.sub.split(' ')[0])+'</span><span class="mut" style="font-size:13px">+251 982 254 883</span></span></div>'+
+   '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(it.e?line('Expires',it.e,0):'')+line(credit?'Added to':'Paid with',credit?'Balance':(p.method==='rew'?'Reward balance':'Balance'),it.e?1:0)+line('Transaction ID',S.txn,2)+'</div></div></div>'+btn56('Done','finish2');
+}
+
 /* ---------- render ---------- */
 var phone=$('#phone');
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,amount:amountHTML,pin:pinHTML,done:doneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -422,6 +601,38 @@ document.addEventListener('click',function(e){
     },900);
   }
   else if(a==='finish'){resetFlow();go('home')}
+  else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
+  else if(a==='tab-air'){go('air')}
+  else if(a==='tab-pkg'){go('pkg')}
+  else if(a==='ptab'){S.pk.tab=t.getAttribute('data-k');render(false)}
+  else if(a==='type'){var k=t.getAttribute('data-k');S.pk.type=k;S.pk.chip=CAT[k].def;S.pk.sel=CAT[k].sel;go('type')}
+  else if(a==='chip'){S.pk.chip=+t.getAttribute('data-k');S.pk.sel=Math.min(CAT[S.pk.type].sel,typeItems().length-1);render(false)}
+  else if(a==='sel'){S.pk.sel=+t.getAttribute('data-k');render(false)}
+  else if(a==='fav'){toggleFav(typeItems()[S.pk.sel]);render(false)}
+  else if(a==='fav2'){toggleFav(S.pk.item);render(false)}
+  else if(a==='unfav'){S.pk.favs.splice(+t.getAttribute('data-i'),1);render(false)}
+  else if(a==='favs'){go('favs')}
+  else if(a==='back-pkg'){go('pkg')}
+  else if(a==='back-air'){go('air')}
+  else if(a==='back-from'){go(S.pk.from)}
+  else if(a==='buy'){var src={fav:S.pk.favs,freq:FREQ,pop:POP,new:NEWP}[t.getAttribute('data-src')];openConfirm(src[+t.getAttribute('data-i')],S.screen)}
+  else if(a==='next-type'){openConfirm(typeItems()[S.pk.sel],'type')}
+  else if(a==='air'){S.pk.air=+t.getAttribute('data-k');render(false)}
+  else if(a==='next-air'){openConfirm({n:'Airtime top-up',p:S.pk.air,sub:'Airtime',kind:'air',k:'calls',e:null},'air')}
+  else if(a==='voucher'){go('voucher')}
+  else if(a==='recharge'){S.pk.item={n:'Voucher recharge',p:100,sub:'Voucher',kind:'voucher',k:'offers',e:null};S.pk.method='bal';S.balance=Math.round((S.balance+100)*100)/100;S.txn=mkTxn();S.time=nowStr();go('pkgdone')}
+  else if(a==='method'){S.pk.method=t.getAttribute('data-k');S.pk.err='';render(false)}
+  else if(a==='pay2'){
+    if(S.paying)return;
+    var it=S.pk.item,rw=S.pk.method==='rew';
+    if(it.p>(rw?S.pk.reward:S.balance)){S.pk.err=rw?'Not enough Reward balance. Choose Balance instead.':'Not enough balance.';render(false);return}
+    S.pk.err='';S.paying=true;render(false);
+    setTimeout(function(){
+      if(rw)S.pk.reward=Math.round((S.pk.reward-it.p)*100)/100;else S.balance=Math.round((S.balance-it.p)*100)/100;
+      S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
+    },900);
+  }
+  else if(a==='finish2'){resetFlow();go('home')}
 });
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
