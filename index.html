@@ -458,16 +458,16 @@ var FAVSEED=[{n:'1.2 GB',p:37,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line
 var FREQ=[{n:'720 MB',p:25,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line:'Daily · bought 8 times'},{n:'4.8 GB',p:200,sub:'Weekly data',e:'In 7 days',k:'data',line:'Weekly · bought 5 times'},{n:'2.4 GB',p:150,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · bought 3 times'}];
 var POP=[{n:'1.2 GB',p:37,sub:'Daily data',e:'Today, 11:59 PM',k:'data',line:'Daily · until midnight',tag:'Data'},{n:'3 GB',p:140,sub:'Weekly data',e:'In 7 days',k:'data',line:'Weekly · 7 days',tag:'Data'},{n:'Night pack',p:20,sub:'Night calls',e:'Tonight, 6:00 AM',k:'calls',line:'Calls · 10 PM to 6 AM',tag:'Calls'},{n:'12 GB',p:550,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · 30 days',tag:'Data'}];
 var NEWP=[{n:'5G Boost 20 GB',p:500,sub:'Monthly data',e:'In 30 days',k:'data',line:'Monthly · 30 days',tag:'New'},{n:'Student 6 GB',p:100,sub:'Weekly offer',e:'In 7 days',k:'offers',line:'Weekly · 7 days',tag:'New'},{n:'Weekend 4 GB',p:60,sub:'Weekend offer',e:'Sunday, 11:59 PM',k:'offers',line:'Sat and Sun',tag:'New'}];
-S.pk={num:'+251 982 254 883',picking:false,tab:'freq',type:'data',chip:1,sel:3,favs:FAVSEED.slice(),method:'bal',item:null,from:'pkg',air:50,reward:86.4,err:''};
+S.pk={who:{ini:'NM'},num:'+251 982 254 883',picking:false,tab:'freq',type:'data',chip:1,sel:3,favs:FAVSEED.slice(),method:'bal',item:null,from:'pkg',air:50,reward:86.4,err:''};
 function itemKey(it){return it.n+'|'+it.sub}
 function isFav(it){for(var i=0;i<S.pk.favs.length;i++)if(itemKey(S.pk.favs[i])===itemKey(it))return true;return false}
 function toggleFav(it){var f=S.pk.favs;for(var i=0;i<f.length;i++)if(itemKey(f[i])===itemKey(it)){f.splice(i,1);return}f.push({n:it.n,p:it.p,sub:it.sub,e:it.e,k:it.k,line:it.sub+' · '+it.e})}
-function setNum(n){S.pk.num='+251 '+n.slice(1,4)+' '+n.slice(4,7)+' '+n.slice(7);S.pk.picking=false;S.digits='';go(S.pk.back)}
+function setNum(n,c){S.pk.who=c||null;S.pk.num='+251 '+n.slice(1,4)+' '+n.slice(4,7)+' '+n.slice(7);S.pk.picking=false;S.digits='';go(S.pk.back)}
 function sfx(it){return it.sub.indexOf('Long validity')===0?'Long validity':it.sub.split(' ')[0]}
 function openConfirm(it,from){S.pk.item=it;S.pk.from=from;S.pk.method='bal';S.pk.err='';S.paying=false;go('confirm')}
 
 function tgl(on){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on===0?'on':'')+'" data-act="tab-air">Airtime</button><button type="button" class="'+(on===1?'on':'')+'" data-act="tab-pkg">Packages</button></div>'}
-function numfield(){return '<div class="input" style="border-color:var(--tilebd);margin:0"><span class="val">'+S.pk.num+'</span><button type="button" data-act="chg" style="height:32px;padding:0 14px;border-radius:16px;display:flex;align-items:center;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none">Change</button></div>'}
+function numfield(){return '<div class="input" style="border-color:var(--tilebd);margin:0">'+avatar(S.pk.who,36,13)+'<span class="val">'+S.pk.num+'</span><button type="button" data-act="chg" style="height:32px;padding:0 14px;border-radius:16px;display:flex;align-items:center;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none">Change</button></div>'}
 function searchbar(ph){return '<div class="input" style="height:48px;border-radius:24px;border-color:var(--tilebd);padding:0 16px;margin:0;flex:none">'+ico('search',20)+'<span class="mut" style="font-size:14px">'+ph+'</span></div>'}
 function btn56(label,act){return '<div class="btnwrap" style="padding:12px 16px 24px"><button type="button" class="btn" style="height:56px;border-radius:28px;font-size:18px;box-shadow:0 8px 16px rgba(1,135,208,.30)" data-act="'+act+'">'+label+'</button></div>'}
 function buyRow(it,i,fromTab,tag){
@@ -594,7 +594,7 @@ document.addEventListener('click',function(e){
   else if(a==='back-number'){S.contact=null;S.amount='';S.screen='number';render(false)}
   else if(a==='back-amount'){go('amount')}
   else if(a==='key')pressKey(t.getAttribute('data-k'));
-  else if(a==='pick'&&S.pk.picking){setNum(byId(t.getAttribute('data-id')).num)}
+  else if(a==='pick'&&S.pk.picking){var cc=byId(t.getAttribute('data-id'));setNum(cc.num,cc)}
   else if(a==='pick-new'&&S.pk.picking){setNum(S.digits)}
   else if(a==='chg'){S.pk.picking=true;S.pk.back=S.screen;S.digits='';go('number')}
   else if(a==='back-pick'){S.pk.picking=false;S.digits='';go(S.pk.back)}
