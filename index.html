@@ -382,7 +382,7 @@ function amountHTML(){
 function pinDots(){
   var n=S.pin.length,d='';
   for(var i=0;i<6;i++)d+='<span style="width:26px;height:26px;border-radius:13px;box-sizing:border-box;'+(i<n?'background:#8DC73F;border:2px solid #8DC73F':'border:2px solid var(--dot)')+'"></span>';
-  return '<div class="pinbtn" role="img" aria-label="'+n+' of 6 digits entered">'+d+'</div>'+(S.paying?'<span style="font-size:13px;font-weight:600;color:var(--muted)">Processing...</span>':'')+'<span style="font-size:12.5px;font-weight:600;color:var(--softink);background:var(--totalbg);border-radius:10px;padding:6px 12px;text-align:center">Prototype only. Don't enter your real PIN.</span>';
+  return '<div class="pinbtn" role="img" aria-label="'+n+' of 6 digits entered">'+d+'</div>'+(S.paying?'<span style="font-size:13px;font-weight:600;color:var(--muted)">Processing...</span>':'')+'<span style="font-size:12.5px;font-weight:600;color:var(--softink);background:var(--totalbg);border-radius:10px;padding:6px 12px;text-align:center">Prototype only. Don\'t enter your real PIN.</span>';
 }
 function pinHTML(){
   var a=amountVal(), f=fee(a), tot=a+f; S.total=tot;
