@@ -66,12 +66,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (max-width:760px){
   .seg .ic{display:block}
   .stage{display:block;padding:0}
-  .side{position:fixed;top:6px;right:68px;left:auto;transform:none;z-index:50;width:auto;padding:0;gap:0}
+  .side{position:relative;display:flex;justify-content:flex-end;align-items:center;height:40px;box-sizing:border-box;padding:0 12px;gap:0;width:auto;transform:none;background:var(--bg)}
   .side h1,.side p,.note{display:none}
   .seg{padding:2px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
   .seg button{width:38px;height:30px;padding:0;display:flex;align-items:center;justify-content:center}
   .seg .tx{display:none}
-  .phone{width:100%;height:100dvh;min-height:0;border-radius:0;box-shadow:none}
+  .phone{width:100%;height:calc(100dvh - 40px);min-height:0;border-radius:0;box-shadow:none}
 }
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);animation:fade .18s ease-out}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -146,9 +146,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .home *{pointer-events:none}
 .home .tbank{pointer-events:auto;cursor:pointer;background:transparent;border:0;padding:0;font-family:inherit;color:inherit;width:100%}
 .tbank:focus-visible{outline:3px solid var(--link);outline-offset:2px;border-radius:18px}
-.scrim{position:absolute;inset:0;background:rgba(0,0,0,.38);border:0;padding:0;width:100%}
+.scrim{z-index:20;position:absolute;inset:0;background:rgba(0,0,0,.38);border:0;padding:0;width:100%}
 [data-theme="dark"] .scrim{background:rgba(0,0,0,.6)}
-.sheetp{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:28px 28px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:12px;padding:10px 16px 0;overflow:hidden}
+.sheetp{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:28px 28px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:12px;padding:10px 16px 0;overflow:hidden;z-index:21}
 [data-theme="dark"] .sheetp{border-top:1px solid var(--line)}
 .btn.danger{background:#C62828;color:#fff;box-shadow:none}
 [data-theme="dark"] .btn.danger{background:#FF8A80;color:#2A0A08}
@@ -161,6 +161,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bal{background:var(--balbg);border-radius:28px;padding:22px 20px 16px;display:flex;flex-direction:column;align-items:center;color:var(--balink);position:relative;z-index:0;overflow:hidden;border:1px solid var(--balbd);box-shadow:var(--balsh)}
 .bal .rings{position:absolute;right:0;bottom:0;z-index:-1}
 .bal .logo{position:absolute;top:16px;left:18px;height:36px;width:auto}
+.bal2{align-items:stretch;gap:12px;padding:16px;border-radius:24px}
+.bal2 .rings{width:220px;height:220px;right:-20px;bottom:-24px}
+.hlogo{height:24px;width:auto;flex:none}
+[data-theme="dark"] .hlogo{filter:invert(1)}
+.home .hero{pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:14px;height:64px;box-sizing:border-box;padding:0 18px;border-radius:22px;background:var(--tile);border:1.5px solid var(--tilebd);font-family:inherit;width:100%}
+.home .fav,.home .htile{pointer-events:auto;cursor:pointer;background:transparent;border:0;padding:0;font-family:inherit;color:inherit}
+.home .fav{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.home .htile{width:100%}
+.home .hero:focus-visible,.home .fav:focus-visible,.home .htile:focus-visible{outline:3px solid var(--link);outline-offset:2px}
 [data-theme="dark"] .bal .logo{filter:invert(1)}
 .home .eyebtn{pointer-events:auto;cursor:pointer;background:transparent;border:0;padding:0;color:inherit;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .home .eyebtn:focus-visible{outline:3px solid var(--link)}
@@ -216,7 +225,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
+var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -275,6 +284,26 @@ function topbar(title,backAct){
 function tabs(){return '<div class="tabs" aria-hidden="true"><span class="on">To individual</span><span>To group</span></div>'}
 
 /* ---------- screens ---------- */
+function sheetHTML(){
+  if(!S.sheet)return '';
+  function ic(inner){return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+inner+'</svg>'}
+  var chev='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+  function row(i,t,sub){return '<div style="display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 4px"><span style="width:48px;height:48px;border-radius:16px;background:var(--tile);border:1.5px solid var(--tilebd);display:flex;align-items:center;justify-content:center;flex:none">'+i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+t+'</span><span class="mut" style="font-size:13px">'+sub+'</span></span>'+chev+'</div>'}
+  var line='<div style="height:1px;background:var(--line)"></div>',inn;
+  if(S.sheet==='cash'){
+    inn='<h2 style="margin:0;font-size:18px;font-weight:700">Cash in &amp; out</h2><span class="mut" style="font-size:13px;margin-top:-6px">Use a telebirr agent to put money in or take it out.</span><div style="display:flex;flex-direction:column;margin-top:4px">'+
+      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 16.5v-9M12 16.5l-3-3M12 16.5l3-3"/>'),'Cash in','Add money to your balance at an agent')+line+
+      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 7.5v9M12 7.5l-3 3M12 7.5l3 3"/>'),'Cash out','Withdraw money from your balance at an agent')+line+
+      row(ic('<circle cx="11" cy="11" r="6.5" style="fill:var(--icfill)"/><path d="M20.5 20.5 16 16"/>'),'Find an agent','See agents near you on the map')+'</div>';
+  }else{
+    function mt(i,l){return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0"><span style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;box-sizing:border-box;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px">'+i+'</span><span style="font-size:12px;line-height:15px;font-weight:600;text-align:center">'+l+'</span></div>'}
+    inn='<h2 style="margin:0;font-size:18px;font-weight:700">More</h2><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:4px 4px 0">'+
+      mt(ic('<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M8.8 15.2l6.4-6.4"/><circle cx="9" cy="9" r="1.8" style="fill:var(--icfill)"/><circle cx="15" cy="15" r="1.8" style="fill:var(--icfill)"/>'),'Loans')+
+      mt(ic('<path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" style="fill:var(--icfill)"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/>'),'Merchant')+
+      mt(ic('<rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/>'),'All services')+'</div><span class="mut" style="font-size:13px">Bills, transport, shopping and more are under All services.</span>';
+  }
+  return '<button type="button" class="scrim" data-act="sheet-close" aria-label="Close"></button><div class="sheetp" style="padding:10px 20px 28px;gap:14px;background:var(--card)"><span style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line)"></span>'+inn+'</div>';
+}
 function homeHTML(){
   var rings='';for(var r=8;r<=192;r+=8)rings+='<circle cx="200" cy="200" r="'+r+'"/>';
   var eye='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.6" fill="currentColor" fill-opacity=".7" stroke="none"/></svg>';
@@ -301,28 +330,30 @@ function homeHTML(){
   var nApps='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/></svg>';
   var nAcc='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6" style="fill:var(--icfill)"/><path d="M4.8 20Q4.8 14.6 12 14.6T19.2 20Z"/></svg>';
   var scan='<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</span>';
+  var RINGSVG='<svg class="rings" aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="rgBR" cx="200" cy="200" r="200" gradientUnits="userSpaceOnUse"><stop offset="0.35" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rmBR"><rect width="200" height="200" fill="url(#rgBR)"/></mask></defs><g mask="url(#rmBR)" fill="none" stroke="#ffffff" style="stroke-opacity:var(--ringop)" stroke-width="0.9">'+rings+'</g></svg>';
+  function chip(p){var on=S.show[p[1]];return '<div class="pillbox" style="flex:1;min-width:0;justify-content:center;gap:1px;padding:6px 12px;height:56px;box-sizing:border-box"><span style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:600">'+p[0]+'<button type="button" class="eyebtn" data-act="eye" data-k="'+p[1]+'" aria-pressed="'+(on?'true':'false')+'" aria-label="'+(on?'Hide ':'Show ')+p[0]+'" style="width:36px;height:36px;margin:-10px -10px -10px 0">'+(on?eyeOff.replace('width="18" height="18"','width="15" height="15"'):eyeS)+'</button></span>'+(on?'<span style="font-size:17px;line-height:22px;font-weight:600;font-variant-numeric:tabular-nums">'+p[2]+'</span>':'<span style="font-size:22px;line-height:22px;font-weight:500;letter-spacing:2px;opacity:.9">*****</span>')+'</div>'}
+  var iCashIO='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M9 15.5V8.5M9 8.5 6.7 10.8M9 8.5l2.3 2.3M15 8.5v7M15 15.5l-2.3-2.3M15 15.5l2.3-2.3"/></svg>';
+  var iMore=nApps.replace('width="24" height="24"','width="28" height="28"');
+  function htile(act,k,ic,l){return '<button type="button" class="tcol htile" data-act="'+act+'"'+(k?' data-k="'+k+'"':'')+' aria-label="'+l+'"><span class="tileb" style="background:var(--card);border:1px solid var(--cardbd);box-shadow:var(--cardsh)">'+ic+'</span><span class="t" style="white-space:nowrap">'+l+'</span></button>'}
   return '<div class="scroll" id="sc"><div class="home"><div class="hpad">'+
-   '<div class="hrow"><span class="av" style="width:44px;height:44px;font-size:14px">NM</span><div style="flex:1;display:flex;flex-direction:column"><span class="mut" style="font-size:13px">Good afternoon,</span><span style="font-size:17px;font-weight:700">Nardos</span></div><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5"/></svg></span></div>'+
-   '<div class="bal"><svg class="rings" aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="rgBR" cx="200" cy="200" r="200" gradientUnits="userSpaceOnUse"><stop offset="0.35" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rmBR"><rect width="200" height="200" fill="url(#rgBR)"/></mask></defs><g mask="url(#rmBR)" fill="none" stroke="#ffffff" style="stroke-opacity:var(--ringop)" stroke-width="0.9">'+rings+'</g></svg>'+
-   '<img class="logo" src="assets/logo-telebirr-black.png" alt="telebirr">'+
-   '<span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--balsub)">Your balance<button type="button" class="eyebtn" data-act="eye" data-k="bal" aria-pressed="'+(S.show.bal?'true':'false')+'" aria-label="'+(S.show.bal?'Hide':'Show')+' balance" style="width:36px;height:36px;margin:-6px -2px">'+(S.show.bal?eyeOff:eye)+'</button></span>'+
-   (S.show.bal?'<span style="font-variant-numeric:lining-nums tabular-nums;font-size:42px;font-weight:500;line-height:44px;display:flex;align-items:baseline;gap:6px">'+money(S.balance).split('.')[0]+'<span style="font-size:24px">.'+money(S.balance).split('.')[1]+'</span><span style="font-size:15px;font-weight:700">ETB</span></span>':'<span style="font-variant-numeric:lining-nums tabular-nums;font-size:46px;font-weight:500;letter-spacing:5px;line-height:44px;opacity:.9">******</span>')+
-   '<div style="align-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px">'+
-   [['Endekise','end','1,250.00'],['Reward','rew','86.40']].map(function(p){var on=S.show[p[1]];return '<div class="pillbox"><span style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:600">'+p[0]+'<button type="button" class="eyebtn" data-act="eye" data-k="'+p[1]+'" aria-pressed="'+(on?'true':'false')+'" aria-label="'+(on?'Hide ':'Show ')+p[0]+'" style="width:36px;height:36px;margin:-8px -10px -8px 0">'+(on?eyeOff.replace('width="18" height="18"','width="15" height="15"'):eyeS)+'</button></span>'+(on?'<span style="font-size:20px;line-height:22px;font-weight:600;font-variant-numeric:tabular-nums">'+p[2]+'</span>':'<span style="font-size:24px;line-height:22px;font-weight:500;letter-spacing:2px;opacity:.9">*****</span>')+'</div>'}).join('')+'</div>'+
-   '<span style="display:flex;align-items:center;gap:6px;min-height:30px;margin-top:12px;font-size:14px;font-weight:700;padding:0 12px 0 16px;border-radius:15px;background:var(--vt);border:1px solid var(--vtbd)">View transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></div>'+
-   '<div class="hcard" style="padding:16px"><div class="grid4" style="gap:12px">'+
-   '<button type="button" class="wide tile-send" data-act="send" aria-label="Send money, start the prototype">'+iSend+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text)">Send money</span></button>'+
-   '<button type="button" class="wide tile-send tile-air" data-act="airtime" aria-label="Airtime and data">'+iAir+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button>'+
-   tcol(iCash,'Cash')+tcol(iLoan,'Loans')+'<button type="button" class="tcol tbank" data-act="bank" aria-label="To bank"><span class="tileb">'+iBank+'</span><span class="t">To bank</span></button>'+tcol(iShop,'Merchant')+'</div></div>'+
+   '<div class="hrow"><span class="av" style="width:44px;height:44px;font-size:14px">NM</span><div style="flex:1;display:flex;flex-direction:column"><span class="mut" style="font-size:13px">Good afternoon,</span><span style="font-size:17px;font-weight:700">Nardos</span></div><img class="hlogo" src="assets/logo-telebirr-black.png" alt="telebirr"><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5"/></svg></span></div>'+
+   '<div class="bal bal2">'+RINGSVG+
+   '<div style="display:flex;align-items:center;justify-content:space-between;position:relative;min-height:28px"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--balsub)">Your balance<button type="button" class="eyebtn" data-act="eye" data-k="bal" aria-pressed="'+(S.show.bal?'true':'false')+'" aria-label="'+(S.show.bal?'Hide':'Show')+' balance" style="width:36px;height:36px;margin:-6px -2px">'+(S.show.bal?eyeOff:eye)+'</button></span><span style="display:flex;align-items:center;gap:2px;min-height:44px;margin:-8px 0;font-size:14px;font-weight:700">Transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></div>'+
+   (S.show.bal?'<span style="position:relative;font-variant-numeric:lining-nums tabular-nums;font-size:'+(money(S.balance).length<=9?36:32)+'px;font-weight:700;line-height:40px;display:flex;align-items:baseline;gap:6px">'+money(S.balance)+'<span style="font-size:15px;font-weight:600;opacity:.75">ETB</span></span>':'<span style="position:relative;font-variant-numeric:lining-nums tabular-nums;font-size:38px;font-weight:500;letter-spacing:5px;line-height:40px">******</span>')+
+   '<div style="display:flex;gap:10px;position:relative">'+[['Endekise','end','1,250.00'],['Reward','rew','86.40']].map(chip).join('')+'</div></div>'+
+   '<div class="hcard" style="border-radius:24px;gap:14px"><button type="button" class="hero" data-act="send" aria-label="Send money, start the prototype">'+iSend+'<span style="flex:1;text-align:left;font-size:18px;font-weight:700;color:var(--text)">Send money</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>'+
+   '<div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Favorites</span><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">'+
+   ['ak','st','mg'].map(function(id){var c=byId(id);return '<button type="button" class="fav" data-act="pick" data-id="'+id+'" aria-label="Send to '+c.name+'">'+avatar(c,52,15)+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text)">'+c.name.split(' ')[0]+'</span></button>'}).join('')+
+   '<button type="button" class="fav" data-act="send" aria-label="Add favorite"><span style="width:52px;height:52px;box-sizing:border-box;border-radius:26px;border:1.5px dashed var(--link);display:flex;align-items:center;justify-content:center;color:var(--link)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span style="font-size:12px;line-height:15px;font-weight:600;color:var(--link)">Add</span></button></div></div></div>'+
+   '<div class="grid4" style="gap:8px">'+htile('airtime','',iAir,'Airtime &amp; data')+htile('bank','',iBank,'To bank')+htile('sheet','cash',iCashIO,'Cash in/out')+htile('sheet','more',iMore,'More')+'</div>'+
    '<div class="hcard"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>My shortcuts</h2><span class="mut" style="font-size:13px">Your own services, one tap away</span></div><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:16px 12px">'+
    tcol(iBill,'Pay bills')+tcol(iZem,'Zemen')+tcol(iPark,'Parking')+
    '<div class="tcol"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></div></div></div>'+
    '<div style="display:flex;flex-direction:column;gap:8px"><div class="carousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px">'+
    '<img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"><img class="banner" src="assets/banner-zemen.png" alt="Zemen Gebeya, where Ethiopia shops digitally"></div>'+
    '<div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
-   '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>Do more with telebirr</h2><span class="mut" style="font-size:13px">Pay, book, shop and learn in one place.</span></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'+dm+'</div><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px"><span class="mut" style="font-size:13px">Can\'t find what you need?</span><span style="display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:#0187D0;color:#fff">Browse all services</span></div></div>'+
    '</div><nav class="hnav" aria-label="Main (not part of this prototype)"><svg class="bgshape" aria-hidden="true" width="100%" height="72" viewBox="0 0 390 72" preserveAspectRatio="none"><path d="M0 10 L140 10 C160 10 168 -5 195 -5 C222 -5 230 10 250 10 L390 10 L390 72 L0 72 Z" fill="var(--navbg)" stroke="var(--navstroke)" stroke-width="1"/></svg>'+
-   nav(true,'Home',nHome)+nav(false,'Pay',nPay)+scan+nav(false,'Apps',nApps)+nav(false,'Account',nAcc)+'</nav></div></div>';
+   nav(true,'Home',nHome)+nav(false,'Pay',nPay)+scan+nav(false,'Apps',nApps)+nav(false,'Account',nAcc)+'</nav></div></div>'+sheetHTML();
 }
 
 function matchesFor(d){return CONTACTS.filter(function(c){return c.num.indexOf(d)===0})}
@@ -648,7 +679,7 @@ function render(anim){
   var nsc=phone.querySelector('.scroll'); if(nsc&&same&&!anim)nsc.scrollTop=top;
   if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
 }
-function go(screen){S.screen=screen;S.pin='';render(true)}
+function go(screen){S.screen=screen;S.pin='';S.sheet=null;render(true)}
 function resetFlow(){S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin=''}
 
 function doPay(){
@@ -729,6 +760,8 @@ document.addEventListener('click',function(e){
   else if(a==='pick'){var c=byId(t.getAttribute('data-id'));S.contact=c;S.digits=c.num;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='pick-new'){S.contact=null;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='next'){go('pin')}
+  else if(a==='sheet'){S.sheet=t.getAttribute('data-k');render(false)}
+  else if(a==='sheet-close'){S.sheet=null;render(false)}
   else if(a==='bio'){S.pin='123456';render(false);setTimeout(S.screen==='pin'?doPay:doPay2,250)}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
@@ -756,6 +789,7 @@ document.addEventListener('click',function(e){
 });
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
   if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&S.screen!=='pin'&&S.screen!=='confirm')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
