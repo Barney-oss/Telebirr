@@ -216,7 +216,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
+var S={pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -259,15 +259,14 @@ function avatar(c,size,fs){
 
 /* ---------- keypad ---------- */
 function keypad(kind){
-  var h='<div class="pad'+(kind==='pin'?' inert" aria-hidden="true':'')+'">';
+  var h='<div class="pad">';
   for(var i=1;i<=9;i++)h+='<button type="button" class="key" data-act="key" data-k="'+i+'" aria-label="'+i+'">'+i+'</button>';
   if(kind==='amount') h+='<button type="button" class="key acc" data-act="key" data-k="." aria-label="Decimal point">.</button>';
-  else if(kind==='pin') h+='<span class="key acc">'+I.finger+'</span>';
+  else if(kind==='pin') h+='<button type="button" class="key acc" data-act="bio" aria-label="Use fingerprint (prototype shortcut)">'+I.finger+'</button>';
   else if(kind==='acc') h+='<span class="key acc" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="3" style="fill:var(--icfill)"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></svg></span>';
   else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
   h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
-  if(kind==='pin') h+='<span class="key acc">'+I.bksp+'</span>';
-  else h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
+  h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
   return h+'</div>';
 }
 function topbar(title,backAct){
@@ -380,6 +379,11 @@ function amountHTML(){
   return (isBank()?topbar('To bank','back-bank'):topbar('Send money','back-number')+tabs())+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+field+who+card+reason+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="next"'+((a<=0||over)?' disabled':'')+'>Next</button></div>'+keypad('amount');
 }
 
+function pinDots(){
+  var n=S.pin.length,d='';
+  for(var i=0;i<6;i++)d+='<span style="width:26px;height:26px;border-radius:13px;box-sizing:border-box;'+(i<n?'background:#8DC73F;border:2px solid #8DC73F':'border:2px solid var(--dot)')+'"></span>';
+  return '<div class="pinbtn" role="img" aria-label="'+n+' of 6 digits entered">'+d+'</div>'+(S.paying?'<span style="font-size:13px;font-weight:600;color:var(--muted)">Processing...</span>':'')+'<span style="font-size:12.5px;font-weight:600;color:var(--softink);background:var(--totalbg);border-radius:10px;padding:6px 12px;text-align:center">Prototype only. Don't enter your real PIN.</span>';
+}
 function pinHTML(){
   var a=amountVal(), f=fee(a), tot=a+f; S.total=tot;
   var dots='';for(var i=0;i<6;i++)dots+='<span style="width:26px;height:26px;border-radius:13px;background:#8DC73F;border:2px solid #8DC73F"></span>';
@@ -387,7 +391,7 @@ function pinHTML(){
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientSub()+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">Includes '+money(f)+' ETB fee</span></div>'+
    '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">Personal transfer</span></div></div></div>'+
-   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span><button type="button" class="pinbtn hint" data-act="pay" aria-label="PIN already entered for this demo, tap to pay"'+(S.paying?' disabled':'')+'>'+dots+'</button>'+(S.paying?'<span style="font-size:13px;font-weight:600;color:var(--muted)">Processing...</span>':'')+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
 }
 
 function qrSVG(text,px){
@@ -547,7 +551,7 @@ function confirmHTML(){
    '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="width:52px;height:52px;border-radius:17px">'+ico(it.k||'data',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+it.n+(it.kind?'':' '+sfx(it))+'</span><span class="mut" style="font-size:14px">'+S.pk.num+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(it.p)+' ETB</span><span class="mut" style="font-size:13px">No fee'+(it.e?' · expires '+it.e.charAt(0).toLowerCase()+it.e.slice(1):'')+'</span></div>'+
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Pay with</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+meth('bal','Balance',bal)+meth('rew','Reward',rew)+'</div>'+(p.err?'<span class="err">'+I.warn+p.err+'</span>':'')+'</div></div>'+
-   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span><button type="button" class="pinbtn hint" data-act="pay2" aria-label="PIN already entered for this demo, tap to pay"'+(S.paying?' disabled':'')+'>'+dots+'</button>'+(S.paying?'<span style="font-size:13px;font-weight:600;color:var(--muted)">Processing...</span>':'')+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
 }
 function pkgDoneHTML(){
   var p=S.pk,it=p.item,credit=it.kind==='voucher';
@@ -644,10 +648,34 @@ function render(anim){
   var nsc=phone.querySelector('.scroll'); if(nsc&&same&&!anim)nsc.scrollTop=top;
   if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
 }
-function go(screen){S.screen=screen;render(true)}
-function resetFlow(){S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false}
+function go(screen){S.screen=screen;S.pin='';render(true)}
+function resetFlow(){S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin=''}
 
+function doPay(){
+  if(S.paying)return; S.paying=true; render(false);
+  setTimeout(function(){
+    S.balance=Math.round((S.balance-S.total)*100)/100; S.txn=mkTxn(); S.time=nowStr(); S.paying=false; go('done');
+  },900);
+}
+function doPay2(){
+  if(S.paying)return;
+  var it=S.pk.item,rw=S.pk.method==='rew';
+  if(it.p>(rw?S.pk.reward:S.balance)){S.pin='';S.pk.err=rw?'Not enough Reward balance. Choose Balance instead.':'Not enough balance.';render(false);return}
+  S.pk.err='';S.paying=true;render(false);
+  setTimeout(function(){
+    if(rw)S.pk.reward=Math.round((S.pk.reward-it.p)*100)/100;else S.balance=Math.round((S.balance-it.p)*100)/100;
+    S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
+  },900);
+}
 function pressKey(k){
+  if(S.screen==='pin'||S.screen==='confirm'){
+    if(S.paying)return;
+    if(k==='b'){S.pin=S.pin.slice(0,-1)}
+    else if(/\d/.test(k)&&S.pin.length<6){S.pin+=k}
+    render(false);
+    if(S.pin.length===6)setTimeout(S.screen==='pin'?doPay:doPay2,250);
+    return;
+  }
   if(S.screen==='number'){
     if(k==='b'){S.digits=S.digits.slice(0,-1)}
     else if(/\d/.test(k)&&S.digits.length<10){S.digits+=k}
@@ -701,12 +729,7 @@ document.addEventListener('click',function(e){
   else if(a==='pick'){var c=byId(t.getAttribute('data-id'));S.contact=c;S.digits=c.num;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='pick-new'){S.contact=null;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='next'){go('pin')}
-  else if(a==='pay'){
-    if(S.paying)return; S.paying=true; render(false);
-    setTimeout(function(){
-      S.balance=Math.round((S.balance-S.total)*100)/100; S.txn=mkTxn(); S.time=nowStr(); S.paying=false; go('done');
-    },900);
-  }
+  else if(a==='bio'){S.pin='123456';render(false);setTimeout(S.screen==='pin'?doPay:doPay2,250)}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
   else if(a==='tab-air'){go('air')}
@@ -729,21 +752,11 @@ document.addEventListener('click',function(e){
   else if(a==='voucher'){go('voucher')}
   else if(a==='recharge'){S.pk.item={n:'Voucher recharge',p:100,sub:'Voucher',kind:'voucher',k:'offers',e:null};S.pk.method='bal';S.balance=Math.round((S.balance+100)*100)/100;S.txn=mkTxn();S.time=nowStr();go('pkgdone')}
   else if(a==='method'){S.pk.method=t.getAttribute('data-k');S.pk.err='';render(false)}
-  else if(a==='pay2'){
-    if(S.paying)return;
-    var it=S.pk.item,rw=S.pk.method==='rew';
-    if(it.p>(rw?S.pk.reward:S.balance)){S.pk.err=rw?'Not enough Reward balance. Choose Balance instead.':'Not enough balance.';render(false);return}
-    S.pk.err='';S.paying=true;render(false);
-    setTimeout(function(){
-      if(rw)S.pk.reward=Math.round((S.pk.reward-it.p)*100)/100;else S.balance=Math.round((S.balance-it.p)*100)/100;
-      S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
-    },900);
-  }
   else if(a==='finish2'){resetFlow();go('home')}
 });
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
-  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&S.screen!=='pin'&&S.screen!=='confirm')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
   else if(e.key==='.'&&S.screen==='amount'){pressKey('.');e.preventDefault()}
