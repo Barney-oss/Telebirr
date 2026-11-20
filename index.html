@@ -144,6 +144,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* home */
 .home{min-height:100%;display:flex;flex-direction:column;background:var(--homebg)}
 .home *{pointer-events:none}
+.home .tbank{pointer-events:auto;cursor:pointer;background:transparent;border:0;padding:0;font-family:inherit;color:inherit;width:100%}
+.tbank:focus-visible{outline:3px solid var(--link);outline-offset:2px;border-radius:18px}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.38);border:0;padding:0;width:100%}
+[data-theme="dark"] .scrim{background:rgba(0,0,0,.6)}
+.sheetp{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:28px 28px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:12px;padding:10px 16px 0;overflow:hidden}
+[data-theme="dark"] .sheetp{border-top:1px solid var(--line)}
+.btn.danger{background:#C62828;color:#fff;box-shadow:none}
+[data-theme="dark"] .btn.danger{background:#FF8A80;color:#2A0A08}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--fieldbd);box-shadow:none}
 .home .tile-send{pointer-events:auto;cursor:pointer}
 .home .carousel{pointer-events:auto}
 .hpad{display:flex;flex-direction:column;gap:12px;padding:8px 16px 16px;flex:1}
@@ -207,7 +216,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0};
+var S={show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -221,12 +230,14 @@ function amountDisplay(){
   i=i.replace(/\B(?=(\d{3})+(?!\d))/g,',');
   return p.length>1? i+'.'+p[1] : i }
 /* Ethio telecom P2P tariff (telebirr to telebirr) */
-function fee(a){ if(a<=0)return 0; if(a<=100)return 1; if(a<=500)return 2; if(a<=1500)return 4; if(a<=5000)return 6; return 8 }
+function fee(a){ if(S.mode==='bank')return a>0?1:0; if(a<=0)return 0; if(a<=100)return 1; if(a<=500)return 2; if(a<=1500)return 4; if(a<=5000)return 6; return 8 }
 function pad2(n){return (n<10?'0':'')+n}
 function nowStr(){var d=new Date();return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
 function mkTxn(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',o='DK';for(var i=0;i<8;i++)o+=c.charAt(Math.floor(Math.random()*c.length));return o}
 function recipientName(){return S.contact?S.contact.name:fmtNum(S.digits)}
-function recipientNum(){return S.contact?fmtNum(S.contact.num):fmtNum(S.digits)}
+function recipientNum(){return S.mode==='bank'?fmtAcc(S.contact.num):(S.contact?fmtNum(S.contact.num):fmtNum(S.digits))}
+function isBank(){return S.mode==='bank'}
+function recipientSub(){return isBank()?bankShort(S.bk.bank)+' · ••'+S.bk.acc.slice(-4):recipientNum()}
 function validNum(d){return d.length===10&&/^0[79]/.test(d)}
 
 /* ---------- icons ---------- */
@@ -252,6 +263,7 @@ function keypad(kind){
   for(var i=1;i<=9;i++)h+='<button type="button" class="key" data-act="key" data-k="'+i+'" aria-label="'+i+'">'+i+'</button>';
   if(kind==='amount') h+='<button type="button" class="key acc" data-act="key" data-k="." aria-label="Decimal point">.</button>';
   else if(kind==='pin') h+='<span class="key acc">'+I.finger+'</span>';
+  else if(kind==='acc') h+='<span class="key acc" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="3" style="fill:var(--icfill)"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></svg></span>';
   else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
   h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
   if(kind==='pin') h+='<span class="key acc">'+I.bksp+'</span>';
@@ -302,7 +314,7 @@ function homeHTML(){
    '<div class="hcard" style="padding:16px"><div class="grid4" style="gap:12px">'+
    '<button type="button" class="wide tile-send" data-act="send" aria-label="Send money, start the prototype">'+iSend+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text)">Send money</span></button>'+
    '<button type="button" class="wide tile-send tile-air" data-act="airtime" aria-label="Airtime and data">'+iAir+'<span style="font-size:12px;line-height:15px;font-weight:600;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button>'+
-   tcol(iCash,'Cash')+tcol(iLoan,'Loans')+tcol(iBank,'To bank')+tcol(iShop,'Merchant')+'</div></div>'+
+   tcol(iCash,'Cash')+tcol(iLoan,'Loans')+'<button type="button" class="tcol tbank" data-act="bank" aria-label="To bank"><span class="tileb">'+iBank+'</span><span class="t">To bank</span></button>'+tcol(iShop,'Merchant')+'</div></div>'+
    '<div class="hcard"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>My shortcuts</h2><span class="mut" style="font-size:13px">Your own services, one tap away</span></div><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:16px 12px">'+
    tcol(iBill,'Pay bills')+tcol(iZem,'Zemen')+tcol(iPark,'Parking')+
    '<div class="tcol"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></div></div></div>'+
@@ -358,21 +370,21 @@ function historyHTML(){
 function amountHTML(){
   var a=amountVal(), f=fee(a), tot=a+f, over=a>0&&tot>S.balance;
   S.rise=S.risePending;S.risePending=false;
-  var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Send to</span><div class="input ok"><span class="val">'+recipientNum()+'</span><span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span></div></div>';
-  var who='<div id="who" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:32px;height:32px;font-size:12px;font-weight:800;background:transparent;border:2px solid #8DC73F;color:var(--avtx)">'+(S.contact?S.contact.ini:I.person(18))+'</span><span style="flex:1;font-size:16px;font-weight:700;min-width:0">'+(S.contact?S.contact.name:'New recipient')+'</span><span style="font-size:12px;font-weight:600;color:var(--softink)">Sending to</span></div>';
+  var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">'+(isBank()?'Account number':'Send to')+'</span><div class="input ok"><span class="val">'+recipientNum()+'</span><span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span></div></div>';
+  var who='<div id="who" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:32px;height:32px;font-size:12px;font-weight:800;background:transparent;border:2px solid #8DC73F;color:var(--avtx)">'+(S.contact?S.contact.ini:I.person(18))+'</span><span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:16px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span>'+(isBank()?'<span class="mut" style="font-size:12px">'+recipientSub()+'</span>':'')+'</span><span style="font-size:12px;font-weight:600;color:var(--softink)">Sending to</span></div>';
   var card='<div class="card'+(S.rise?' rise':'')+'" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">You send</span><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">'+(a>0?'Balance after':'Available')+'</span><span style="font-size:14px;font-weight:600'+(over?';color:var(--err)':'')+'">'+money(a>0?S.balance-tot:S.balance)+' ETB</span></div></div>'+
     '<div class="dash"></div><div style="display:flex;flex-direction:column;gap:8px"><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Fee</span><span style="font-weight:600;color:var(--text)">'+(a>0?money(f)+' ETB':'0.00 ETB')+'</span></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8DC73F"></span>Total to pay</span><span style="font-size:20px;font-weight:700">'+money(tot)+' ETB</span></div>'+
     (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB, so lower the amount.</span></div>':'')+'</div></div>';
   var reason='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Payment reason</span><div style="display:flex;align-items:center;height:46px;padding:0 16px;border-radius:14px;background:var(--field);border:1.5px solid var(--fieldbd)"><span style="flex:1;font-size:16px;font-weight:500">Personal transfer</span></div></div>';
-  return topbar('Send money','back-number')+tabs()+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+field+who+card+reason+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="next"'+((a<=0||over)?' disabled':'')+'>Next</button></div>'+keypad('amount');
+  return (isBank()?topbar('To bank','back-bank'):topbar('Send money','back-number')+tabs())+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+field+who+card+reason+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="next"'+((a<=0||over)?' disabled':'')+'>Next</button></div>'+keypad('amount');
 }
 
 function pinHTML(){
   var a=amountVal(), f=fee(a), tot=a+f; S.total=tot;
   var dots='';for(var i=0;i<6;i++)dots+='<span style="width:26px;height:26px;border-radius:13px;background:#8DC73F;border:2px solid #8DC73F"></span>';
   return topbar('Confirm payment','back-amount')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:12px 16px 16px;min-height:100%">'+
-   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientNum()+'</span></span></div>'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientSub()+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">Includes '+money(f)+' ETB fee</span></div>'+
    '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">Personal transfer</span></div></div></div>'+
    '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Your PIN</span><div style="display:flex;gap:16px" role="img" aria-label="PIN already entered for this demo">'+dots+'</div>'+
@@ -396,7 +408,7 @@ function doneHTML(){
   '<div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">'+
   '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px"><div style="display:flex;align-items:center;gap:12px"><span style="width:30px;height:30px;border-radius:15px;background:var(--avbg);'+(S.theme==='dark'?'border:1.5px solid #4F7A2E;box-shadow:0 0 14px 2px rgba(141,199,63,.36),0 0 26px 4px rgba(141,199,63,.14);':'box-shadow:0 0 0 5px rgba(141,199,63,.14),0 4px 14px rgba(141,199,63,.32);')+'display:flex;align-items:center;justify-content:center;flex:none;color:var(--greenInk)">'+I.okbig.replace('stroke="#2F6B12"','stroke="currentColor"')+'</span><span style="font-size:17px;line-height:22px;font-weight:700;color:var(--greenInk)">Successful</span></div>'+
   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
-  '<div class="card" style="border-radius:24px;gap:14px"><div style="display:flex;align-items:center;gap:12px">'+avatar(S.contact,44,15)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span class="lbl">Sent to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+recipientName()+'</span></span></div></div>'+
+  '<div class="card" style="border-radius:24px;gap:14px"><div style="display:flex;align-items:center;gap:12px">'+avatar(S.contact,44,15)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span class="lbl">Sent to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+recipientName()+'</span>'+(isBank()?'<span class="mut" style="font-size:13px">'+recipientSub()+'</span>':'')+'</span></div></div>'+
   '<div class="card" style="border-radius:24px;gap:14px;margin-top:-4px"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Reason','Personal transfer')+col('Transaction number',S.txn)+'<span class="mut" style="font-size:12px;line-height:16px">Scan to this QR code to confirm this payment</span></div>'+
   '<span style="flex:none;width:124px;height:124px;padding:12px;border-radius:16px;background:#FFFFFF;border:1.5px solid #E6E6EA;display:flex">'+qrSVG(S.txn,100)+'</span></div></div>'+
   '<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;border-radius:20px;overflow:hidden"><img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"></div><div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
@@ -554,9 +566,77 @@ function pkgDoneHTML(){
 
 /* ---------- render ---------- */
 var phone=$('#phone');
+
+/* ---------- To bank ---------- */
+var BANKS=[['AY','Abay Bank'],['AD','Addis Bank'],['AH','Ahadu Bank'],['AM','Amhara Bank'],['AW','Awash Bank'],['BA','Bank of Abyssinia'],['BE','Berhan Bank'],['BU','Bunna Bank'],['CB','Commercial Bank of Ethiopia'],['CO','Cooperative Bank of Oromia'],['DA','Dashen Bank'],['GL','Global Bank'],['EN','Enat Bank'],['GA','Gadaa Bank'],['HI','Hibret Bank'],['NI','Nib International Bank'],['WE','Wegagen Bank'],['ZE','Zemen Bank']];
+var KNOWN=[
+ {i:'AK',n:'Abebe Kebede',b:'CB',a:'100045217788'},
+ {i:'ST',n:'Selam Tesfaye',b:'AW',a:'200130213021'},
+ {i:'DM',n:'Dawit Mekonnen',b:'DA',a:'300055405540'},
+ {i:'ZB',n:'Zemen Bakery PLC',b:'BA',a:'400001770177'},
+ {i:'MG',n:'Mekdes Girma',b:'HI',a:'600066146614'},
+ {i:'MH',n:'Meron Haile',b:'NI',a:'500022902290'}];
+var BFAV=[0,1,4], BREC=[0,1];
+var BHIST=[['Today',[[0,'10:42 AM','500'],[1,'8:15 AM','300']]],['Yesterday',[[2,'6:30 PM','2,000'],[3,'1:05 PM','450']]],['Mon, 16 Nov',[[5,'9:20 AM','800']]]];
+function bankName(c){for(var i=0;i<BANKS.length;i++)if(BANKS[i][0]===c)return BANKS[i][1];return ''}
+function bankShort(c){return c==='CB'?'Commercial Bank':c==='NI'?'Nib Bank':bankName(c)}
+function fmtAcc(d){return d.replace(/(\d{4})(?=\d)/g,'$1 ')}
+function bkState(){
+  var b=S.bk,a=b.acc;
+  if(!a)return {s:'none'};
+  if(a.length<12)return {s:'part'};
+  for(var i=0;i<KNOWN.length;i++)if(KNOWN[i].a===a&&KNOWN[i].b===b.bank)return {s:'ok',i:i};
+  return {s:'err',m:b.bank?'We can\'t find this account. Check the bank and number, then try again.':'Choose a bank to check this account.'};
+}
+function bkRow(i,sub,right){
+  var k=KNOWN[i];
+  return '<button type="button" class="row" data-act="bk-pick" data-i="'+i+'"><span class="av" style="width:40px;height:40px;font-size:13px">'+k.i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+k.n+'</span><span class="mut" style="font-size:13px">'+sub+'</span></span>'+(right?'<span style="font-size:15px;font-weight:600">'+right+' ETB</span>':'')+'</button>';
+}
+function bankSheet(){
+  var sh=S.bk.sheet; if(!sh)return '';
+  if(sh==='pick'){
+    var grid=BANKS.map(function(b){return '<button type="button" data-act="bk-bank" data-code="'+b[0]+'" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:96px;padding:0 6px;border-radius:18px;background:var(--card);border:1.5px solid '+(S.bk.bank===b[0]?'var(--green)':'var(--line)')+';font-family:inherit;color:var(--text)"><span class="av" style="width:40px;height:40px;border-radius:13px;font-size:13px">'+b[0]+'</span><span style="font-size:12px;font-weight:600;text-align:center;line-height:15px">'+b[1]+'</span></button>'}).join('');
+    return '<button type="button" class="scrim" data-act="bk-close" aria-label="Close bank list"></button><div class="sheetp" style="top:112px"><span style="align-self:center;width:40px;height:5px;border-radius:3px;background:var(--line)"></span><span style="text-align:center;font-size:16px;font-weight:700">Choose bank</span>'+
+      '<div aria-hidden="true" style="flex:none;display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--field);border:1.5px solid var(--link);padding:0 16px;box-sizing:border-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span class="mut" style="font-size:14px">Search banks</span></div>'+
+      '<div style="flex:1;min-height:0;overflow-y:auto;scrollbar-width:none"><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-bottom:24px">'+grid+'</div></div></div>';
+  }
+  return '<button type="button" class="scrim" data-act="bk-close" aria-label="Cancel"></button><div class="sheetp" style="padding-bottom:28px;gap:16px"><span style="align-self:center;width:40px;height:5px;border-radius:3px;background:var(--line)"></span><div style="display:flex;flex-direction:column;gap:6px;padding-top:6px"><span style="font-size:20px;line-height:24px;font-weight:700">Clear sent before?</span><span class="mut" style="font-size:14px;line-height:20px">This removes the list of accounts you sent to. Your Favorites and transaction history stay as they are.</span></div><div style="display:flex;flex-direction:column;gap:10px"><button type="button" class="btn danger" data-act="bk-clear-yes">Clear list</button><button type="button" class="btn ghost" data-act="bk-close">Cancel</button></div></div>';
+}
+function bankHTML(){
+  var st=bkState(),b=S.bk;
+  var fav='<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Favorites</span><div style="display:flex;gap:12px">'+BFAV.map(function(i){var k=KNOWN[i];return '<button type="button" data-act="bk-pick" data-i="'+i+'" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none;background:transparent;border:0;padding:0;font-family:inherit;color:var(--text)"><span class="av" style="width:52px;height:52px;font-size:15px">'+k.i+'</span><span style="font-size:12px;font-weight:600">'+k.n.split(' ')[0]+'</span></button>'}).join('')+
+    '<div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;flex:none"><span style="width:52px;height:52px;border-radius:26px;border:1.5px dashed var(--link);display:flex;align-items:center;justify-content:center;color:var(--link)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span style="font-size:12px;font-weight:600;color:var(--link)">Add</span></div></div></div>';
+  var bankField='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Bank</span><button type="button" class="input" data-act="bk-sheet" aria-label="Choose a bank" style="border-color:var(--fieldbd);height:52px;width:100%;text-align:left;font-family:inherit;color:var(--text)">'+
+    (b.bank?'<span class="av" style="width:28px;height:28px;border-radius:9px;font-size:11px">'+b.bank+'</span><span style="flex:1;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+bankName(b.bank)+'</span>':'<span class="mut" style="flex:1;font-size:16px;font-weight:500">Choose a bank</span>')+
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>';
+  var shown=b.acc?fmtAcc(b.acc)+'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'<span class="caret" style="height:22px;vertical-align:-4px"></span><span class="mut" style="font-weight:500;margin-left:4px">Account number</span>';
+  var tail=st.s==='ok'?'<span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span>':(st.s==='err'?'<span style="display:flex;width:28px;justify-content:center;color:var(--err)">'+I.warn.replace('width="18" height="18"','width="22" height="22"')+'</span>':'');
+  var acc='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Account number</span><div class="input'+(st.s==='ok'?' ok':'')+'" style="height:52px'+(st.s==='err'?';border-color:var(--err)':'')+'"><span class="val">'+shown+'</span>'+tail+'</div></div>';
+  var below,btn='';
+  if(st.s==='ok'){
+    var k=KNOWN[st.i];
+    below='<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:48px;height:48px;font-size:16px;font-weight:800;background:transparent;border:2px solid #8DC73F">'+k.i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:12px;font-weight:600;color:var(--softink)">Sending to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+k.n+'</span><span class="mut" style="font-size:13px">'+bankShort(k.b)+' · ••'+k.a.slice(-4)+'</span></span></div>';
+    btn='<div class="btnwrap"><button type="button" class="btn" data-act="bk-pick" data-i="'+st.i+'">Next</button></div>';
+  }else if(st.s==='err'){
+    below='<div class="err" role="alert">'+I.warn+'<span>'+st.m+'</span></div>';
+    btn='<div class="btnwrap"><button type="button" class="btn" disabled>Next</button></div>';
+  }else if(S.bkCleared){
+    below='<div class="card" style="align-items:center;text-align:center;gap:8px;padding:28px 16px"><span style="width:56px;height:56px;border-radius:18px;background:var(--avbg);border:1.5px solid var(--avbd);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 10.2Q4.2 9.2 5 8.7L11 4.9Q12 4.3 13 4.9L19 8.7Q19.8 9.2 19.8 10.2Q19.8 11.4 18.6 11.4H5.4Q4.2 11.4 4.2 10.2Z" style="fill:var(--icfill)"/><path d="M7.5 15v2M12 15v2M16.5 15v2M5 20.4h14"/></svg></span><span style="font-size:16px;font-weight:700">No saved accounts yet</span><span class="mut" style="font-size:13px;line-height:18px">Accounts you send to will show up here, so next time is one tap.</span></div>';
+  }else{
+    below='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Sent before</h2><button type="button" data-act="bk-all" style="font-size:14px;font-weight:600;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 0 0 12px;margin:-12px 0;font-family:inherit">See all</button></div>'+
+      BREC.map(function(i,n){return (n?'<div class="divider"></div>':'')+bkRow(i,bankShort(KNOWN[i].b)+' · ••'+KNOWN[i].a.slice(-4))}).join('')+'</div>';
+  }
+  return topbar('To bank','back-home')+'<div class="scroll"><div class="body" style="gap:10px;padding:8px 16px 16px">'+fav+bankField+acc+below+'</div></div>'+btn+keypad('acc')+bankSheet();
+}
+function bankAllHTML(){
+  var chips=['Today','Yesterday','This week','Last 30 days','Last 3 months','Custom'].map(function(c){var on=c==='This week';return '<span style="flex:none;display:flex;align-items:center;height:36px;padding:0 14px;border-radius:18px;font-size:14px;white-space:nowrap;'+(on?'background:var(--avbg);border:1.5px solid var(--avbd);color:var(--avtx);font-weight:700':'background:var(--field);border:1.5px solid var(--fieldbd);color:var(--muted);font-weight:600')+'">'+c+'</span>'}).join('');
+  var cards=BHIST.map(function(g){return '<div class="card"><div style="margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">'+g[0]+'</h2></div>'+g[1].map(function(it,n){return (n?'<div class="divider"></div>':'')+bkRow(it[0],bankShort(KNOWN[it[0]].b)+' · '+it[1],it[2])}).join('')+'</div>'}).join('');
+  return '<div class="topbar"><button type="button" class="back" data-act="back-bank" aria-label="Back">'+I.back+'</button><h1>Sent before</h1><button type="button" data-act="bk-clear" style="font-size:14px;font-weight:600;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 8px;font-family:inherit">Clear</button></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:8px 0 24px"><div aria-hidden="true" style="display:flex;gap:8px;overflow:hidden;padding:0 16px">'+chips+'</div><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px">'+cards+'</div></div></div>'+bankSheet();
+}
+
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -567,12 +647,17 @@ function render(anim){
   if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
 }
 function go(screen){S.screen=screen;render(true)}
-function resetFlow(){S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false}
+function resetFlow(){S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false}
 
 function pressKey(k){
   if(S.screen==='number'){
     if(k==='b'){S.digits=S.digits.slice(0,-1)}
     else if(/\d/.test(k)&&S.digits.length<10){S.digits+=k}
+    render(false);
+  }else if(S.screen==='bank'){
+    if(S.bk.sheet)return;
+    if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
+    else if(/\d/.test(k)&&S.bk.acc.length<12){S.bk.acc+=k}
     render(false);
   }else if(S.screen==='amount'){
     var s=S.fresh?'':S.amount;
@@ -599,6 +684,15 @@ document.addEventListener('click',function(e){
   else if(a==='send'){resetFlow();go('number')}
   else if(a==='back-home'){resetFlow();go('home')}
   else if(a==='history'){S.screen='history';render(true)}
+  else if(a==='bank'){resetFlow();S.mode='bank';go('bank')}
+  else if(a==='back-bank'){S.contact=null;S.amount='';S.screen='bank';render(false)}
+  else if(a==='bk-all'){go('bankall')}
+  else if(a==='bk-sheet'){S.bk.sheet='pick';render(false)}
+  else if(a==='bk-clear'){S.bk.sheet='clear';render(false)}
+  else if(a==='bk-close'){S.bk.sheet=null;render(false)}
+  else if(a==='bk-bank'){S.bk.bank=t.getAttribute('data-code');S.bk.sheet=null;render(false)}
+  else if(a==='bk-clear-yes'){S.bkCleared=true;S.bk.sheet=null;go('bank')}
+  else if(a==='bk-pick'){var kk2=KNOWN[+t.getAttribute('data-i')];S.mode='bank';S.bk.bank=kk2.b;S.bk.acc=kk2.a;S.bk.sheet=null;S.contact={id:'bk',ini:kk2.i,name:kk2.n,num:kk2.a};S.amount='';S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='back-number'){S.contact=null;S.amount='';S.screen='number';render(false)}
   else if(a==='back-amount'){go('amount')}
   else if(a==='key')pressKey(t.getAttribute('data-k'));
@@ -651,7 +745,7 @@ document.addEventListener('click',function(e){
 });
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
-  if(S.screen!=='number'&&S.screen!=='amount')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
   else if(e.key==='.'&&S.screen==='amount'){pressKey('.');e.preventDefault()}
