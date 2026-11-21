@@ -163,6 +163,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .home .hcard{border-radius:16px}
 .home .hcard div[style*="border-radius:16px"]{border-radius:12px!important}
 .home .pillbox{border-radius:11px}
+.livedot{width:8px;height:8px;border-radius:4px;background:#8DC73F;box-shadow:0 0 0 0 rgba(141,199,63,.6);animation:livep 1.6s infinite}
+@keyframes livep{0%{box-shadow:0 0 0 0 rgba(141,199,63,.6)}70%{box-shadow:0 0 0 8px rgba(141,199,63,0)}100%{box-shadow:0 0 0 0 rgba(141,199,63,0)}}
+@media (prefers-reduced-motion:reduce){.livedot{animation:none}}
 .hpad{display:flex;flex-direction:column;gap:12px;padding:8px 16px 16px;flex:1}
 .hacts{display:flex;flex-direction:column;gap:8px}
 .hpad>.hacts~*{margin-top:12px}
@@ -251,7 +254,17 @@ function amountDisplay(){
 /* Ethio telecom P2P tariff (telebirr to telebirr) */
 function fee(a){ if(S.mode==='bank')return a>0?1:0; if(a<=0)return 0; if(a<=100)return 1; if(a<=500)return 2; if(a<=1500)return 4; if(a<=5000)return 6; return 8 }
 function pad2(n){return (n<10?'0':'')+n}
-function nowStr(){var d=new Date();return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
+function hm(d,sec){var h=d.getHours(),ap=h<12?'AM':'PM';h=h%12||12;return h+':'+pad2(d.getMinutes())+(sec?':'+pad2(d.getSeconds()):'')+' '+ap}
+var LIVE_MS=5*60*1000;
+function stampHTML(){
+  var d=S.paidAt||new Date(),live=(Date.now()-d.getTime())<LIVE_MS;
+  var day=d.toLocaleDateString('en-GB',{weekday:'long'})+', '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  return '<span style="margin-top:6px;font-size:17px;line-height:22px;font-weight:700">'+day+'</span>'+
+   '<span style="font-size:15px;line-height:20px;font-weight:600;color:var(--muted)">'+hm(d)+'</span>'+
+   (live?'<span class="livechip" data-t="'+d.getTime()+'" style="margin-top:6px;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:15px;background:var(--softbg);border:1.5px solid var(--softbd);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums"><span class="livedot" aria-hidden="true"></span>Live <span class="livec">'+hm(new Date(),true)+'</span></span>':'');
+}
+setInterval(function(){document.querySelectorAll('.livechip').forEach(function(el){if(Date.now()-(+el.getAttribute('data-t'))>=LIVE_MS){el.remove();return}var c=el.querySelector('.livec');if(c)c.textContent=hm(new Date(),true)})},1000);
+function nowStr(){var d=new Date();S.paidAt=d;return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
 function mkTxn(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',o='DK';for(var i=0;i<8;i++)o+=c.charAt(Math.floor(Math.random()*c.length));return o}
 function recipientName(){return S.contact?S.contact.name:fmtNum(S.digits)}
 function recipientNum(){return S.mode==='bank'?fmtAcc(S.contact.num):(S.contact?fmtNum(S.contact.num):fmtNum(S.digits))}
@@ -384,7 +397,9 @@ function contactRow(c,act,k,sub){
 
 function numberHTML(){
   var d=S.digits, ok=validNum(d), m=d?matchesFor(d):[];
-  var shown=d?fmtNum(d)+'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'<span class="caret" style="height:22px;vertical-align:-4px"></span><span class="mut" style="font-weight:500;margin-left:4px">Phone number</span>';
+  var loc=d.slice(1),lf=loc.slice(0,3)+(loc.length>3?' '+loc.slice(3,6):'')+(loc.length>6?' '+loc.slice(6,9):'');
+  var pre='<span style="font-weight:600;color:var(--muted);margin-right:8px;padding-right:10px;border-right:1.5px solid var(--line)">+251</span>';
+  var shown=pre+(d?lf+'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'<span class="caret" style="height:22px;vertical-align:-4px"></span><span class="mut" style="font-weight:500;margin-left:4px">9XX XXX XXX</span>');
   var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Send to</span><div class="input'+(ok?' ok':'')+'"><span class="val">'+shown+'</span>'+
     (ok?'<span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span>':'<span aria-hidden="true" style="width:36px;height:36px;border-radius:12px;background:var(--avbg);border:1.5px solid var(--avbd);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)">'+I.person(20)+'</span>')+'</div></div>';
   var body;
@@ -457,7 +472,7 @@ function doneHTML(){
   return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px 0;height:60px;flex:none;color:var(--ink)" aria-hidden="true"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link)">'+I.dl+'Download</span><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link)">'+I.share+'Share</span></div>'+
   '<div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">'+
   '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px"><div style="display:flex;align-items:center;gap:12px"><span style="width:68px;height:68px;box-sizing:border-box;border-radius:34px;'+(S.theme==='dark'?'background:#2F4F1E;border:2.5px solid #8DC73F;color:#E6F2D5;box-shadow:0 0 18px 3px rgba(141,199,63,.34),0 0 34px 6px rgba(141,199,63,.14);':'background:#B3DE7D;border:2.5px solid #2F6B12;color:#2F6B12;box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32);')+'display:flex;align-items:center;justify-content:center;flex:none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span></div>'+
-  '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+  '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
   '<div class="card" style="border-radius:24px;gap:14px"><div style="display:flex;align-items:center;gap:12px">'+avatar(S.contact,44,15)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span class="lbl">Sent to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+recipientName()+'</span>'+(isBank()?'<span class="mut" style="font-size:13px">'+recipientSub()+'</span>':'')+'</span></div></div>'+
   '<div class="card" style="border-radius:24px;gap:14px;margin-top:-4px"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Reason','Personal transfer')+col('Transaction number',S.txn)+'<span class="mut" style="font-size:12px;line-height:16px">Scan to this QR code to confirm this payment</span></div>'+
   '<span style="flex:none;width:124px;height:124px;padding:12px;border-radius:16px;background:#FFFFFF;border:1.5px solid #E6E6EA;display:flex">'+qrSVG(S.txn,100)+'</span></div></div>'+
@@ -609,7 +624,7 @@ function pkgDoneHTML(){
   return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px 0;height:60px;flex:none;color:var(--text)">'+
    '<button type="button" class="tl2" data-act="fav2">'+ico(fav?'heart':'heart0',22)+'Favorite</button><span class="tl2" style="pointer-events:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.6" style="fill:var(--icfill)"/><circle cx="18" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6"/></svg>Share</span></div>'+
    '<div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
-   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">'+(credit?'+':'-')+money(it.p)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">'+(credit?'+':'-')+money(it.p)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
    '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px"><span class="tbig" style="width:48px;height:48px;border-radius:16px">'+ico(it.k||'data',26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:18px;font-weight:700">'+it.n+(it.kind?'':' '+sfx(it))+'</span><span class="mut" style="font-size:13px">'+S.pk.num+'</span></span></div>'+
    '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(it.e?line('Expires',it.e,0):'')+line(credit?'Added to':'Paid with',credit?'Balance':(p.method==='rew'?'Reward balance':'Balance'),it.e?1:0)+line('Transaction ID',S.txn,2)+'</div></div></div>'+btn56('Done','finish2');
 }
@@ -722,7 +737,7 @@ function cdoneHTML(){
   function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
   var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
   var head=vch?'<span style="margin-top:22px;font-size:24px;line-height:30px;font-weight:700">Code sent</span><span class="mut" style="font-size:14px;line-height:20px">Check your SMS for the secret code.</span>':
-    '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span>';
+    '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'';
   var next=mvch?['ticket','Next: give the code to the merchant','They use it to take the payment.']:mer?['store','Paid to '+MNAME,'Merchant '+S.cash.code]:vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
   var nc='<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none"><span class="tbig" style="width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1.5px solid var(--tilebd)">'+ico(next[0],26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+next[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+next[2]+'</span></span></div>';
   var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(mer?line('Merchant',MNAME,0)+line('Merchant ID',S.cash.code,1)+(S.cash.op?line('Operator',S.cash.op,1):'')+line('Amount',money(a)+' ETB',1):(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1))+line('Transaction ID',S.txn,1)+'</div>';
@@ -806,11 +821,11 @@ function ldoneHTML(){
   var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
   var due=payBack(p),rp=S.ln.mode==='repay';
   if(rp)return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
-   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
    '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">Loan repaid</span><span class="mut" style="font-size:13px;line-height:18px">Your '+b.s+' limit is back to '+money(limOf(p[0]))+' ETB.</span></span></div>'+
    '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+line('Loan',p[1],0)+line('Bank',b.n,1)+line('Paid from','Balance',1)+line('Transaction ID',S.txn,1)+'</div></div></div>'+btn56('Done','ln-back-hub');
   return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
-   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">+'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">+'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
    '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+due[0]+(p[5]==='short'?' ':': ')+due[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+b.n+'</span></span></div>'+
    '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+line('Loan',p[1],0)+line('Bank',b.n,1)+line('Added to','Balance',1)+line('Transaction ID',S.txn,1)+'</div></div></div>'+btn56('Done','finish');
 }
@@ -926,8 +941,11 @@ function pressKey(k){
     return;
   }
   if(S.screen==='number'){
-    if(k==='b'){S.digits=S.digits.slice(0,-1)}
-    else if(/\d/.test(k)&&S.digits.length<10){S.digits+=k}
+    if(k==='b'){S.digits=S.digits.length<=2?'':S.digits.slice(0,-1)}
+    else if(/\d/.test(k)){
+      if(S.digits===''){ if(k==='7'||k==='9')S.digits='0'+k; } // leading 0 is optional: +251 is already there
+      else if(S.digits.length<10)S.digits+=k;
+    }
     render(false);
   }else if(S.screen==='bank'){
     if(S.bk.sheet)return;
