@@ -300,9 +300,9 @@ function sheetHTML(){
       row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 7.5v9M12 7.5l-3 3M12 7.5l3 3"/>'),'Cash out','Take cash at an agent or an ATM','cash-out')+line+
       row(ic('<circle cx="11" cy="11" r="6.5" style="fill:var(--icfill)"/><path d="M20.5 20.5 16 16"/>'),'Find an agent','See agents near you on the map')+'</div>';
   }else{
-    function mt(i,l){return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0"><span style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;box-sizing:border-box;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px">'+i+'</span><span style="font-size:12px;line-height:15px;font-weight:600;text-align:center">'+l+'</span></div>'}
+    function mt(i,l,act){return '<'+(act?'button type="button" data-act="'+act+'"':'div')+' style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;background:transparent;border:0;padding:0;font-family:inherit;color:inherit"><span style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;box-sizing:border-box;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px">'+i+'</span><span style="font-size:12px;line-height:15px;font-weight:600;text-align:center">'+l+'</span></'+(act?'button':'div')+'>'}
     inn='<h2 style="margin:0;font-size:18px;font-weight:700">More</h2><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:4px 4px 0">'+
-      mt(ic('<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M8.8 15.2l6.4-6.4"/><circle cx="9" cy="9" r="1.8" style="fill:var(--icfill)"/><circle cx="15" cy="15" r="1.8" style="fill:var(--icfill)"/>'),'Loans')+
+      mt(ic('<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M8.8 15.2l6.4-6.4"/><circle cx="9" cy="9" r="1.8" style="fill:var(--icfill)"/><circle cx="15" cy="15" r="1.8" style="fill:var(--icfill)"/>'),'Loans','loans')+
       mt(ic('<path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" style="fill:var(--icfill)"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/>'),'Merchant')+
       mt(ic('<rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/>'),'All services')+'</div><span class="mut" style="font-size:13px">Bills, transport, shopping and more are under All services.</span>';
   }
@@ -688,6 +688,68 @@ function cdoneHTML(){
   var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1)+line('Transaction ID',S.txn,1)+'</div>';
   return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+head+'</div>'+nc+det+'</div></div>'+btn56('Done','finish');
 }
+/* ---------- Loans ---------- */
+var LBANK={db:{n:'Dashen Bank',s:'Dashen',b:'Mela',img:'assets/banks/dashen.png',lim:386.87},cbe:{n:'Commercial Bank of Ethiopia',s:'CBE',b:'Enderas',img:'assets/banks/cbe.png',lim:1200},sq:{n:'Siinqee Bank',s:'Siinqee',b:'Wabi',img:'assets/banks/siinqee.png',lim:0},aw:{n:'Awash Bank',s:'Awash',b:'Tila',img:'assets/banks/awash.png',lim:2500}};
+var LPROD=[ // bank, plain name, days to repay (for sorting), min, max, type
+ ['db','1 day',1,100,2000,'short','mela daily'],['sq','5 days',5,100,5000,'short','5-Days Wabi'],['db','7 days',7,100,5000,'short','mela weekly'],['cbe','10 days',10,100,4000,'short','10-Days Enderas'],['sq','10 days',10,100,6000,'short','10-days Wabi'],
+ ['aw','15 days',15,500,5000,'short','15-days Tila'],['cbe','25 days',25,100,13000,'short','25-Days Enderas'],['db','30 days',30,600,15000,'short','mela monthly'],['sq','30 days',30,200,15000,'short','30-days Wabi'],['aw','40 days',40,3000,30000,'short','40-days Tila'],
+ ['sq','45 days',45,2500,30000,'short','45-days Wabi'],['db','50 days',50,3000,30000,'short','Mela 50-Days'],['cbe','60 days',60,100,30000,'short','60-Days Enderas'],['aw','75 days',75,6000,0,'short','75-days Tila'],
+ ['cbe','25% of salary, 1 payment',30,100,50000,'salary','Adrash 25%, 1 month'],['cbe','50% of salary, 2 payments',60,100,50000,'salary','Adrash 50%, 2 months'],['cbe','1 month salary, 3 payments',90,100,50000,'salary','Adrash 1 month, 3 months'],['cbe','1 month salary, 4 payments',120,100,50000,'salary','Adrash 1 month, 4 months'],
+ ['cbe','2 months salary, 6 payments',180,1000,300000,'salary','Adrash 2 months, 6 months'],['db','2 months salary, 9 payments',270,1000,300000,'salary','Medaresha 2 months, 9 months'],['cbe','3 months salary, 9 payments',270,1000,450000,'salary','Adrash 3 months, 9 months'],
+ ['db','3 months salary, 12 payments',360,1000,450000,'salary','Medaresha 3 months, 12 months'],['cbe','4 months salary, 12 payments',360,1000,600000,'salary','Adrash 4 months, 12 months'],['sq','5 months salary, 14 payments',420,1000,1000000,'salary','Wabi 5 months, 14 months']
+];
+S.ln={tab:'short',bank:'all',p:null};
+function k0(n){return n.toLocaleString('en-US',{maximumFractionDigits:0})}
+function blogo(b,px){return '<span style="width:'+px+'px;height:'+px+'px;border-radius:'+Math.round(px*.3)+'px;background:#FFFFFF;border:1px solid #E6E6EA;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"><img src="'+LBANK[b].img+'" alt="" style="width:'+Math.round(px*.78)+'px;height:'+Math.round(px*.78)+'px;object-fit:contain"></span>'}
+function addDays(n){var d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function loansHTML(){
+  var L=S.ln;
+  var lim=Object.keys(LBANK).map(function(k){var b=LBANK[k],ok=b.lim>0;return '<div style="min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:18px;background:var(--card);border:1px solid var(--cardbd);box-shadow:var(--cardsh)"><div style="display:flex;align-items:center;gap:8px">'+blogo(k,32)+'<span style="font-size:13px;font-weight:700">'+b.s+'</span></div><span style="display:flex;flex-direction:column;gap:1px"><span class="lbl">'+(ok?'Available':'Not eligible yet')+'</span><span style="font-size:17px;font-weight:700'+(ok?'':';color:var(--muted)')+'">'+(ok?money(b.lim)+' <span class="mut" style="font-size:12px;font-weight:600">ETB</span>':'0.00 <span style="font-size:12px;font-weight:600">ETB</span>')+'</span></span></div>'}).join('');
+  var chips=['all','db','cbe','sq','aw'].map(function(k){var on=L.bank===k;return '<button type="button" class="chip'+(on?' on':'')+'" data-act="ln-bank" data-k="'+k+'" aria-pressed="'+on+'" style="height:36px;padding:0 14px;border-radius:18px;flex:none;font-size:13px;font-weight:600;font-family:inherit;color:var(--text);border:1.5px solid '+(on?'var(--selbd)':'var(--line)')+';background:'+(on?'var(--tile)':'var(--card)')+'">'+(k==='all'?'All banks':LBANK[k].s)+'</button>'}).join('');
+  var list=LPROD.map(function(p,i){return [p,i]}).filter(function(x){return x[0][5]===L.tab&&(L.bank==='all'||x[0][0]===L.bank)});
+  var rows=list.map(function(x,j){var p=x[0],b=LBANK[p[0]];return '<div class="prow" style="gap:12px'+(j?';border-top:1px solid var(--line)':'')+'">'+blogo(p[0],36)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:700;line-height:19px">'+p[1]+'</span><span class="mut" style="font-size:12px">'+b.s+' · '+k0(p[3])+(p[4]?' to '+k0(p[4]):'+')+' ETB</span></span><button type="button" class="buy" data-act="ln-apply" data-i="'+x[1]+'">Apply</button></div>'}).join('');
+  return topbar('Loans','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Your credit limits</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+lim+'</div></div>'+
+   '<button type="button" class="hcard vrow" style="padding:12px 16px" aria-label="My loans"><span class="tbig" style="width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('clock',22)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">My loans</span><span class="mut" style="font-size:12px">No active loans</span></span>'+mut('chev',20)+'</button>'+
+   '<div class="tabs" style="margin:4px 0 0"><button type="button" class="'+(L.tab==='short'?'on':'')+'" data-act="ln-tab" data-k="short">Pay back at once</button><button type="button" class="'+(L.tab==='salary'?'on':'')+'" data-act="ln-tab" data-k="salary">Pay monthly</button></div>'+
+   '<div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px">'+chips+'</div>'+
+   '<div class="hcard" style="padding:0 16px;gap:0">'+(rows||'<div class="mut" style="padding:24px 0;text-align:center;font-size:14px">No '+(L.tab==='short'?'pay-at-once':'monthly')+' loans from this bank</div>')+'</div>'+
+   '<span class="mut" style="font-size:12px;text-align:center;line-height:16px">Limits are set by each bank from how you use telebirr.</span></div></div>';
+}
+function lnP(){return LPROD[S.ln.p]}
+function lamtHTML(){
+  var p=lnP(),b=LBANK[p[0]],a=amountVal(),max=Math.min(b.lim,p[4]||b.lim),err='';
+  if(a>0&&a>max)err=b.lim<=0?'You are not eligible for a '+b.s+' loan yet.':'This is above your limit. You can borrow up to '+money(max)+' ETB.';
+  else if(a>0&&a<p[3])err='The smallest amount for this loan is '+k0(p[3])+' ETB.';
+  var who='<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+blogo(p[0],32)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:700">'+p[1]+'</span><span class="mut" style="font-size:12px">'+b.n+' · '+b.b+'</span></span></div>';
+  var card='<div class="card" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">You borrow</span><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">Your limit</span><span style="font-size:14px;font-weight:600'+(err?';color:var(--err)':'')+'">'+money(max)+' ETB</span></div></div>'+
+    '<div class="dash"></div><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Pay back by</span><span style="font-weight:600;color:var(--text)">'+(p[5]==='short'?addDays(p[2]):'In '+p[1].split(', ')[1])+'</span></div>'+
+    (err?'<div class="err" role="alert">'+I.warn+'<span>'+err+'</span></div>':'')+'</div>';
+  return topbar('Apply for a loan','back-loans')+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+who+card+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="ln-next"'+((a<=0||err)?' disabled':'')+'>Review</button></div>'+keypad('amount');
+}
+function lpinHTML(){
+  var p=lnP(),b=LBANK[p[0]],a=amountVal();
+  function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:36px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
+  return topbar('Confirm loan','back-lamt')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:12px"><div style="display:flex;align-items:center;gap:14px">'+blogo(p[0],52)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+p[1]+'</span><span class="mut" style="font-size:14px">'+b.n+'</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">You get</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(a)+' ETB</span><span class="mut" style="font-size:13px">Added to your telebirr balance</span></div>'+
+   '<div style="display:flex;flex-direction:column;padding:0 2px">'+line('Pay back by',p[5]==='short'?addDays(p[2]):p[1].split(', ')[1],0)+line('Interest and fees','<span class="mut">Set by '+b.s+'</span>',1)+'</div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap ✓ to confirm':'Enter PIN to confirm')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+}
+function doPay4(){
+  if(S.paying)return; S.paying=true; render(false);
+  setTimeout(function(){var a=amountVal();S.balance=Math.round((S.balance+a)*100)/100;S.txn=mkTxn();S.time=nowStr();S.paying=false;go('ldone')},900);
+}
+function ldoneHTML(){
+  var p=lnP(),b=LBANK[p[0]],a=amountVal();
+  function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
+  var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
+  var due=p[5]==='short'?addDays(p[2]):p[1].split(', ')[1];
+  return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">+'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">Pay back by '+due+'</span><span class="mut" style="font-size:13px;line-height:18px">'+b.s+' takes it from your balance on the due date.</span></span></div>'+
+   '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+line('Loan',p[1],0)+line('Bank',b.n,1)+line('Added to','Balance',1)+line('Transaction ID',S.txn,1)+'</div></div></div>'+btn56('Done','finish');
+}
 /* ---------- render ---------- */
 var phone=$('#phone');
 
@@ -760,7 +822,7 @@ function bankAllHTML(){
 
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -789,8 +851,8 @@ function doPay2(){
     S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
   },900);
 }
-function payFn(){return S.screen==='pin'?doPay:S.screen==='confirm'?doPay2:doPay3}
-function isPinScr(){return S.screen==='pin'||S.screen==='confirm'||S.screen==='cpin'}
+function payFn(){return S.screen==='pin'?doPay:S.screen==='confirm'?doPay2:S.screen==='lpin'?doPay4:doPay3}
+function isPinScr(){return S.screen==='pin'||S.screen==='confirm'||S.screen==='cpin'||S.screen==='lpin'}
 function pressKey(k){
   if(isPinScr()){
     if(S.paying)return;
@@ -813,7 +875,7 @@ function pressKey(k){
     if(k==='b'){if(!c[f]&&f==='op'){c.fld='code'}else c[f]=c[f].slice(0,-1)}
     else if(/\d/.test(k)&&c[f].length<mx){c[f]+=k;if(f==='code'&&c[f].length===6)c.fld='op'}
     render(false);
-  }else if(S.screen==='amount'||S.screen==='camt'){
+  }else if(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt'){
     var s=S.fresh?'':S.amount;
     if(k==='b'){s=(S.fresh?S.amount:s).slice(0,-1)}
     else if(k==='.'){if(s.indexOf('.')<0)s=(s===''?'0':s)+'.'}
@@ -861,6 +923,13 @@ document.addEventListener('click',function(e){
   else if(a==='sheet-close'){S.sheet=null;render(false)}
   else if(a==='bio'){if(!S.paying){S.pin='123456';render(false)}}
   else if(a==='pay'){if(S.pin.length===6)payFn()()}
+  else if(a==='loans'){resetFlow();S.ln={tab:'short',bank:'all',p:null};go('loans')}
+  else if(a==='ln-tab'){S.ln.tab=t.getAttribute('data-k');render(false)}
+  else if(a==='ln-bank'){S.ln.bank=t.getAttribute('data-k');render(false)}
+  else if(a==='ln-apply'){S.ln.p=+t.getAttribute('data-i');S.amount='';S.fresh=false;go('lamt')}
+  else if(a==='back-loans'){go('loans')}
+  else if(a==='back-lamt'){go('lamt')}
+  else if(a==='ln-next'){go('lpin')}
   else if(a==='cash-in'){resetFlow();S.cash.tab='agent';go('cin')}
   else if(a==='cash-out'){resetFlow();S.cash.otab='agent';go('cout')}
   else if(a==='cin-tab'){S.cash.tab=t.getAttribute('data-k');render(false)}
@@ -901,10 +970,10 @@ document.addEventListener('click',function(e){
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
-  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='lamt')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
-  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt')){pressKey('.');e.preventDefault()}
+  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt')){pressKey('.');e.preventDefault()}
   else if(e.key==='Enter'&&isPinScr()&&S.pin.length===6){payFn()();e.preventDefault()}
   else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
 });
