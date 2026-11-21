@@ -355,23 +355,25 @@ function navBar(cur){
 /* ---------- Home: For you ---------- */
 var PKG={air:23.5,data:[1.2,2],voice:[45,100],ends:'25 Nov'};
 function meter(pct){return '<span style="display:block;height:6px;border-radius:3px;background:var(--line);overflow:hidden"><span style="display:block;width:'+pct+'%;height:100%;border-radius:3px;background:#8DC73F"></span></span>'}
-function pkgTile(label,val,unit,meta,pct){
-  return '<button type="button" data-act="airtime" aria-label="'+label+': '+val+' '+unit+', '+meta+'" style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;background:var(--soft2);border:0;font-family:inherit;color:var(--text);text-align:left;min-width:0;pointer-events:auto;cursor:pointer">'+
-   '<span class="mut" style="font-size:12px;font-weight:600">'+label+'</span><span style="display:flex;align-items:baseline;gap:4px;white-space:nowrap"><span style="font-size:19px;line-height:22px;font-weight:700;font-variant-numeric:tabular-nums">'+val+'</span><span class="mut" style="font-size:12px;font-weight:600">'+unit+'</span></span>'+
-   (pct!==null?meter(pct):'<span style="display:block;height:6px"></span>')+'<span class="mut" style="font-size:11px;line-height:14px">'+meta+'</span></button>'}
+function pkgIc(k){var p={
+ air:'<rect x="6.5" y="2.5" width="11" height="19" rx="4"/><path d="M6.5 6.5Q6.5 2.5 10.5 2.5h3q4 0 4 4V13h-11Z" style="fill:var(--icfill)" stroke="none"/><rect x="6.5" y="2.5" width="11" height="19" rx="4"/><path d="M6.5 13h11M10.5 18h3"/>',
+ data:'<path d="M5 20v-4" /><path d="M10 20v-8"/><path d="M15 20V8"/><path d="M20 20V4"/><rect x="13.6" y="8" width="2.8" height="12" rx="1.4" style="fill:var(--icfill)" stroke="none"/><rect x="18.6" y="4" width="2.8" height="16" rx="1.4" style="fill:var(--icfill)" stroke="none"/>',
+ voice:'<path d="M5 4.5h3.2l1.6 4-2 1.3a10 10 0 0 0 6.4 6.4l1.3-2 4 1.6v3.2a2 2 0 0 1-2 2A15.5 15.5 0 0 1 3 6.5a2 2 0 0 1 2-2Z" style="fill:var(--icfill)"/>'}[k];
+ return '<span class="bico" style="background:var(--tile);border:1.5px solid var(--tilebd)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg></span>'}
+function pkgRow(k,label,val,unit,meta,pct){
+  return '<button type="button" data-act="airtime" aria-label="'+label+': '+val+' '+unit+', '+meta+'" style="display:flex;align-items:center;gap:12px;width:100%;padding:0;background:transparent;border:0;font-family:inherit;color:var(--text);text-align:left;pointer-events:auto;cursor:pointer">'+pkgIc(k)+
+   '<span style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0"><span style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:15px;font-weight:600">'+label+'</span><span style="display:flex;align-items:baseline;gap:4px;white-space:nowrap"><span style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums">'+val+'</span><span class="mut" style="font-size:12px;font-weight:600">'+unit+'</span></span></span>'+
+   (pct!==null?meter(pct):'')+'<span class="mut" style="font-size:12px;line-height:15px">'+meta+'</span></span></button>'}
 function forYouHTML(){
   var link='font-size:14px;font-weight:600;color:var(--link);background:transparent;border:0;font-family:inherit;pointer-events:auto;cursor:pointer;padding:0';
-  return '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>For you</h2><span class="mut" style="font-size:13px">Your packages and bills</span></div><button type="button" data-act="airtime" style="'+link+';min-height:24px">Buy more</button></div>'+
-   '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'+
-     pkgTile('Airtime',money(PKG.air),'ETB','Main balance',null)+
-     pkgTile('Data',PKG.data[0],'GB left','of '+PKG.data[1]+' GB · till '+PKG.ends,Math.round(PKG.data[0]/PKG.data[1]*100))+
-     pkgTile('Voice',PKG.voice[0],'min left','of '+PKG.voice[1]+' min · till '+PKG.ends,Math.round(PKG.voice[0]/PKG.voice[1]*100))+'</div>'+
+  return '<div class="hcard" style="gap:16px"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>For you</h2><span class="mut" style="font-size:13px">Your packages and bills</span></div><button type="button" data-act="airtime" style="'+link+';min-height:24px">Buy more</button></div>'+
+   pkgRow('air','Airtime',money(PKG.air),'ETB','Main balance',null)+
+   pkgRow('data','Data',PKG.data[0],'GB left','of '+PKG.data[1]+' GB · till '+PKG.ends,Math.round(PKG.data[0]/PKG.data[1]*100))+
+   pkgRow('voice','Voice',PKG.voice[0],'min left','of '+PKG.voice[1]+' min · till '+PKG.ends,Math.round(PKG.voice[0]/PKG.voice[1]*100))+
    '<div style="height:1px;background:var(--line)"></div>'+
    '<div style="display:flex;align-items:center;gap:12px"><span class="bico" style="background:var(--tile);border:1.5px solid var(--tilebd)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2.5 5.5 13.5h6l-1 8 7.5-11h-6Z" style="fill:var(--icfill)"/></svg></span>'+
    '<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:12px;font-weight:700;color:var(--softink)">Due soon</span><span style="font-size:15px;font-weight:700">Electricity bill</span><span class="mut" style="font-size:12px">845.60 ETB · by 30 Nov</span></span>'+
-   '<button type="button" data-act="due-pay" style="height:40px;padding:0 18px;border-radius:20px;background:#0187D0;color:#fff;border:0;font-family:inherit;font-size:14px;font-weight:700;pointer-events:auto;cursor:pointer;flex:none">Pay</button></div>'+
-   '<div style="height:1px;background:var(--line)"></div>'+
-   '<button type="button" data-act="tab" data-k="pay" style="'+link+';display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;margin:-8px 0 -6px">See all services<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>';
+   '<button type="button" data-act="due-pay" style="height:40px;padding:0 18px;border-radius:20px;background:#0187D0;color:#fff;border:0;font-family:inherit;font-size:14px;font-weight:700;pointer-events:auto;cursor:pointer;flex:none">Pay</button></div></div>';
 }
 function homeHTML(){
   var rings='';for(var r=8;r<=192;r+=8)rings+='<circle cx="200" cy="200" r="'+r+'"/>';
