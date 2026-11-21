@@ -265,9 +265,10 @@ function stampHTML(){
 setInterval(function(){document.querySelectorAll('.livechip').forEach(function(el){var t0=+el.getAttribute('data-t');if(Date.now()-t0>=LIVE_MS){var x=document.createElement('span');x.style.cssText='font-size:15px;line-height:20px;font-weight:600;color:var(--muted)';x.textContent=hm(new Date(t0));el.replaceWith(x);return}var c=el.querySelector('.livec');if(c)c.textContent=hm(new Date(),true)})},1000);
 function nowStr(){var d=new Date();S.paidAt=d;return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
 function mkTxn(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',o='DK';for(var i=0;i<8;i++)o+=c.charAt(Math.floor(Math.random()*c.length));return o}
+function newContact(d){return {id:'new',name:'Abebe Girma',ini:'AG',num:d,newc:true}} // sample registered name for a number not in contacts
 function intlNum(d){d=d.replace(/\D/g,'');if(d[0]==='0')d=d.slice(1);return '+251 '+d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6)}
 function recipientName(){return S.contact?S.contact.name:fmtNum(S.digits)}
-function recipientNum(){return S.mode==='bank'?fmtAcc(S.contact.num):(S.contact?fmtNum(S.contact.num):fmtNum(S.digits))}
+function recipientNum(){return S.mode==='bank'?fmtAcc(S.contact.num):intlNum(S.contact?S.contact.num:S.digits)}
 function isBank(){return S.mode==='bank'}
 function recipientSub(){return isBank()?bankShort(S.bk.bank)+' · ••'+S.bk.acc.slice(-4):recipientNum()}
 function validNum(d){return d.length===10&&/^0[79]/.test(d)}
@@ -413,7 +414,7 @@ function numberHTML(){
     body=field+'<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Matches</h2><span class="mut" style="font-size:12px">'+m.length+(m.length===1?' person':' people')+'</span></div>'+
       m.map(function(c,i){return (i?'<div class="divider"></div>':'')+contactRow(c,'pick',d.length)}).join('')+'</div>';
   }else if(ok){
-    body=field+'<div class="card"><div style="margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Not in your contacts</h2></div><button type="button" class="row" data-act="pick-new"><span class="av" style="width:40px;height:40px;color:var(--ink)">'+I.person(22)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Send to '+fmtNum(d)+'</span><span class="mut" style="font-size:13px">New recipient</span></span></button></div>';
+    body=field+'<div class="card"><div style="margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:700">Not in your contacts</h2></div><button type="button" class="row" data-act="pick-new">'+avatar(newContact(d),40,14)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">'+newContact(d).name+'</span><span class="mut" style="font-size:13px;font-variant-numeric:tabular-nums">'+intlNum(d)+'</span></span></button></div>';
   }else{
     body=field+'<div class="card"><h2 style="margin:0;font-size:16px;font-weight:700">No contact starts with '+fmtNum(d)+'</h2><span class="mut" style="font-size:13px;line-height:18px">Keep typing the full 10-digit number to send to someone new.</span></div>';
   }
@@ -1005,7 +1006,7 @@ document.addEventListener('click',function(e){
   else if(a==='chg'){S.pk.picking=true;S.pk.back=S.screen;S.digits='';go('number')}
   else if(a==='back-pick'){S.pk.picking=false;S.digits='';go(S.pk.back)}
   else if(a==='pick'){var c=byId(t.getAttribute('data-id'));S.contact=c;S.digits=c.num;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
-  else if(a==='pick-new'){S.contact=null;S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
+  else if(a==='pick-new'){S.contact=newContact(S.digits);S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='next'){go('pin')}
   else if(a==='sheet'){S.sheet=t.getAttribute('data-k');render(false)}
   else if(a==='sheet-close'){S.sheet=null;render(false)}
