@@ -166,6 +166,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 .livedot{width:8px;height:8px;border-radius:4px;background:#8DC73F;box-shadow:0 0 0 0 rgba(141,199,63,.6);animation:livep 1.6s infinite}
 @keyframes livep{0%{box-shadow:0 0 0 0 rgba(141,199,63,.6)}70%{box-shadow:0 0 0 8px rgba(141,199,63,0)}100%{box-shadow:0 0 0 0 rgba(141,199,63,0)}}
 @media (prefers-reduced-motion:reduce){.livedot{animation:none}}
+.hnav button.ni{pointer-events:auto;cursor:pointer;background:transparent;border:0;font-family:inherit;padding:0}
+.hnav button.ni:focus-visible{outline:3px solid var(--link);outline-offset:2px;border-radius:12px}
+.tabpg{min-height:100%;display:flex;flex-direction:column;background:var(--homebg)}
+.tabpg .tbody{display:flex;flex-direction:column;gap:12px;padding:8px 16px 24px;flex:1}
+.bico{width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:var(--avbg);border:1.5px solid var(--avbd);color:var(--avtx)}
+.apptile{display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;flex:none;background:transparent;border:0;padding:0;font-family:inherit;color:var(--text)}
+.apptile .bico{width:56px;height:56px;border-radius:16px;font-size:16px;background:var(--card);border:none;box-shadow:var(--cardsh);color:var(--icst)}
+.apptile span.t{font-size:12px;line-height:15px;font-weight:600;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px}
 .hpad{display:flex;flex-direction:column;gap:12px;padding:8px 16px 16px;flex:1}
 .hacts{display:flex;flex-direction:column;gap:8px}
 .hpad>.hacts~*{margin-top:12px}
@@ -331,6 +339,17 @@ function sheetHTML(){
   }
   return '<button type="button" class="scrim" data-act="sheet-close" aria-label="Close"></button><div class="sheetp" style="padding:10px 20px 28px;gap:14px;background:var(--card)"><span style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line)"></span>'+inn+'</div>';
 }
+function navBar(cur){
+  function nav(on,label,ic,key){return '<'+(key?'button type="button" data-act="tab" data-k="'+key+'" aria-label="'+label+'"'+(on?' aria-current="page"':''):'div')+' class="ni'+(on?' on':'')+'">'+(on?'<span style="position:absolute;top:3px;left:50%;margin-left:-9px;width:18px;height:4px;border-radius:2px;background:#8DC73F"></span>':'')+ic+'<span>'+label+'</span></'+(key?'button':'div')+'>'}
+  var navI='stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"';
+  var nHome='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 11 4.8Q12 4 13 4.8L20 11V18a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18Z"/><path d="M9.5 20.5v-3.5a2.5 2.5 0 0 1 5 0v3.5" style="fill:var(--icfill)"/></svg>';
+  var nPay='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10V9.5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4V10Z" style="fill:var(--icfill)" stroke="none"/><rect x="3" y="5.5" width="18" height="13" rx="4"/><path d="M3 10h18M7 14.5h3"/></svg>';
+  var nApps='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/></svg>';
+  var nAcc='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6" style="fill:var(--icfill)"/><path d="M4.8 20Q4.8 14.6 12 14.6T19.2 20Z"/></svg>';
+  var scan='<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</span>';
+  return '<nav class="hnav" aria-label="Main"><svg class="bgshape" aria-hidden="true" width="100%" height="72" viewBox="0 0 390 72" preserveAspectRatio="none"><path d="M0 10 L140 10 C160 10 168 -5 195 -5 C222 -5 230 10 250 10 L390 10 L390 72 L0 72 Z" fill="var(--navbg)" stroke="var(--navstroke)" stroke-width="1"/></svg>'+
+   nav(cur==='home','Home',nHome,'home')+nav(cur==='pay','Pay',nPay,'pay')+scan+nav(cur==='apps','Apps',nApps,'apps')+nav(false,'Account',nAcc)+'</nav>';
+}
 function homeHTML(){
   var rings='';for(var r=8;r<=192;r+=8)rings+='<circle cx="200" cy="200" r="'+r+'"/>';
   var eye='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.6" fill="currentColor" fill-opacity=".7" stroke="none"/></svg>';
@@ -348,19 +367,12 @@ function homeHTML(){
   var iZem='<img src="assets/icon-zemen.png" alt="" width="34" height="34" style="display:block;object-fit:contain">';
   var iPark='<img src="assets/icon-parking.png" alt="" width="34" height="34" style="display:block;object-fit:contain">';
   function tcol(ic,l){return '<div class="tcol"><span class="tileb">'+ic+'</span><span class="t">'+l+'</span></div>'}
+  var DMK={'Pay bills':'util','Transport &amp; parking':'traffic','Shop &amp; gift':'shop','Education':'edu','Travel &amp; tickets':'events','Entertainment':'events'};
   var dm=''; ['Pay bills','Transport &amp; parking','Shop &amp; gift','Education','Travel &amp; tickets','Entertainment'].forEach(function(t){
-    dm+='<div style="background:var(--soft2);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:92px"><span style="font-size:14px;font-weight:600">'+t+'</span><span style="display:flex">'+[0,1,2].map(function(k){return '<span style="width:24px;height:24px;border-radius:12px;background:var(--soft2dot);border:2px solid var(--soft2);margin-left:'+(k?-6:0)+'px"></span>'}).join('')+'</span></div>'});
-  function nav(on,label,ic){return '<div class="ni'+(on?' on':'')+'">'+(on?'<span style="position:absolute;top:3px;left:50%;margin-left:-9px;width:18px;height:4px;border-radius:2px;background:#8DC73F"></span>':'')+ic+'<span>'+label+'</span></div>'}
-  var navI='stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"';
-  var nHome='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 11 4.8Q12 4 13 4.8L20 11V18a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18Z"/><path d="M9.5 20.5v-3.5a2.5 2.5 0 0 1 5 0v3.5" style="fill:var(--icfill)"/></svg>';
-  var nPay='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10V9.5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4V10Z" style="fill:var(--icfill)" stroke="none"/><rect x="3" y="5.5" width="18" height="13" rx="4"/><path d="M3 10h18M7 14.5h3"/></svg>';
-  var nApps='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/></svg>';
-  var nAcc='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6" style="fill:var(--icfill)"/><path d="M4.8 20Q4.8 14.6 12 14.6T19.2 20Z"/></svg>';
-  var scan='<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</span>';
+    dm+='<button type="button" data-act="paycat" data-k="'+DMK[t]+'" style="background:var(--soft2);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:92px;border:0;font-family:inherit;color:inherit;text-align:left;pointer-events:auto;cursor:pointer"><span style="font-size:14px;font-weight:600">'+t+'</span><span style="display:flex">'+[0,1,2].map(function(k){return '<span style="width:24px;height:24px;border-radius:12px;background:var(--soft2dot);border:2px solid var(--soft2);margin-left:'+(k?-6:0)+'px"></span>'}).join('')+'</span></button>'});
   var RINGSVG='<svg class="rings" aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="rgBR" cx="200" cy="200" r="200" gradientUnits="userSpaceOnUse"><stop offset="0.35" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rmBR"><rect width="200" height="200" fill="url(#rgBR)"/></mask></defs><g mask="url(#rmBR)" fill="none" stroke="#ffffff" style="stroke-opacity:var(--ringop)" stroke-width="0.9">'+rings+'</g></svg>';
   function chip(p){var on=S.show[p[1]];return '<div class="pillbox" style="flex:1;min-width:0;justify-content:center;gap:1px;padding:6px 12px;height:56px;box-sizing:border-box"><span style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:600">'+p[0]+'<button type="button" class="eyebtn" data-act="eye" data-k="'+p[1]+'" aria-pressed="'+(on?'true':'false')+'" aria-label="'+(on?'Hide ':'Show ')+p[0]+'" style="width:36px;height:36px;margin:-10px -10px -10px 0">'+(on?eyeOff.replace('width="18" height="18"','width="15" height="15"'):eyeS)+'</button></span>'+(on?'<span style="font-size:17px;line-height:22px;font-weight:600;font-variant-numeric:tabular-nums">'+p[2]+'</span>':'<span style="font-size:22px;line-height:22px;font-weight:500;letter-spacing:2px;opacity:.9">*****</span>')+'</div>'}
   var iCashIO='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M9 15.5V8.5M9 8.5 6.7 10.8M9 8.5l2.3 2.3M15 8.5v7M15 15.5l-2.3-2.3M15 15.5l2.3-2.3"/></svg>';
-  var iMore=nApps.replace('width="24" height="24"','width="28" height="28"');
   var iLoan='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M8.8 15.2l6.4-6.4"/><circle cx="9" cy="9" r="1.8" style="fill:var(--icfill)"/><circle cx="15" cy="15" r="1.8" style="fill:var(--icfill)"/></svg>';
   var iMerch='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" style="fill:var(--icfill)"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/></svg>';
   function htile(act,k,ic,l){return '<button type="button" class="tcol htile" data-act="'+act+'"'+(k?' data-k="'+k+'"':'')+' aria-label="'+l+'"><span class="tileb" style="background:var(--card);border:none;box-shadow:var(--cardsh)">'+ic+'</span><span class="t" style="white-space:nowrap">'+l+'</span></button>'}
@@ -382,9 +394,8 @@ function homeHTML(){
    '<div style="display:flex;flex-direction:column;gap:8px"><div class="carousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px">'+
    '<img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"><img class="banner" src="assets/banner-zemen.png" alt="Zemen Gebeya, where Ethiopia shops digitally"></div>'+
    '<div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
-      '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>Do more with telebirr</h2><span class="mut" style="font-size:13px">Pay, book, shop and learn in one place.</span></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'+dm+'</div><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px"><span class="mut" style="font-size:13px">Can\'t find what you need?</span><span style="display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:#0187D0;color:#fff">Browse all services</span></div></div>'+
-'</div><nav class="hnav" aria-label="Main (not part of this prototype)"><svg class="bgshape" aria-hidden="true" width="100%" height="72" viewBox="0 0 390 72" preserveAspectRatio="none"><path d="M0 10 L140 10 C160 10 168 -5 195 -5 C222 -5 230 10 250 10 L390 10 L390 72 L0 72 Z" fill="var(--navbg)" stroke="var(--navstroke)" stroke-width="1"/></svg>'+
-   nav(true,'Home',nHome)+nav(false,'Pay',nPay)+scan+nav(false,'Apps',nApps)+nav(false,'Account',nAcc)+'</nav></div></div>'+sheetHTML();
+      '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><h2>Do more with telebirr</h2><span class="mut" style="font-size:13px">Pay, book, shop and learn in one place.</span></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'+dm+'</div><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px"><span class="mut" style="font-size:13px">Can\'t find what you need?</span><button type="button" data-act="tab" data-k="pay" style="display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:#0187D0;color:#fff;border:0;font-family:inherit;pointer-events:auto;cursor:pointer">Browse all services</button></div></div>'+
+'</div>'+navBar('home')+'</div></div>'+sheetHTML();
 }
 
 function matchesFor(d){return CONTACTS.filter(function(c){return c.num.indexOf(d)===0})}
@@ -671,6 +682,8 @@ function cfield(k,label,ph){
     (k==='code'?'<span style="height:36px;padding:0 12px;border-radius:18px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none" aria-hidden="true">'+ico('scan',18)+'Scan</span>':'')+'</button></div>';
 }
 var MNAME='Abebe Supermarket';
+function pName(){return S.cash.via==='bill'?S.biller.n:MNAME}
+function pSub(){return S.cash.via==='bill'?'Account '+S.cash.code+' · Abebe Girma':'Merchant '+S.cash.code+(S.cash.op?' · Operator '+S.cash.op:'')}
 function merchOver(){var a=amountVal();return a>0&&a+fee(a)>S.balance}
 function merchOK(){return S.cash.code.length>=5&&amountVal()>0&&!merchOver()}
 function afield(){
@@ -707,7 +720,7 @@ function coutHTML(){
 }
 function camtHTML(){
   var qr=S.cash.via==='qr',a=amountVal(),f=qr?0:fee(a),tot=a+f,over=!qr&&a>0&&tot>S.balance;
-  var mer=S.cash.via==='merch';
+  var mer=S.cash.via==='merch'||S.cash.via==='bill';
   var ctx=qr?['cin','Cash in at an agent','Shown on your QR code']:mer?['store',MNAME,'Merchant '+S.cash.code+(S.cash.op?' · Operator '+S.cash.op:'')]:S.cash.via==='atm'?['atm','Cash out at an ATM','Code sent by SMS']:['store','Agent '+S.cash.code,'Operator '+S.cash.op];
   var who='<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico(ctx[0],24)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:700">'+ctx[1]+'</span><span class="mut" style="font-size:12px">'+ctx[2]+'</span></span></div>';
   var big='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>';
@@ -719,9 +732,9 @@ function camtHTML(){
   return topbar(qr?'Cash in':mer?'Pay a merchant':'Cash out','back-camt')+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+who+card+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="camt-next"'+((a<=0||over)?' disabled':'')+'>'+(qr?'Add to my code':'Next')+'</button></div>'+keypad('amount');
 }
 function cpinHTML(){
-  var a=amountVal(),f=fee(a),tot=a+f,atm=S.cash.via==='atm',mer=S.cash.via==='merch';S.total=tot;
+  var a=amountVal(),f=fee(a),tot=a+f,atm=S.cash.via==='atm',mer=S.cash.via==='merch'||S.cash.via==='bill';S.total=tot;
   if(mer)return topbar('Confirm payment','back-cpin')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
-   '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('store',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+MNAME+'</span><span class="mut" style="font-size:14px">Merchant '+S.cash.code+(S.cash.op?' · Operator '+S.cash.op:'')+'</span></span></div>'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('store',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+pName()+'</span><span class="mut" style="font-size:14px">'+pSub()+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">'+money(a)+' ETB · includes '+money(f)+' ETB fee</span></div></div>'+
    '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
   return topbar('Confirm cash out','back-cpin')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
@@ -734,14 +747,14 @@ function doPay3(){
   setTimeout(function(){S.balance=Math.round((S.balance-S.total)*100)/100;S.txn=mkTxn();S.time=nowStr();S.paying=false;go('cdone')},900);
 }
 function cdoneHTML(){
-  var v=S.cash.via,mvch=v==='mvoucher',vch=v==='voucher'||mvch,atm=v==='atm',mer=v==='merch',a=amountVal();
+  var v=S.cash.via,mvch=v==='mvoucher',vch=v==='voucher'||mvch,atm=v==='atm',mer=v==='merch'||v==='bill',a=amountVal();
   function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
   var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
   var head=vch?'<span style="margin-top:22px;font-size:24px;line-height:30px;font-weight:700">Code sent</span><span class="mut" style="font-size:14px;line-height:20px">Check your SMS for the secret code.</span>':
     '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'';
-  var next=mvch?['ticket','Next: give the code to the merchant','They use it to take the payment.']:mer?['store','Paid to '+MNAME,'Merchant '+S.cash.code]:vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
+  var next=mvch?['ticket','Next: give the code to the merchant','They use it to take the payment.']:mer?['store','Paid to '+pName(),pSub()]:vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
   var nc='<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none"><span class="tbig" style="width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1.5px solid var(--tilebd)">'+ico(next[0],26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+next[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+next[2]+'</span></span></div>';
-  var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(mer?line('Merchant',MNAME,0)+line('Merchant ID',S.cash.code,1)+(S.cash.op?line('Operator',S.cash.op,1):'')+line('Amount',money(a)+' ETB',1):(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1))+line('Transaction ID',S.txn,1)+'</div>';
+  var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(mer?(v==='bill'?line('Biller',pName(),0)+line('Account',S.cash.code,1)+line('Account holder','Abebe Girma',1):line('Merchant',MNAME,0)+line('Merchant ID',S.cash.code,1)+(S.cash.op?line('Operator',S.cash.op,1):''))+line('Amount',money(a)+' ETB',1):(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1))+line('Transaction ID',S.txn,1)+'</div>';
   return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+head+'</div>'+nc+det+'</div></div>'+btn56('Done','finish');
 }
 /* ---------- Loans ---------- */
@@ -829,6 +842,70 @@ function ldoneHTML(){
    '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">+'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
    '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+due[0]+(p[5]==='short'?' ':': ')+due[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+b.n+'</span></span></div>'+
    '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+line('Loan',p[1],0)+line('Bank',b.n,1)+line('Added to','Balance',1)+line('Transaction ID',S.txn,1)+'</div></div></div>'+btn56('Done','finish');
+}
+/* ---------- Pay tab (bills) ---------- */
+var PCATS=[
+ ['util','Utilities','Electricity, water, phone','<path d="M13 2.5 5.5 13.5h6l-1 8 7.5-11h-6Z" class="f"/>',
+  ['Ethiopian Electric Utility','Ethio telecom bill','Addis Ababa Water and Sewerage','Water utility by Derash','Water utility by WeBirr','Water utility by UniCash','Water utility by Palaba','WebSprix']],
+ ['gov','Government &amp; tax','Customs, permits, MESOB','<path d="M4 9.5 12 4l8 5.5Z" class="f"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8M3.5 20.5h17"/>',
+  ['Tax Payment','Ethiopian Customs Commission','Immigration and Citizenship Service','Government Payment','Building Permit','E-Land by Derash','Ministry of Trade','Addis MESOB One-stop Service','FDRE MESOB Service','Dire Dawa MESOB One-stop','Amhara National Regional State','Somali Regional State','Benishangul Gumuz Region','Smart-Land by Icons']],
+ ['traffic','Transport &amp; traffic','Fines, parking, licences','<rect x="4" y="9" width="16" height="8" rx="3" class="f"/><path d="M6.5 9 8 5.5h8L17.5 9M7.5 17v2M16.5 17v2"/>',
+  ['National Traffic Penalty','AA Traffic Penalty Payment','Adama Traffic Police','Oromia Transport Authority','AATMA Parking Payment','AA Drivers and Vehicles Licensing','Transport Payment','ETRE service and trade']],
+ ['edu','School &amp; university','Fees and exams','<path d="M2.5 9 12 4.5 21.5 9 12 13.5Z" class="f"/><path d="M6.5 11v4.5Q12 19 17.5 15.5V11M21.5 9v5"/>',
+  ['telebirr school pay','Addis Ababa University','Jimma University','Ethiopian Aviation University','Educational Assessment and Examinations','Awash E-School Pay','Hibir E-School Pay','Berhan SchoolPay','Gibson Schools','Education Management','Adey Fee','Rasynergy']],
+ ['events','Events &amp; tickets','Parks, museums, shows','<path d="M3.5 8a2 2 0 0 0 0 4 2 2 0 0 1 0 4V18q0 1.5 1.5 1.5h14q1.5 0 1.5-1.5v-2a2 2 0 0 1 0-4 2 2 0 0 1 0-4V6q0-1.5-1.5-1.5H5Q3.5 4.5 3.5 6Z" class="f"/><path d="M14.5 5v14" stroke-dasharray="2 2.5"/>',
+  ['Unity Park','Adwa Victory Museum','Friendship Square Park','AAU IES Museum','Addis Ababa Light Rail','Palace Museum','Ethiopian National Theatre','Film Festival','Gursha &amp; Zema','Kuriftu Waterparks','Admas lottery','DStv']],
+ ['shop','Shopping','Online stores','<path d="M5 8h14l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3Z" class="f"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>',
+  ['Zmall','Agelgil','Mama&#39;s kitchen palace']],
+ ['ins','Insurance','Car and health cover','<path d="M12 3.5 19.5 6v5.5q0 5.5-7.5 9-7.5-3.5-7.5-9V6Z" class="f"/><path d="m9 12 2 2 4-4"/>',
+  ['Third Party Insurance','Awash Insurance']],
+ ['give','Donations &amp; memberships','Charities and clubs','<path d="M12 20.5s-7.5-4.3-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.7-7.5 10-7.5 10Z" class="f"/>',
+  ['Mekedonia Charity Association','Wendem Kalid Foundation','Yeaddis Kidan Kahinat','Addisun Amet Bebete','Excellent Youth Persons','Membership Payment','Boost Software Development','Link Net Communication']],
+ ['agri','Farming','Agricultural inputs','<path d="M12 20.5V10M12 10Q12 4.5 6.5 4.5 6.5 10 12 10ZM12 13q0-5 5.5-5 0 5-5.5 5Z" class="f"/>',
+  ['Agricultural inputs supply']]
+];
+var PRECENT=[['util',0],['util',1],['traffic',0]];
+function bInit(n){var w=n.replace(/&amp;|&#39;/g,'').split(/\s+/).filter(function(x){return /^[A-Za-z]/.test(x)&&!/^(of|and|by|the)$/i.test(x)});return ((w[0]||'?')[0]+(w[1]?w[1][0]:'')).toUpperCase()}
+function pcat(id){return PCATS.filter(function(c){return c[0]===id})[0]}
+function searchBox(ph){return '<div aria-hidden="true" style="display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--card);box-shadow:var(--cardsh);padding:0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span class="mut" style="font-size:14px">'+ph+'</span></div>'}
+function tabHead(t){return '<div style="display:flex;align-items:center;min-height:56px;padding:8px 16px 0"><h1 style="margin:0;font-size:24px;font-weight:700">'+t+'</h1></div>'}
+function payHTML(){
+  var rec=PRECENT.map(function(x){var c=pcat(x[0]),n=c[4][x[1]];return '<button type="button" data-act="bill" data-c="'+x[0]+'" data-i="'+x[1]+'" style="flex:none;width:148px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:12px;border-radius:16px;background:var(--card);border:0;box-shadow:var(--cardsh);font-family:inherit;color:var(--text);text-align:left"><span class="bico">'+bInit(n)+'</span><span style="font-size:13px;line-height:17px;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px">'+n+'</span></button>'}).join('');
+  var cats=PCATS.map(function(c){return '<button type="button" data-act="paycat" data-k="'+c[0]+'" style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px;border-radius:16px;background:var(--card);border:0;box-shadow:var(--cardsh);font-family:inherit;color:var(--text);text-align:left;min-height:118px"><span class="bico" style="background:var(--tile);border:1.5px solid var(--tilebd)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+c[3].replace(/class="f"/g,'style="fill:var(--icfill)"')+'</svg></span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;line-height:18px;font-weight:700">'+c[1]+'</span><span class="mut" style="font-size:12px;line-height:16px">'+c[4].length+(c[4].length===1?' biller':' billers')+'</span></span></button>'}).join('');
+  return '<div class="scroll"><div class="tabpg">'+tabHead('Pay')+'<div class="tbody">'+searchBox('Search billers, e.g. electricity')+
+   '<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font-size:16px;font-weight:700">Paid recently</h2><div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 6px">'+rec+'</div></div>'+
+   '<h2 style="margin:12px 0 0;font-size:16px;font-weight:700">All categories</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+cats+'</div></div>'+navBar('pay')+'</div></div>';
+}
+function paycatHTML(){
+  var c=pcat(S.paycat);
+  var rows=c[4].map(function(n,i){return (i?'<div class="divider"></div>':'')+'<button type="button" class="row" data-act="bill" data-c="'+c[0]+'" data-i="'+i+'"><span class="bico">'+bInit(n)+'</span><span style="flex:1;font-size:15px;line-height:19px;font-weight:600;text-align:left">'+n+'</span>'+mut('chev',20)+'</button>'}).join('');
+  return topbar(c[1],'back-pay')+'<div class="scroll"><div class="body" style="padding-top:4px"><span class="mut" style="font-size:13px;padding:0 2px">'+c[2]+'</span><div class="card" style="padding:4px 16px">'+rows+'</div></div></div>';
+}
+function billHTML(){
+  var c=S.cash,b=S.biller,has=c.code.length>=6,ok=has&&amountVal()>0&&!merchOver();
+  var head='<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--card);box-shadow:var(--cardsh)"><span class="bico">'+bInit(b.n)+'</span><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;line-height:19px;font-weight:700">'+b.n+'</span><span class="mut" style="font-size:12px">'+pcat(b.c)[1]+'</span></span></div>';
+  var found=has?'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:36px;height:36px;font-size:12px">AG</span><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">Abebe Girma</span><span class="mut" style="font-size:12px">Account '+c.code+'</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>':'';
+  return topbar('Pay a bill','back-paycat')+'<div class="scroll"><div class="body" style="padding-top:4px;padding-bottom:90px">'+head+cfield('code','Account or customer number','e.g. 1234567')+found+(has?afield():'')+'</div></div>'+
+   '<div class="btnwrap"><button type="button" class="btn" data-act="bill-next"'+(ok?'':' disabled')+'>Next</button></div>'+keypad(c.fld==='amt'?'amount':'none');
+}
+/* ---------- Apps tab ---------- */
+var ASECT=[
+ ['Shopping',['Zmall','Awra Store','AddisGebeya','Deje Shop','Tina Mart','Suqe Store','Seregela','Shaggar e-Court','CommercePal','Lekfel']],
+ ['Getting around',['RIDE','Public Transport','EDR Ticket Booking','Safe Transport','Cross Country Bus Tickets','BS Transit','Shaggar City Transport','teleEV Charging','Ethiopian Airlines','Ethiopian Shipping and Logistics']],
+ ['Savings &amp; Equb',['Digital Equb','Virtual Equb','Ashewa','Derash Equb','eQUB','Harambee']],
+ ['Government &amp; ID',['NID (Fayda) Digital ID','NID (Fayda) printing','Dire Dawa Digital ID','Bahir Dar Digital Kebele ID','Online Employment','Ethio Legal Shield']],
+ ['Entertainment',['TeleTv','MyDStv','Hulu beje','Seleda','Mekina','Football Club Membership','Great Ethiopian Run','Addis sport fields booking']],
+ ['Learning',['AfroRead','ACT American','ACT Academy','etdemy Learning','Lemengede','Muyalogy','School Payment']],
+ ['Health',['Medhin Link','YeneHealth','Semayline']],
+ ['From Ethio telecom',['My Ethiotel','telebirrRemit','tele-Online Fixed','Online teleSIM','Choose Number','teledrive','tele-forum']]
+];
+var ARECENT=['Zmall','RIDE','Digital Equb','NID (Fayda) Digital ID'];
+function appTile(n){return '<button type="button" class="apptile" aria-label="'+n.replace(/&amp;/g,'and')+'"><span class="bico">'+bInit(n)+'</span><span class="t">'+n+'</span></button>'}
+function appsHTML(){
+  var rec='<div style="display:flex;justify-content:space-between">'+ARECENT.map(appTile).join('')+'</div>';
+  var secs=ASECT.map(function(sx){return '<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:16px;font-weight:700">'+sx[0]+'</h2><span class="mut" style="font-size:12px">'+sx[1].length+' apps</span></div><div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 6px">'+sx[1].map(appTile).join('')+'</div></div>'}).join('');
+  return '<div class="scroll"><div class="tabpg">'+tabHead('Apps')+'<div class="tbody" style="gap:18px">'+searchBox('Search apps')+
+   '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="margin:0;font-size:16px;font-weight:700">Recently used</h2>'+rec+'</div>'+secs+'</div>'+navBar('apps')+'</div></div>';
 }
 /* ---------- render ---------- */
 var phone=$('#phone');
@@ -920,7 +997,7 @@ function bankAllHTML(){
 
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -980,16 +1057,17 @@ function pressKey(k){
     if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
     else if(/\d/.test(k)&&S.bk.acc.length<16){S.bk.acc+=k}
     bkLookup();render(false);
-  }else if(S.screen==='merch'&&S.cash.fld==='amt'){
+  }else if((S.screen==='merch'||S.screen==='bill')&&S.cash.fld==='amt'){
     var s2=S.amount;
     if(k==='b'){if(!s2){S.cash.fld='op'}else s2=s2.slice(0,-1)}
     else if(k==='.'){if(s2.indexOf('.')<0)s2=(s2===''?'0':s2)+'.'}
     else if(/\d/.test(k)){var q=s2.split('.');if(q.length>1){if(q[1].length<2)s2+=k}else if(q[0].length<6){s2=(q[0]==='0'?'':q[0])+k}}
     S.amount=s2;render(false);
-  }else if(S.screen==='cout'||S.screen==='merch'){
-    var c=S.cash,f=c.fld,mx=f==='code'?6:4;
+  }else if(S.screen==='cout'||S.screen==='merch'||S.screen==='bill'){
+    var c=S.cash,f=c.fld,mx=f==='code'?(S.screen==='bill'?10:6):4;
     if(k==='b'){if(!c[f]&&f==='op'){c.fld='code'}else c[f]=c[f].slice(0,-1)}
-    else if(/\d/.test(k)&&c[f].length<mx){c[f]+=k;if(f==='code'&&c[f].length===6)c.fld='op'}
+    else if(/\d/.test(k)&&c[f].length<mx){c[f]+=k;if(f==='code'&&c[f].length===6&&S.screen!=='bill')c.fld='op'}
+    if(S.screen==='bill'&&c.code.length>=6&&!S.amount){S.amount='845.60'}
     render(false);
   }else if(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt'){
     var s=S.fresh?'':S.amount;
@@ -1049,6 +1127,12 @@ document.addEventListener('click',function(e){
   else if(a==='back-loans'){go('loans')}
   else if(a==='back-lamt'){go('lamt')}
   else if(a==='ln-next'){go('lpin')}
+  else if(a==='tab'){var tk=t.getAttribute('data-k');resetFlow();S.sheet=null;go(tk==='home'?'home':tk)}
+  else if(a==='paycat'){S.paycat=t.getAttribute('data-k');go('paycat')}
+  else if(a==='back-pay'){go('pay')}
+  else if(a==='bill'){var bc=t.getAttribute('data-c'),bi=+t.getAttribute('data-i');resetFlow();S.amount='';S.paycat=bc;S.biller={c:bc,n:pcat(bc)[4][bi]};S.cash.fld='code';go('bill')}
+  else if(a==='back-paycat'){go('paycat')}
+  else if(a==='bill-next'){if(S.cash.code.length>=6&&amountVal()>0&&!merchOver()){S.cash.via='bill';S.pin='';go('cpin')}}
   else if(a==='merch'){resetFlow();S.amount='';S.cash.otab='agent';go('merch')}
   else if(a==='m-tab'){S.cash.otab=t.getAttribute('data-k');render(false)}
   else if(a==='m-next'){if(merchOK()){S.cash.via='merch';S.pin='';go('cpin')}}
@@ -1064,7 +1148,7 @@ document.addEventListener('click',function(e){
   else if(a==='cout-next'){if(coutOK()){S.cash.via='agent';S.amount='';go('camt')}}
   else if(a==='cout-atm'){S.cash.via='atm';S.amount='';go('camt')}
   else if(a==='back-camt'){go(S.cash.via==='qr'?'cin':S.cash.via==='merch'?'merch':'cout')}
-  else if(a==='back-cpin'){go(S.cash.via==='merch'?'merch':'camt')}
+  else if(a==='back-cpin'){go(S.cash.via==='merch'?'merch':S.cash.via==='bill'?'bill':'camt')}
   else if(a==='camt-next'){var av=amountVal();if(S.cash.via==='qr'){S.cash.qr=av;go('cin')}else go('cpin')}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
@@ -1093,10 +1177,10 @@ document.addEventListener('click',function(e){
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
-  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='merch'&&S.screen!=='lamt')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='merch'&&S.screen!=='bill'&&S.screen!=='lamt')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
-  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt'||(S.screen==='merch'&&S.cash.fld==='amt'))){pressKey('.');e.preventDefault()}
+  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt'||((S.screen==='merch'||S.screen==='bill')&&S.cash.fld==='amt'))){pressKey('.');e.preventDefault()}
   else if(e.key==='Enter'&&isPinScr()&&S.pin.length===6){payFn()();e.preventDefault()}
   else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
 });
