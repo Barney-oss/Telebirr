@@ -66,7 +66,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (max-width:760px){
   .seg .ic{display:block}
   .stage{display:block;padding:0}
-  .side{position:fixed;top:6px;right:68px;left:auto;transform:none;z-index:50;width:auto;padding:0;gap:0}
+  .side{position:fixed;top:6px;right:116px;left:auto;transform:none;z-index:50;width:auto;padding:0;gap:0}
   .side h1,.side p,.note{display:none}
   .seg{padding:2px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
   .seg button{width:38px;height:30px;padding:0;display:flex;align-items:center;justify-content:center}
@@ -98,6 +98,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.rise{animation:none}}
 .divider{height:1px;background:var(--line)}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.sw span{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:13px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.sw.on{background:#8DC73F}.sw.on span{left:23px}
+.radio{width:24px;height:24px;border-radius:12px;border:2px solid var(--tilebd);box-sizing:border-box;flex:none}
+.radio.on{border:7px solid #8DC73F}
+.scanpg{position:relative;display:flex;flex-direction:column;height:100%;background:#0B0F0C;overflow:hidden}
+.scancam{position:absolute;inset:0;background:radial-gradient(120% 80% at 30% 30%,#3A4A3E 0%,#1C241E 45%,#0B0F0C 100%)}
+.scancam:after{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 70% 70%,rgba(255,255,255,.08),transparent 70%)}
+.scanbox{position:relative;width:250px;height:250px;border-radius:22px;background:rgba(255,255,255,.04);box-shadow:0 0 0 2000px rgba(0,0,0,.38);border:0;padding:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:18px;font-family:inherit;cursor:pointer}
+.scanline{position:absolute;left:20px;right:20px;top:24px;height:2px;border-radius:1px;background:#8DC73F;box-shadow:0 0 12px 2px rgba(141,199,63,.6);animation:scanmv 2.4s ease-in-out infinite alternate}
+@keyframes scanmv{to{top:220px}}
+@media (prefers-reduced-motion:reduce){.scanline{animation:none;top:124px}}
+
 .dash{border-top:1.5px dashed var(--line)}
 .pad{background:var(--keybg);border-radius:28px 28px 0 0;padding:14px 16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;height:266px;flex:none;align-content:start}
 .key{height:52px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--key);box-shadow:var(--keysh);font-size:24px;font-weight:500;color:var(--text);border:0;padding:0}
@@ -247,7 +260,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false};
+var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'home',digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false,lang:'en',bio:{login:true,pay:false},cp:{step:0,nw:'',err:''},faq:0,tx:{tab:'main',type:'all',days:'30',sel:0,back:'back-txns'},txf:{type:'all',days:'30'},toast:'',torch:false};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -307,11 +320,11 @@ function keypad(kind){
   for(var i=1;i<=9;i++)h+='<button type="button" class="key" data-act="key" data-k="'+i+'" aria-label="'+i+'">'+i+'</button>';
   if(kind==='amount') h+='<button type="button" class="key acc" data-act="key" data-k="." aria-label="Decimal point">.</button>';
   else if(kind==='pin') h+='<button type="button" class="key acc" data-act="bio" aria-label="Use fingerprint (prototype shortcut)">'+I.finger+'</button>';
-  else if(kind==='none') h+='<span aria-hidden="true"></span>';
+  else if(kind==='none'||kind==='pin2') h+='<span aria-hidden="true"></span>';
   else if(kind==='acc') h+='<span class="key acc" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="3" style="fill:var(--icfill)"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></svg></span>';
   else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
   h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
-  if(kind==='pin'&&S.pin.length===6) h+='<button type="button" class="key ok" data-act="pay" aria-label="Confirm and pay"'+(S.paying?' disabled':'')+'>'+I.tick+'</button>';
+  if((kind==='pin'||kind==='pin2')&&S.pin.length===6) h+='<button type="button" class="key ok" data-act="pay" aria-label="Confirm and pay"'+(S.paying?' disabled':'')+'>'+I.tick+'</button>';
   else h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
   return h+'</div>';
 }
@@ -348,9 +361,9 @@ function navBar(cur){
   var nPay='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10V9.5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4V10Z" style="fill:var(--icfill)" stroke="none"/><rect x="3" y="5.5" width="18" height="13" rx="4"/><path d="M3 10h18M7 14.5h3"/></svg>';
   var nApps='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.8" style="fill:var(--icfill)"/></svg>';
   var nAcc='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6" style="fill:var(--icfill)"/><path d="M4.8 20Q4.8 14.6 12 14.6T19.2 20Z"/></svg>';
-  var scan='<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</span>';
+  var scan='<button type="button" data-act="scan" aria-label="Scan QR" style="border:0;background:transparent;padding:0;font-family:inherit;pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;margin-top:-9px;font-size:12px;line-height:15px;font-weight:500;color:var(--navtx)"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:22px;background:#0187D0;box-shadow:0 6px 12px rgba(1,135,208,.30)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M6.5 6.5h0M17.5 6.5h0M6.5 17.5h0" stroke-width="2.6"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17.5 20.5H21M21 17v3.5"/></svg></span>Scan</button>';
   return '<nav class="hnav" aria-label="Main"><svg class="bgshape" aria-hidden="true" width="100%" height="72" viewBox="0 0 390 72" preserveAspectRatio="none"><path d="M0 10 L140 10 C160 10 168 -5 195 -5 C222 -5 230 10 250 10 L390 10 L390 72 L0 72 Z" fill="var(--navbg)" stroke="var(--navstroke)" stroke-width="1"/></svg>'+
-   nav(cur==='home','Home',nHome,'home')+nav(cur==='pay','Pay',nPay,'pay')+scan+nav(cur==='apps','Apps',nApps,'apps')+nav(false,'Account',nAcc)+'</nav>';
+   nav(cur==='home','Home',nHome,'home')+nav(cur==='pay','Pay',nPay,'pay')+scan+nav(cur==='apps','Apps',nApps,'apps')+nav(cur==='acct','Account',nAcc,'acct')+'</nav>';
 }
 /* ---------- Home: For you ---------- */
 var PKG={air:23.5,data:[1.2,2],voice:[45,100],ends:'25 Nov'};
@@ -402,13 +415,13 @@ function homeHTML(){
   var iMerch='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" style="fill:var(--icfill)"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/></svg>';
   function htile(act,k,ic,l){return '<button type="button" class="tcol htile" data-act="'+act+'"'+(k?' data-k="'+k+'"':'')+' aria-label="'+l+'"><span class="tileb" style="background:var(--card);border:none;box-shadow:var(--cardsh)">'+ic+'</span><span class="t" style="white-space:nowrap">'+l+'</span></button>'}
   return '<div class="scroll" id="sc"><div class="home"><div class="hpad">'+
-   '<div class="hrow"><span style="width:32px;height:44px;display:flex;align-items:center;justify-content:center;flex:none"><img class="hlogo" src="assets/logo-telebirr-black.png" alt="telebirr"></span><div style="flex:1;display:flex;flex-direction:column"><span class="mut" style="font-size:13px">Good afternoon,</span><span style="font-size:17px;font-weight:700">Nardos</span></div><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5"/></svg></span></div>'+
+   '<div class="hrow"><span style="width:32px;height:44px;display:flex;align-items:center;justify-content:center;flex:none"><img class="hlogo" src="assets/logo-telebirr-black.png" alt="telebirr"></span><div style="flex:1;display:flex;flex-direction:column"><span class="mut" style="font-size:13px">Good afternoon,</span><span style="font-size:17px;font-weight:700">Nardos</span></div><button type="button" class="ibtn" data-act="notif" aria-label="Notifications, 4 new" style="position:relative;border:0;padding:0;pointer-events:auto;cursor:pointer;margin-right:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15Z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg><span style="position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:5px;background:#E5484D;border:2px solid var(--iconbtn)"></span></button><span class="ibtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5"/></svg></span></div>'+
    '<div class="bal"><svg class="rings" aria-hidden="true" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="rgBR" cx="200" cy="200" r="200" gradientUnits="userSpaceOnUse"><stop offset="0.35" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rmBR"><rect width="200" height="200" fill="url(#rgBR)"/></mask></defs><g mask="url(#rmBR)" fill="none" stroke="#ffffff" style="stroke-opacity:var(--ringop)" stroke-width="0.9">'+rings+'</g></svg>'+
    '<span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--balsub)">Your balance<button type="button" class="eyebtn" data-act="eye" data-k="bal" aria-pressed="'+(S.show.bal?'true':'false')+'" aria-label="'+(S.show.bal?'Hide':'Show')+' balance" style="width:36px;height:36px;margin:-6px -2px">'+(S.show.bal?eyeOff:eye)+'</button></span>'+
    (S.show.bal?'<span style="font-variant-numeric:lining-nums tabular-nums;font-size:42px;font-weight:500;line-height:44px;display:flex;align-items:baseline">'+money(S.balance).split('.')[0]+'<span style="font-size:24px">.'+money(S.balance).split('.')[1]+'</span><span style="font-size:15px;font-weight:700;margin-left:6px">ETB</span></span>':'<span style="font-variant-numeric:lining-nums tabular-nums;font-size:46px;font-weight:500;letter-spacing:5px;line-height:44px;opacity:.9">******</span>')+
    '<div style="align-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px">'+
    [['Endekise','end','1,250.00'],['Reward','rew','86.40']].map(function(p){var on=S.show[p[1]];return '<div class="pillbox"><span style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:600">'+p[0]+'<button type="button" class="eyebtn" data-act="eye" data-k="'+p[1]+'" aria-pressed="'+(on?'true':'false')+'" aria-label="'+(on?'Hide ':'Show ')+p[0]+'" style="width:36px;height:36px;margin:-8px -10px -8px 0">'+(on?eyeOff.replace('width="18" height="18"','width="15" height="15"'):eyeS)+'</button></span>'+(on?'<span style="font-size:20px;line-height:22px;font-weight:600;font-variant-numeric:tabular-nums">'+p[2]+'</span>':'<span style="font-size:24px;line-height:22px;font-weight:500;letter-spacing:2px;opacity:.9">*****</span>')+'</div>'}).join('')+'</div>'+
-   '<span style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;margin-top:2px;font-size:14px;font-weight:700">View transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></div>'+
+   '<button type="button" data-act="txns" style="border:0;background:transparent;padding:0 8px;font-family:inherit;color:inherit;pointer-events:auto;cursor:pointer;align-self:center;display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;margin-top:2px;font-size:14px;font-weight:700">View transactions<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>'+
    '<div class="hacts"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
    '<button type="button" class="hero" data-act="send" aria-label="Send money, start the prototype" style="height:64px;padding:0 14px;gap:10px">'+iSend+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Send money</span></button>'+
    '<button type="button" class="hero" data-act="airtime" style="height:64px;padding:0 14px;gap:10px">'+iAir.replace(/width="\d+" height="\d+"/,'width="28" height="28"')+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button></div>'+
@@ -1073,9 +1086,214 @@ function bankAllHTML(){
   return '<div class="topbar"><button type="button" class="back" data-act="back-bank" aria-label="Back">'+I.back+'</button><h1>Sent before</h1><button type="button" data-act="bk-clear" style="font-size:14px;font-weight:600;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 8px;font-family:inherit">Clear</button></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:8px 0 24px"><div aria-hidden="true" style="display:flex;gap:8px;overflow:hidden;padding:0 16px">'+chips+'</div><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px">'+cards+'</div></div></div>'+bankSheet();
 }
 
+/* ---------- shared bits for Account, Scan, Transactions, Notifications ---------- */
+function sv(inner,px){return '<svg width="'+(px||22)+'" height="'+(px||22)+'" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+inner.replace(/class="f"/g,'style="fill:var(--icfill)"')+'</svg>'}
+var AI={
+ id:'<rect x="3" y="5" width="18" height="14" rx="4"/><circle cx="9" cy="11" r="2.2" class="f"/><path d="M5.8 16q.6-2.3 3.2-2.3t3.2 2.3M14.5 10h3.5M14.5 13.5h2.5"/>',
+ coupon:'<path d="M3.5 8.5V7a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.5a3.5 3.5 0 0 0 0 7V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-1.5a3.5 3.5 0 0 0 0-7Z" class="f"/><path d="M14 5v14" stroke-dasharray="2 2.4"/>',
+ pin:'<rect x="4" y="10" width="16" height="10.5" rx="4" class="f"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5"/>',
+ finger:'<path d="M12 3.5a7.5 7.5 0 0 0-7.5 7.5v1.5M19.5 12V11A7.5 7.5 0 0 0 12 3.5M8 20c-.9-1.6-1.5-3.4-1.5-5.5V11a5.5 5.5 0 0 1 11 0v3.5c0 1.4.2 2.6.6 3.8M12 20.5c-.9-1.2-1.5-2.8-1.5-4.8V11a1.5 1.5 0 0 1 3 0v4.7c0 1.6.3 2.8.9 4"/>',
+ shield:'<path d="M12 3.5 19 6v5.5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6Z" class="f"/><path d="M12 9.5v3M12 15.5v.01"/>',
+ verify:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M8.3 12.3l2.5 2.5 5-5.2"/>',
+ split:'<rect x="3.5" y="4" width="11" height="14" rx="3" class="f"/><path d="M7 8h4M7 11.5h4M17.5 8.5v9a2.5 2.5 0 0 1-2.5 2.5H8"/>',
+ lang:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12a8.5 8.5 0 0 1 8.5-8.5c-3 3-3 14 0 17A8.5 8.5 0 0 1 3.5 12Z" class="f" stroke="none"/><path d="M3.5 12h17M12 3.5c-3 3-3 14 0 17M12 3.5c3 3 3 14 0 17"/>',
+ wifi:'<path d="M3.5 9.5a12 12 0 0 1 17 0M6.5 12.8a7.7 7.7 0 0 1 11 0M9.4 16a3.6 3.6 0 0 1 5.2 0"/><circle cx="12" cy="19" r="1.4" class="f"/>',
+ share:'<rect x="4" y="9" width="16" height="11.5" rx="4" class="f"/><path d="M12 13.5V3M8.5 6.5 12 3l3.5 3.5"/>',
+ faq:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M9.6 9.6a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.5M12 16.6v.01"/>',
+ phone:'<path d="M5 4.5h3.2l1.6 4-2 1.3a10 10 0 0 0 6.4 6.4l1.3-2 4 1.6v3.2a2 2 0 0 1-2 2A15.5 15.5 0 0 1 3 6.5a2 2 0 0 1 2-2Z" class="f"/>',
+ chat:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5Z" class="f"/><path d="M8.5 9h7M8.5 12h4.5"/>',
+ info:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M12 11v5M12 8v.01"/>',
+ web:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M3.5 12h17M12 3.5c-3 3-3 14 0 17M12 3.5c3 3 3 14 0 17"/>',
+ qr:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.6" class="f"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M13.5 13.5h3v3h-3zM20.5 13.5v.01M13.5 20.5v.01M17 20.5h3.5M20.5 17v3.5"/>',
+ bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15Z" class="f"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+ promo:'<path d="M4 10v4a1.5 1.5 0 0 0 1.5 1.5H7l6 4V4.5l-6 4H5.5A1.5 1.5 0 0 0 4 10Z" class="f"/><path d="M17 9a4 4 0 0 1 0 6"/>',
+ cart:'<path d="M3.5 4.5h2.2l2 10.5h10.3l2-7.5H7" /><path d="M7.4 7.5h12.6l-2 7.5H8.8Z" class="f" stroke="none"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+ car:'<path d="M5 15.5v-3.2L7 7.5h10l2 4.8v3.2Z" class="f"/><path d="M4 12.5h16v4a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1V16h-9v.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="M7.5 14.3h.01M16.5 14.3h.01"/>',
+ send:'<path d="M4.6 4.7 19.6 11.1Q21.2 12 19.6 12.9L4.6 19.3Q3.3 19.6 3.5 18.3L5.6 12 3.5 5.7Q3.3 4.4 4.6 4.7Z" class="f"/><path d="M5.6 12h5"/>',
+ recv:'<circle cx="12" cy="12" r="8.5" class="f"/><path d="M12 7.5v9M8.5 13l3.5 3.5 3.5-3.5"/>',
+ bank:'<path d="M4.2 10.2Q4.2 9.2 5 8.7L11 4.9Q12 4.3 13 4.9L19 8.7Q19.8 9.2 19.8 10.2Q19.8 11.4 18.6 11.4H5.4Q4.2 11.4 4.2 10.2Z" class="f"/><path d="M7.5 15v2M12 15v2M16.5 15v2M5 20.4h14"/>',
+ air:'<path d="M6.5 6.5Q6.5 2.5 10.5 2.5h3q4 0 4 4V13h-11Z" class="f" stroke="none"/><rect x="6.5" y="2.5" width="11" height="19" rx="4"/><path d="M6.5 13h11M10.5 18h3"/>',
+ bill:'<path d="M13 2.5 5.5 13.5h6l-1 8 7.5-11h-6Z" class="f"/>',
+ merch:'<path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" class="f"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/>',
+ cashin:'<rect x="2.5" y="6" width="19" height="12" rx="4.5"/><circle cx="12" cy="12" r="3" class="f"/>',
+ gift:'<rect x="4" y="9" width="16" height="11.5" rx="3" class="f"/><path d="M3.5 9h17M12 9v11.5M12 9C9 9 7.5 7.8 7.5 6.3S9 3.8 12 9c3-5.2 4.5-4.2 4.5-2.7S15 9 12 9Z"/>',
+ filter:'<path d="M4 6h16M7 12h10M10 18h4"/>',
+ dl:'<rect x="3.5" y="12" width="17" height="8.5" rx="3.5" class="f"/><path d="M12 3.5v9M8.3 9.2l3.7 3.7 3.7-3.7"/>',
+ close:'<path d="M6 6l12 12M18 6 6 18"/>',
+ light:'<path d="M9 18.5h6M10 21h4M8.5 14.5Q6 12.8 6 9.5a6 6 0 0 1 12 0q0 3.3-2.5 5V16h-7Z" class="f"/>',
+ image:'<rect x="3.5" y="4.5" width="17" height="15" rx="4"/><circle cx="9" cy="10" r="1.8" class="f"/><path d="M4 17l4.5-4.5 3.5 3.5 2.5-2.5 5 4.5"/>',
+ star:'<path d="M12 3.5 14.6 9l6 .8-4.4 4.1 1.1 6L12 17l-5.3 2.9 1.1-6L3.4 9.8l6-.8Z" class="f"/>',
+ doc:'<path d="M6.5 3.5h7l4.5 4.5v10a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 4 18V6a2.5 2.5 0 0 1 2.5-2.5Z" class="f"/><path d="M13.5 3.5V8h4.5M8 12.5h8M8 16h5"/>'
+};
+var CHEV='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+function tileIc(k,px){return '<span class="bico" style="background:var(--tile);border:1.5px solid var(--tilebd)">'+sv(AI[k],px||22)+'</span>'}
+function sw(on){return '<span class="sw'+(on?' on':'')+'" aria-hidden="true"><span></span></span>'}
+function lrow(ic,label,right,act,k,sub){
+  return '<button type="button" class="row" data-act="'+act+'"'+(k?' data-k="'+k+'"':'')+' style="min-height:60px;font-family:inherit;color:var(--text)">'+tileIc(ic)+
+   '<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:15px;line-height:19px;font-weight:600">'+label+'</span>'+(sub?'<span class="mut" style="font-size:12px;line-height:16px">'+sub+'</span>':'')+'</span>'+
+   (right?'<span class="mut" style="font-size:13px;font-weight:600;white-space:nowrap">'+right+'</span>':'')+CHEV+'</button>'}
+function lcard(title,rows){return '<div style="display:flex;flex-direction:column;gap:8px">'+(title?'<h2 style="margin:0 4px;font-size:13px;line-height:16px;font-weight:700;color:var(--muted);letter-spacing:.2px">'+title+'</h2>':'')+'<div class="card" style="padding:2px 16px;gap:0">'+rows.join('<div class="divider"></div>')+'</div></div>'}
+function toastHTML(){return S.toast?'<div role="status" style="position:absolute;left:16px;right:16px;bottom:96px;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:#1B1B1F;color:#fff;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8DC73F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'+S.toast+'</div>':''}
+function toast(m){S.toast=m;render(false);clearTimeout(S.toastT);S.toastT=setTimeout(function(){S.toast='';render(false)},2200)}
+
+/* ---------- Account tab ---------- */
+var LANGS=[['en','English','English'],['am','አማርኛ','Amharic'],['om','Afaan Oromoo','Oromo'],['ti','ትግርኛ','Tigrinya'],['so','Af Soomaali','Somali']];
+function langName(){for(var i=0;i<LANGS.length;i++)if(LANGS[i][0]===S.lang)return LANGS[i][1];return 'English'}
+function acctHTML(){
+  var prof='<div class="hcard" style="flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="av" style="width:56px;height:56px;font-size:19px">N</span>'+
+   '<span style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0"><span style="display:flex;align-items:center;gap:8px"><span style="font-size:19px;line-height:24px;font-weight:700">Nardos</span><span style="height:22px;padding:0 9px;border-radius:11px;display:inline-flex;align-items:center;font-size:12px;font-weight:700;background:var(--softbg);border:1.5px solid var(--softbd);color:var(--softink)">Level 3</span></span><span class="mut" style="font-size:14px;font-variant-numeric:tabular-nums">+251 912 345 678</span></span>'+
+   '<button type="button" data-act="soon" aria-label="My QR code" style="width:48px;height:48px;border-radius:16px;background:var(--tile);border:1.5px solid var(--tilebd);display:flex;align-items:center;justify-content:center;flex:none;padding:0">'+sv(AI.qr,24)+'</button></div>';
+  return '<div class="scroll"><div class="tabpg">'+tabHead('Account')+'<div class="tbody" style="gap:16px">'+prof+
+   lcard('Account',[lrow('id','Verify or upgrade with Fayda','','soon','','Link your national ID to raise your limits'),lrow('coupon','My coupons','','soon')])+
+   lcard('Security',[lrow('pin','Change PIN','','chpin'),lrow('finger','Fingerprint',(S.bio.login||S.bio.pay)?'On':'Off','biom'),lrow('shield','Security question','','soon')])+
+   lcard('Payments',[lrow('verify','Verify a payment','','soon','','Check a receipt is real'),lrow('split','Bill share history','','soon')])+
+   lcard('App',[lrow('lang','Language',langName(),'lang'),lrow('wifi','Access on Wi-Fi','','soon'),lrow('share','Share telebirr','','soon')])+
+   lcard('Help',[lrow('faq','FAQ','','faq'),lrow('phone','Contact us','','contact'),lrow('chat','Feedback','','soon'),lrow('info','About telebirr','','about')])+
+   '</div>'+navBar('acct')+'</div></div>'+toastHTML();
+}
+function langHTML(){
+  var rows=LANGS.map(function(l){var on=S.lang===l[0];return '<button type="button" class="row" data-act="lang-set" data-k="'+l[0]+'" aria-pressed="'+on+'" style="min-height:60px;font-family:inherit;color:var(--text)"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:16px;line-height:20px;font-weight:600">'+l[1]+'</span>'+(l[1]!==l[2]?'<span class="mut" style="font-size:12px">'+l[2]+'</span>':'')+'</span><span class="radio'+(on?' on':'')+'" aria-hidden="true"></span></button>'});
+  return topbar('Language','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px"><span class="mut" style="font-size:13px;line-height:18px;padding:0 2px">Choose the language for the app. Your SMS messages may still come in your SIM language.</span><div class="card" style="padding:2px 16px;gap:0">'+rows.join('<div class="divider"></div>')+'</div></div></div>'+toastHTML();
+}
+function bioHTML(){
+  function trow(k,t,sub){var on=S.bio[k];return '<button type="button" class="row" data-act="bio-set" data-k="'+k+'" role="switch" aria-checked="'+on+'" style="min-height:72px;font-family:inherit;color:var(--text)"><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;line-height:19px;font-weight:600">'+t+'</span><span class="mut" style="font-size:12px;line-height:16px">'+sub+'</span></span>'+sw(on)+'</button>'}
+  return topbar('Fingerprint','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px">'+
+   '<div class="card" style="flex-direction:row;align-items:center;gap:14px;padding:16px;border-radius:24px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+sv(AI.finger,28)+'</span><span style="flex:1;font-size:14px;line-height:20px">Use the fingerprint saved on this phone instead of typing your PIN.</span></div>'+
+   '<div class="card" style="padding:2px 16px;gap:0">'+trow('login','Log in with fingerprint','Open telebirr without typing your PIN')+'<div class="divider"></div>'+trow('pay','Pay with fingerprint','Confirm payments with your fingerprint')+'</div>'+
+   '<span class="mut" style="font-size:12px;line-height:17px;padding:0 4px">Anyone whose fingerprint is saved on this phone can use these.</span></div></div>';
+}
+var CP_T=['Enter your current PIN','Choose a new PIN','Enter the new PIN again'];
+function chpinHTML(){
+  var st=S.cp.step,steps='';for(var i=0;i<3;i++)steps+='<span style="flex:1;height:4px;border-radius:2px;background:'+(i<=st?'#8DC73F':'var(--line)')+'"></span>';
+  return topbar('Change PIN','back-acct')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:8px 16px 16px;min-height:100%">'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Step '+(st+1)+' of 3</span><div style="display:flex;gap:6px">'+steps+'</div></div>'+
+   '<div style="margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center"><span style="font-size:20px;line-height:26px;font-weight:700">'+CP_T[st]+'</span>'+(S.cp.err?'<span style="font-size:13px;font-weight:600;color:#C2362B">'+S.cp.err+'</span>':(st===1?'<span class="mut" style="font-size:13px">Avoid birthdays and repeated numbers like 111111.</span>':''))+pinDots()+'</div></div></div>'+keypad('pin2');
+}
+function cpNext(){
+  var st=S.cp.step;
+  if(st===0){S.cp.step=1;S.cp.err='';S.pin='';render(false)}
+  else if(st===1){S.cp.nw=S.pin;S.cp.step=2;S.cp.err='';S.pin='';render(false)}
+  else{ if(S.pin!==S.cp.nw){S.cp.err='The PINs don\'t match. Try again.';S.pin='';render(false);return}
+    S.cp={step:0,nw:'',err:''};S.screen='acct';S.pin='';toast('Your PIN is changed');}
+}
+var FAQ=[
+ ['Getting started',[['What is telebirr?','telebirr is Ethio telecom\'s mobile money service. You can send and receive money, pay bills and merchants, buy airtime and packages, and more.'],['How do I sign up?','Download the telebirr app, or dial *127# from your Ethio telecom line, and follow the steps.'],['How do I change the app language?','Go to Account, then Language, and choose the one you want.']]],
+ ['Security',[['How do I change my PIN?','Go to Account, then Change PIN. You enter your current PIN once and the new one twice.'],['What should I do if I lose my SIM card?','Call 127 right away so your account can be protected, then replace your SIM at an Ethio telecom shop.']]],
+ ['Sending and paying',[['How do I check a payment is real?','Open the receipt and scan its QR code with Verify a payment in Account.'],['Where can I see my past payments?','On Home, tap View transactions under your balance.']]]
+];
+function faqHTML(){
+  var n=0,secs=FAQ.map(function(g){return lcard(g[0],g[1].map(function(q){var i=n++,on=S.faq===i;
+    return '<button type="button" class="row" data-act="faq-tog" data-k="'+i+'" aria-expanded="'+on+'" style="flex-direction:column;align-items:stretch;gap:8px;min-height:56px;padding:14px 0;font-family:inherit;color:var(--text)"><span style="display:flex;align-items:center;gap:12px"><span style="flex:1;font-size:15px;line-height:20px;font-weight:600">'+q[0]+'</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;transform:rotate('+(on?'-90':'90')+'deg)"><path d="M9 5l7 7-7 7"/></svg></span>'+(on?'<span class="mut" style="font-size:14px;line-height:20px;font-weight:400;padding-right:28px">'+q[1]+'</span>':'')+'</button>'}))}).join('');
+  return topbar('FAQ','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:16px">'+searchBox('Search questions')+secs+
+   '<button type="button" data-act="contact" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd);font-family:inherit;color:var(--text);text-align:left">'+sv(AI.chat,22)+'<span style="flex:1;font-size:14px;font-weight:600">Still need help? Contact us</span>'+CHEV+'</button></div></div>';
+}
+function contactHTML(){
+  var soc=[['Telegram','T'],['Facebook','f'],['X','X'],['TikTok','TT'],['YouTube','YT'],['LinkedIn','in'],['Instagram','IG']];
+  return topbar('Contact us','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:16px">'+
+   '<div class="hcard" style="gap:14px"><div style="display:flex;align-items:center;gap:12px">'+tileIc('phone')+'<span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:15px;font-weight:700">Contact center</span><span class="mut" style="font-size:13px">Free from your Ethio telecom line</span></span></div>'+
+   '<button type="button" data-act="soon" class="btn" style="height:48px;border-radius:24px;font-size:15px">Call 127</button></div>'+
+   lcard('',[lrow('web','Website','','soon','','ethiotelecom.et/telebirr')])+
+   '<div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0 4px;font-size:13px;font-weight:700;color:var(--muted)">Follow us</h2><div class="card" style="padding:16px 8px"><div class="grid4" style="gap:14px 4px">'+soc.map(function(s){return '<div class="apptile" style="pointer-events:none"><span class="bico" style="width:48px;height:48px;font-size:14px">'+s[1]+'</span><span class="t">'+s[0]+'</span></div>'}).join('')+'</div></div></div></div></div>';
+}
+function aboutHTML(){
+  return topbar('About telebirr','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:16px">'+
+   '<div class="hcard" style="align-items:center;text-align:center;gap:8px;padding:28px 16px 22px"><img class="hlogo" src="assets/logo-telebirr-black.png" alt="telebirr" style="height:52px"><span style="font-size:17px;font-weight:700;margin-top:6px">telebirr</span><span class="mut" style="font-size:13px">Version 1.3.3 · Up to date</span></div>'+
+   lcard('',[lrow('doc','Terms and conditions','','soon'),lrow('shield','Privacy policy','','soon')])+'</div></div>'+
+   '<div class="btnwrap" style="padding:8px 16px 24px"><button type="button" class="btn" data-act="upd" style="background:transparent;color:var(--link);border:1.5px solid var(--link)">Check for updates</button></div>'+toastHTML();
+}
+
+/* ---------- Scan ---------- */
+function scanHTML(){
+  function cb(ic,l,act){return '<button type="button" data-act="'+act+'" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:transparent;border:0;padding:0;font-family:inherit;color:#fff;font-size:13px;font-weight:600"><span style="width:56px;height:56px;border-radius:28px;background:rgba(255,255,255,'+(S.torch&&act==='torch'?'.92':'.16')+');display:flex;align-items:center;justify-content:center">'+sv(AI[ic],26).replace(/var\(--icst\)/g,S.torch&&act==='torch'?'#1B1B1F':'#fff').replace(/var\(--icfill\)/g,S.torch&&act==='torch'?'#F7D84A':'rgba(255,255,255,.25)')+'</span>'+l+'</button>'}
+  var corner=function(r){return '<span style="position:absolute;width:44px;height:44px;'+r+'"></span>'};
+  return '<div class="scanpg"><div class="scancam" aria-hidden="true"></div>'+
+   '<div style="position:relative;display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:60px"><button type="button" class="back" data-act="back-home" aria-label="Close" style="color:#fff">'+sv(AI.close,22).replace(/var\(--icst\)/g,'#fff')+'</button><h1 style="margin:0;font-size:20px;font-weight:700;color:#fff">Scan QR</h1></div>'+
+   '<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 24px">'+
+   '<button type="button" data-act="scan-hit" aria-label="Simulate a scan" class="scanbox">'+corner('top:0;left:0;border-top:4px solid #8DC73F;border-left:4px solid #8DC73F;border-top-left-radius:22px')+corner('top:0;right:0;border-top:4px solid #8DC73F;border-right:4px solid #8DC73F;border-top-right-radius:22px')+corner('bottom:0;left:0;border-bottom:4px solid #8DC73F;border-left:4px solid #8DC73F;border-bottom-left-radius:22px')+corner('bottom:0;right:0;border-bottom:4px solid #8DC73F;border-right:4px solid #8DC73F;border-bottom-right-radius:22px')+'<span class="scanline"></span><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.75);background:rgba(0,0,0,.35);padding:6px 10px;border-radius:10px">Tap to try a sample code</span></button>'+
+   '<span style="font-size:15px;line-height:21px;font-weight:600;color:#fff;text-align:center">Point your camera at a telebirr QR code</span><span style="font-size:13px;line-height:18px;color:rgba(255,255,255,.72);text-align:center;margin-top:-14px">Works for merchants, agents and friends</span></div>'+
+   '<div style="position:relative;display:flex;justify-content:center;gap:48px;padding:8px 0 18px">'+cb('light','Light','torch')+cb('image','From photos','soon')+'</div>'+
+   '<div style="position:relative;padding:0 16px 24px"><button type="button" data-act="merch" style="width:100%;height:52px;border-radius:26px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:#fff;font-family:inherit;font-size:15px;font-weight:700">Enter merchant ID instead</button></div></div>'+toastHTML();
+}
+
+/* ---------- Transactions ---------- */
+// sample history; amounts are made up for the prototype
+var TX=[
+ {g:'Today',ty:'send',n:'Abebe Girma',s:'+251 911 234 567',a:-240,t:'8:38 PM',id:'DK7Q2M9XAB'},
+ {g:'Today',ty:'merch',n:'Abebe Supermarket',s:'Merchant 123456',a:-50,t:'3:42 PM',id:'DK4HC81LMP'},
+ {g:'Today',ty:'recv',n:'Tsion Getachew',s:'+251 922 456 789',a:5000,t:'1:20 PM',id:'DK9WZ3RT2Q'},
+ {g:'Yesterday',ty:'bank',n:'Commercial Bank of Ethiopia',s:'CBE · ••4821',a:-3600,t:'6:24 PM',id:'DK2NB7YQ4D'},
+ {g:'Yesterday',ty:'air',n:'Airtime for you',s:'+251 912 345 678',a:-50,t:'2:10 PM',id:'DK6PL0KS8E'},
+ {g:'Yesterday',ty:'bill',n:'Ethiopian Electric Utility',s:'Account 1234567',a:-845.6,t:'9:05 AM',id:'DK3TF5VW1G'},
+ {g:'Thursday, 19 Nov',ty:'send',n:'Hana Tesfaye',s:'+251 933 222 111',a:-200,t:'8:49 PM',id:'DK8MD4QX6H'},
+ {g:'Thursday, 19 Nov',ty:'cashin',n:'Cash in at agent',s:'Agent 456789',a:1000,t:'11:15 AM',id:'DK1RG9BN5J'}
+];
+var TXR=[{g:'Today',ty:'gift',n:'Data package with Reward',s:'1 GB monthly',a:-25,t:'7:45 PM',id:'DK5YE2HU7K'}];
+var TXT=[['all','All'],['send','Sent'],['recv','Received'],['bank','To bank'],['bill','Bills'],['air','Airtime & packages'],['merch','Merchants'],['cashin','Cash in & out']];
+var TXD=[['30','Last 30 days'],['60','Last 60 days'],['90','Last 90 days'],['180','Last 180 days']];
+var TYIC={send:'send',recv:'recv',bank:'bank',air:'air',bill:'bill',merch:'merch',cashin:'cashin',gift:'gift'};
+var TYLB={send:'Sent',recv:'Received',bank:'To bank',air:'Airtime',bill:'Bill',merch:'Merchant',cashin:'Cash in',gift:'Reward'};
+function txList(){var L=S.tx.tab==='rew'?TXR:TX;return L.filter(function(x){return S.tx.type==='all'||x.ty===S.tx.type})}
+function sgn(a){return (a>0?'+':'-')+money(Math.abs(a))}
+function txRow(x,i){return '<button type="button" class="row" data-act="txd" data-i="'+i+'" style="min-height:64px;font-family:inherit;color:var(--text)">'+tileIc(TYIC[x.ty])+
+  '<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:15px;line-height:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.n+'</span><span class="mut" style="font-size:12px;line-height:16px">'+TYLB[x.ty]+' · '+x.t+'</span></span>'+
+  '<span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:'+(x.a>0?'var(--greenInk)':'var(--text)')+'">'+sgn(x.a)+'</span></button>'}
+function txnsHTML(){
+  var L=txList(),all=S.tx.tab==='rew'?TXR:TX,out=0,inn=0;all.forEach(function(x){if(x.a<0)out+=-x.a;else inn+=x.a});
+  var groups=[],cur=null;L.forEach(function(x){if(!cur||cur.g!==x.g){cur={g:x.g,r:[]};groups.push(cur)}cur.r.push(txRow(x,(S.tx.tab==='rew'?TXR:TX).indexOf(x)))});
+  var dl=TXD.filter(function(d){return d[0]===S.tx.days})[0][1],tl=TXT.filter(function(d){return d[0]===S.tx.type})[0][1];
+  function col(l,v,c){return '<div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">'+l+'</span><span style="font-size:16px;line-height:20px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;'+(c?'color:'+c:'')+'">'+v+'</span></div>'}
+  var ib='width:44px;height:44px;border-radius:22px;background:var(--iconbtn);display:flex;align-items:center;justify-content:center;border:0;padding:0;flex:none';
+  return '<div class="topbar"><button type="button" class="back" data-act="back-home" aria-label="Back">'+I.back+'</button><h1 style="flex:1">Transactions</h1><button type="button" data-act="soon" aria-label="Download statement" style="'+ib+'">'+sv(AI.dl,22)+'</button></div>'+
+   '<div class="scroll"><div class="body" style="padding-top:0;gap:14px">'+
+   '<div class="tabs" style="margin:0"><button type="button" class="'+(S.tx.tab==='main'?'on':'')+'" data-act="tx-tab" data-k="main" aria-pressed="'+(S.tx.tab==='main')+'">Main balance</button><button type="button" class="'+(S.tx.tab==='rew'?'on':'')+'" data-act="tx-tab" data-k="rew" aria-pressed="'+(S.tx.tab==='rew')+'">Reward</button></div>'+
+   '<div class="hcard" style="flex-direction:row;gap:12px;padding:14px 16px">'+col('Money out','-'+money(out))+'<span style="width:1px;background:var(--line)"></span>'+col('Money in','+'+money(inn),'var(--greenInk)')+'</div>'+
+   '<button type="button" data-act="tx-filter" style="display:flex;align-items:center;gap:10px;height:44px;padding:0 6px 0 14px;border-radius:22px;background:var(--card);box-shadow:var(--cardsh);border:1px solid var(--cardbd);font-family:inherit;color:var(--text)">'+sv(AI.filter,20)+'<span style="flex:1;text-align:left;font-size:14px;font-weight:600">'+dl+' · '+tl+'</span><span style="font-size:14px;font-weight:700;color:var(--link);padding:0 10px">Filter</span></button>'+
+   (groups.length?groups.map(function(g){return lcard(g.g,g.r)}).join(''):'<div class="card" style="align-items:center;text-align:center;padding:28px 16px;gap:6px"><span style="font-size:15px;font-weight:700">No transactions</span><span class="mut" style="font-size:13px">Nothing matches this filter. Try another type or a longer period.</span></div>')+
+   '</div></div>'+txSheet();
+}
+function txSheet(){
+  if(S.sheet!=='txf')return '';var f=S.txf;
+  function chip(a,k,l,on){return '<button type="button" data-act="'+a+'" data-k="'+k+'" aria-pressed="'+on+'" style="min-height:44px;padding:6px 10px;border-radius:14px;font-family:inherit;font-size:14px;font-weight:'+(on?700:600)+';line-height:18px;color:'+(on?'#1C2E12':'var(--text)')+';background:'+(on?'var(--green)':'var(--card)')+';border:1.5px solid '+(on?'var(--green)':'var(--tilebd)')+'">'+l+'</button>'}
+  return '<button type="button" class="scrim" data-act="sheet-close" aria-label="Close"></button><div class="sheetp" style="padding:10px 20px 24px;gap:16px;background:var(--card)"><span style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line)"></span><h2 style="margin:0;font-size:18px;font-weight:700">Filter</h2>'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Date</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+TXD.map(function(d){return chip('txf-d',d[0],d[1],f.days===d[0])}).join('')+'</div></div>'+
+   '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Type</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+TXT.map(function(d){return chip('txf-t',d[0],d[1],f.type===d[0])}).join('')+'</div></div>'+
+   '<div style="display:flex;gap:10px;margin-top:4px"><button type="button" data-act="txf-reset" class="btn" style="flex:1;background:transparent;color:var(--link);border:1.5px solid var(--link)">Reset</button><button type="button" data-act="txf-apply" class="btn" style="flex:1">Show results</button></div></div>';
+}
+function txdHTML(){
+  var x=(S.tx.tab==='rew'?TXR:TX)[S.tx.sel],c=x.n.split(' ');
+  function col(l,v){return '<div style="display:flex;flex-direction:column;gap:2px"><span class="lbl">'+l+'</span><span style="font-size:14px;line-height:18px;font-weight:600">'+v+'</span></div>'}
+  var who=(x.ty==='send'||x.ty==='recv')?'<span class="av" style="width:44px;height:44px;font-size:15px">'+c[0][0]+(c[1]?c[1][0]:'')+'</span>':tileIc(TYIC[x.ty]);
+  var fee=x.ty==='send'?2:x.ty==='bank'?1:0;
+  return topbar('Transaction details',S.tx.back)+dlShare()+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:0 16px 24px">'+
+   '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:18px 4px 4px"><span style="height:28px;padding:0 12px;border-radius:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;background:var(--softbg);border:1.5px solid var(--softbd);color:var(--softink)">'+I.okbig.replace('width="17" height="17"','width="15" height="15"')+'Successful</span>'+
+   '<div style="margin-top:12px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px;color:'+(x.a>0?'var(--greenInk)':'var(--text)')+'">'+sgn(x.a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+
+   '<span style="font-size:17px;line-height:22px;font-weight:700">'+(x.g==='Today'?'Saturday, 21 Nov 2026':x.g==='Yesterday'?'Friday, 20 Nov 2026':'Thursday, 19 Nov 2026')+'</span><span class="mut" style="font-size:15px;font-weight:600">'+x.t+'</span></div>'+
+   '<div class="card" style="border-radius:24px;gap:14px"><span class="lbl">'+(x.a>0?'From':'To')+'</span><div style="display:flex;align-items:center;gap:12px;margin-top:-6px">'+who+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:18px;line-height:23px;font-weight:700">'+x.n+'</span><span class="mut" style="font-size:13px;font-variant-numeric:tabular-nums">'+x.s+'</span></span></div></div>'+
+   '<div class="card" style="border-radius:24px;gap:14px;margin-top:-4px"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Type',TYLB[x.ty])+(x.a<0?col('Fee',money(fee)+' ETB'):'')+col('Transaction number',x.id)+'</div>'+
+   '<span style="flex:none;width:124px;height:124px;padding:12px;border-radius:16px;background:#FFFFFF;border:1.5px solid #E6E6EA;display:flex">'+qrSVG(x.id,100)+'</span></div></div>'+
+   '<button type="button" data-act="soon" style="display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:24px;background:transparent;border:1.5px solid var(--tilebd);font-family:inherit;font-size:14px;font-weight:700;color:var(--text)">'+sv(AI.chat,20)+'Report a problem</button></div></div>'+toastHTML();
+}
+
+/* ---------- Notifications ---------- */
+var NTTL={send:'Money sent',recv:'Money received',bank:'Sent to bank',air:'Airtime bought',bill:'Bill paid',merch:'Paid a merchant',cashin:'Cash in'};
+var NCAT=[['tx','Transactions','send',3,'You sent 240.00 ETB to Abebe Girma','8:38 PM'],['promo','Offers and news','promo',1,'Link your telebirr with Fayda','Yesterday'],['shop','Shopping','cart',0,'No new messages',''],['ride','Rides','car',0,'No new messages',''],['sys','From telebirr','bell',0,'No new messages','']];
+function notifHTML(){
+  var rows=NCAT.map(function(c){return '<button type="button" class="row" data-act="'+(c[0]==='tx'?'notifl':'soon')+'" style="min-height:68px;font-family:inherit;color:var(--text)">'+tileIc(c[2])+
+    '<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:15px;line-height:19px;font-weight:'+(c[3]?700:600)+'">'+c[1]+'</span><span class="mut" style="font-size:12px;white-space:nowrap">'+c[5]+'</span></span>'+
+    '<span style="display:flex;align-items:center;gap:8px"><span class="mut" style="flex:1;font-size:13px;line-height:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'+(c[3]?';color:var(--text)':'')+'">'+c[4]+'</span>'+(c[3]?'<span style="min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:10px;background:#0187D0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">'+c[3]+'</span>':'')+'</span></span></button>'});
+  return topbar('Notifications','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px"><div class="card" style="padding:2px 16px;gap:0">'+rows.join('<div class="divider"></div>')+'</div></div></div>'+toastHTML();
+}
+function notiflHTML(){
+  var groups=[],cur=null;TX.forEach(function(x,i){if(!cur||cur.g!==x.g){cur={g:x.g,r:[]};groups.push(cur)}
+    var unread=i<3,verb={send:'You sent',recv:'You received',bank:'You sent',air:'You bought',bill:'You paid',merch:'You paid',cashin:'You received'}[x.ty],pre={send:'to',recv:'from',bank:'to',air:'',bill:'to',merch:'to',cashin:'at'}[x.ty];
+    cur.r.push('<button type="button" class="row" data-act="txd" data-i="'+i+'" data-from="notifl" style="align-items:flex-start;min-height:72px;padding:14px 0;font-family:inherit;color:var(--text)">'+tileIc(TYIC[x.ty])+
+     '<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:15px;line-height:19px;font-weight:'+(unread?700:600)+'">'+NTTL[x.ty]+'</span><span class="mut" style="font-size:12px">'+x.t+'</span>'+(unread?'<span style="width:8px;height:8px;border-radius:4px;background:#0187D0;flex:none" aria-label="Unread"></span>':'')+'</span>'+
+     '<span class="mut" style="font-size:13px;line-height:18px">'+verb+' '+money(Math.abs(x.a))+' ETB'+(x.ty==='air'?' of airtime':' '+pre+' '+(x.ty==='cashin'?'an agent':x.n))+'.</span></span></button>')});
+  return topbar('Transactions','back-notif')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:16px">'+groups.map(function(g){return lcard(g.g,g.r)}).join('')+'</div></div>';
+}
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,sc:scHTML,scall:scAllHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,sc:scHTML,scall:scAllHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML,acct:acctHTML,lang:langHTML,bio:bioHTML,chpin:chpinHTML,faq:faqHTML,contact:contactHTML,about:aboutHTML,scan:scanHTML,txns:txnsHTML,txd:txdHTML,notif:notifHTML,notifl:notiflHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -1104,8 +1322,8 @@ function doPay2(){
     S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
   },900);
 }
-function payFn(){return S.screen==='pin'?doPay:S.screen==='confirm'?doPay2:S.screen==='lpin'?doPay4:doPay3}
-function isPinScr(){return S.screen==='pin'||S.screen==='confirm'||S.screen==='cpin'||S.screen==='lpin'}
+function payFn(){return S.screen==='chpin'?cpNext:S.screen==='pin'?doPay:S.screen==='confirm'?doPay2:S.screen==='lpin'?doPay4:doPay3}
+function isPinScr(){return S.screen==='chpin'||S.screen==='pin'||S.screen==='confirm'||S.screen==='cpin'||S.screen==='lpin'}
 function pressKey(k){
   if(isPinScr()){
     if(S.paying)return;
@@ -1207,6 +1425,30 @@ document.addEventListener('click',function(e){
   else if(a==='ln-next'){go('lpin')}
   else if(a==='tab'){var tk=t.getAttribute('data-k');resetFlow();S.sheet=null;go(tk==='home'?'home':tk)}
   else if(a==='due-pay'){resetFlow();S.paycat='util';S.biller={c:'util',n:pcat('util')[4][0]};S.cash.code='1234567';S.cash.fld='amt';S.amount='845.60';go('bill')}
+  else if(a==='soon'){toast('Not in this prototype yet')}
+  else if(a==='back-acct'){S.cp={step:0,nw:'',err:''};go('acct')}
+  else if(a==='biom'){go('bio')}
+  else if(a==='lang'||a==='faq'||a==='contact'||a==='about'){go(a)}
+  else if(a==='chpin'){S.cp={step:0,nw:'',err:''};go('chpin')}
+  else if(a==='lang-set'){S.lang=t.getAttribute('data-k');S.screen='acct';toast('Language set to '+langName())}
+  else if(a==='bio-set'){var bk=t.getAttribute('data-k');S.bio[bk]=!S.bio[bk];render(false)}
+  else if(a==='faq-tog'){var fi=+t.getAttribute('data-k');S.faq=S.faq===fi?-1:fi;render(false)}
+  else if(a==='upd'){toast('You have the latest version')}
+  else if(a==='scan'){resetFlow();S.torch=false;go('scan')}
+  else if(a==='torch'){S.torch=!S.torch;render(false)}
+  else if(a==='scan-hit'){resetFlow();S.amount='';S.cash.otab='agent';S.cash.code='123456';S.cash.fld='amt';go('merch')}
+  else if(a==='txns'){S.tx.type='all';S.tx.days='30';S.tx.tab='main';go('txns')}
+  else if(a==='back-txns'){go('txns')}
+  else if(a==='tx-tab'){S.tx.tab=t.getAttribute('data-k');render(false)}
+  else if(a==='tx-filter'){S.txf={type:S.tx.type,days:S.tx.days};S.sheet='txf';render(false)}
+  else if(a==='txf-d'){S.txf.days=t.getAttribute('data-k');render(false)}
+  else if(a==='txf-t'){S.txf.type=t.getAttribute('data-k');render(false)}
+  else if(a==='txf-reset'){S.txf={type:'all',days:'30'};render(false)}
+  else if(a==='txf-apply'){S.tx.type=S.txf.type;S.tx.days=S.txf.days;S.sheet=null;render(false)}
+  else if(a==='txd'){var fr=t.getAttribute('data-from');if(fr)S.tx.tab='main';S.tx.sel=+t.getAttribute('data-i');S.tx.back=fr?'back-notifl':'back-txns';go('txd')}
+  else if(a==='notif'){go('notif')}
+  else if(a==='notifl'||a==='back-notifl'){go('notifl')}
+  else if(a==='back-notif'){go('notif')}
   else if(a==='sc-edit'){go('sc')}
   else if(a==='sc-rm'){var rk=t.getAttribute('data-k');S.sc=S.sc.filter(function(x){return x!==rk});render(false)}
   else if(a==='sc-add'){var ak=t.getAttribute('data-k');if(S.sc.length<SC_MAX&&S.sc.indexOf(ak)<0)S.sc.push(ak);render(false)}
