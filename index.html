@@ -103,6 +103,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .key{height:52px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--key);box-shadow:var(--keysh);font-size:24px;font-weight:500;color:var(--text);border:0;padding:0}
 .key:active{transform:scale(.97)}
 .key.acc{background:var(--avbg);border:1.5px solid var(--avbd);box-shadow:none}
+.key.ok{background:var(--blue);color:#fff;border:0;box-shadow:none}
 .key[disabled],.pad.inert .key{cursor:default;pointer-events:none}
 .btnwrap{padding:8px 16px 12px;flex:none}
 .btn{display:flex;align-items:center;justify-content:center;height:52px;border-radius:26px;font-size:16px;font-weight:700;width:100%;background:var(--blue);color:#fff;border:0}
@@ -254,6 +255,7 @@ var I={
  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
  check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
  person:function(px){return '<svg width="'+px+'" height="'+px+'" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6" style=\"fill:var(--icfill)\"/><path d="M4.8 20Q4.8 14.6 12 14.6T19.2 20Z" style=\"fill:var(--icfill)\"/></svg>'},
+ tick:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
  bksp:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>',
  finger:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a7.5 7.5 0 0 0-7.5 7.5v1.5M19.5 12V11A7.5 7.5 0 0 0 12 3.5M8 20c-.9-1.6-1.5-3.4-1.5-5.5V11a5.5 5.5 0 0 1 11 0v3.5c0 1.4.2 2.6.6 3.8M12 20.5c-.9-1.2-1.5-2.8-1.5-4.8V11a1.5 1.5 0 0 1 3 0v4.7c0 1.6.3 2.8.9 4"/></svg>',
  warn:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:0"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.01"/></svg>',
@@ -275,7 +277,8 @@ function keypad(kind){
   else if(kind==='acc') h+='<span class="key acc" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="3" style="fill:var(--icfill)"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></svg></span>';
   else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
   h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
-  h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
+  if(kind==='pin'&&S.pin.length===6) h+='<button type="button" class="key ok" data-act="pay" aria-label="Confirm and pay"'+(S.paying?' disabled':'')+'>'+I.tick+'</button>';
+  else h+='<button type="button" class="key acc" data-act="key" data-k="b" aria-label="Delete">'+I.bksp+'</button>';
   return h+'</div>';
 }
 function topbar(title,backAct){
@@ -422,7 +425,7 @@ function pinHTML(){
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientSub()+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">Includes '+money(f)+' ETB fee</span></div>'+
    '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">Personal transfer</span></div></div></div>'+
-   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
 }
 
 function qrSVG(text,px){
@@ -582,7 +585,7 @@ function confirmHTML(){
    '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="width:52px;height:52px;border-radius:17px">'+ico(it.k||'data',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+it.n+(it.kind?'':' '+sfx(it))+'</span><span class="mut" style="font-size:14px">'+S.pk.num+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(it.p)+' ETB</span><span class="mut" style="font-size:13px">No fee'+(it.e?' · expires '+it.e.charAt(0).toLowerCase()+it.e.slice(1):'')+'</span></div>'+
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Pay with</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+meth('bal','Balance',bal)+meth('rew','Reward',rew)+'</div>'+(p.err?'<span class="err">'+I.warn+p.err+'</span>':'')+'</div></div>'+
-   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">Enter PIN to pay</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
 }
 function pkgDoneHTML(){
   var p=S.pk,it=p.item,credit=it.kind==='voucher';
@@ -704,7 +707,6 @@ function pressKey(k){
     if(k==='b'){S.pin=S.pin.slice(0,-1)}
     else if(/\d/.test(k)&&S.pin.length<6){S.pin+=k}
     render(false);
-    if(S.pin.length===6)setTimeout(S.screen==='pin'?doPay:doPay2,250);
     return;
   }
   if(S.screen==='number'){
@@ -762,7 +764,8 @@ document.addEventListener('click',function(e){
   else if(a==='next'){go('pin')}
   else if(a==='sheet'){S.sheet=t.getAttribute('data-k');render(false)}
   else if(a==='sheet-close'){S.sheet=null;render(false)}
-  else if(a==='bio'){S.pin='123456';render(false);setTimeout(S.screen==='pin'?doPay:doPay2,250)}
+  else if(a==='bio'){if(!S.paying){S.pin='123456';render(false)}}
+  else if(a==='pay'){if(S.pin.length===6)(S.screen==='pin'?doPay:doPay2)()}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
   else if(a==='tab-air'){go('air')}
@@ -794,6 +797,7 @@ window.addEventListener('keydown',function(e){
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
   else if(e.key==='.'&&S.screen==='amount'){pressKey('.');e.preventDefault()}
+  else if(e.key==='Enter'&&(S.screen==='pin'||S.screen==='confirm')&&S.pin.length===6){(S.screen==='pin'?doPay:doPay2)();e.preventDefault()}
   else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
 });
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
