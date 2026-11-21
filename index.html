@@ -648,7 +648,14 @@ function cfield(k,label,ph){
     (k==='code'?'<span style="height:36px;padding:0 12px;border-radius:18px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none" aria-hidden="true">'+ico('scan',18)+'Scan</span>':'')+'</button></div>';
 }
 var MNAME='Abebe Supermarket';
-function merchOK(){return S.cash.code.length>=5}
+function merchOver(){var a=amountVal();return a>0&&a+fee(a)>S.balance}
+function merchOK(){return S.cash.code.length>=5&&amountVal()>0&&!merchOver()}
+function afield(){
+  var on=S.cash.fld==='amt',a=amountVal(),f=fee(a),over=merchOver();
+  var v=S.amount?'<span style="font-size:22px;font-weight:700;letter-spacing:0">'+amountDisplay()+'</span>':'<span class="mut" style="font-weight:500;letter-spacing:0">0.00</span>';
+  return '<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Amount</span><button type="button" class="input" data-act="cfld" data-k="amt" style="margin:0;width:100%;font-family:inherit;color:var(--text);text-align:left;border-color:'+(over?'var(--err)':on?'var(--link)':'var(--fieldbd)')+'" aria-label="Amount"><span class="val">'+v+(on?'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'')+'</span><span class="mut" style="font-size:14px;font-weight:600;flex:none">ETB</span></button>'+
+   (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB.</span></div>':(a>0?'<span class="mut" style="font-size:12px;padding:0 2px">Fee '+money(f)+' ETB · Balance after '+money(S.balance-a-f)+' ETB</span>':''))+'</div>';
+}
 function merchHTML(){
   var c=S.cash;
   if(c.otab==='voucher'){
@@ -656,11 +663,11 @@ function merchHTML(){
      '<div class="card" style="border-radius:28px;flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('ticket',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Pay with a voucher</span><span class="mut" style="font-size:13px;line-height:18px">Get a code, then give it to the merchant to pay.</span></span></div>'+
      steps('How it works',['Tap Get my code. We send a code by SMS.','Give the code to the merchant.','They use it to take the payment.'])+'</div></div>'+btn56('Get my code','m-apply');
   }
-  var ok=merchOK();
-  var found=ok?'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico('store',22)+'<span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">'+MNAME+'</span><span class="mut" style="font-size:12px">Merchant '+c.code+'</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>':'';
+  var ok=merchOK(),hasId=c.code.length>=5;
+  var found=hasId?'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico('store',22)+'<span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">'+MNAME+'</span><span class="mut" style="font-size:12px">Merchant '+c.code+'</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>':'';
   return topbar('Pay a merchant','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px;padding-bottom:90px">'+ctabs('m-tab','agent','Merchant ID','With a voucher')+
-    cfield('code','Merchant ID','e.g. 123456')+found+cfield('op','Operator ID (optional)','e.g. 12')+'</div></div>'+
-    '<div class="btnwrap"><button type="button" class="btn" data-act="m-next"'+(ok?'':' disabled')+'>Next</button></div>'+keypad('none');
+    cfield('code','Merchant ID','e.g. 123456')+found+cfield('op','Operator ID (optional)','e.g. 12')+afield()+'</div></div>'+
+    '<div class="btnwrap"><button type="button" class="btn" data-act="m-next"'+(ok?'':' disabled')+'>Next</button></div>'+keypad(c.fld==='amt'?'amount':'none');
 }
 function coutOK(){return S.cash.code.length>=5&&S.cash.op.length>=1}
 function coutHTML(){
@@ -920,6 +927,12 @@ function pressKey(k){
     if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
     else if(/\d/.test(k)&&S.bk.acc.length<12){S.bk.acc+=k}
     render(false);
+  }else if(S.screen==='merch'&&S.cash.fld==='amt'){
+    var s2=S.amount;
+    if(k==='b'){if(!s2){S.cash.fld='op'}else s2=s2.slice(0,-1)}
+    else if(k==='.'){if(s2.indexOf('.')<0)s2=(s2===''?'0':s2)+'.'}
+    else if(/\d/.test(k)){var q=s2.split('.');if(q.length>1){if(q[1].length<2)s2+=k}else if(q[0].length<6){s2=(q[0]==='0'?'':q[0])+k}}
+    S.amount=s2;render(false);
   }else if(S.screen==='cout'||S.screen==='merch'){
     var c=S.cash,f=c.fld,mx=f==='code'?6:4;
     if(k==='b'){if(!c[f]&&f==='op'){c.fld='code'}else c[f]=c[f].slice(0,-1)}
@@ -982,9 +995,9 @@ document.addEventListener('click',function(e){
   else if(a==='back-loans'){go('loans')}
   else if(a==='back-lamt'){go('lamt')}
   else if(a==='ln-next'){go('lpin')}
-  else if(a==='merch'){resetFlow();S.cash.otab='agent';go('merch')}
+  else if(a==='merch'){resetFlow();S.amount='';S.cash.otab='agent';go('merch')}
   else if(a==='m-tab'){S.cash.otab=t.getAttribute('data-k');render(false)}
-  else if(a==='m-next'){if(merchOK()){S.cash.via='merch';S.amount='';go('camt')}}
+  else if(a==='m-next'){if(merchOK()){S.cash.via='merch';S.pin='';go('cpin')}}
   else if(a==='m-apply'){S.cash.via='mvoucher';S.time=nowStr();go('cdone')}
   else if(a==='cash-in'){resetFlow();S.cash.tab='agent';go('cin')}
   else if(a==='cash-out'){resetFlow();S.cash.otab='agent';go('cout')}
@@ -997,7 +1010,7 @@ document.addEventListener('click',function(e){
   else if(a==='cout-next'){if(coutOK()){S.cash.via='agent';S.amount='';go('camt')}}
   else if(a==='cout-atm'){S.cash.via='atm';S.amount='';go('camt')}
   else if(a==='back-camt'){go(S.cash.via==='qr'?'cin':S.cash.via==='merch'?'merch':'cout')}
-  else if(a==='back-cpin'){go('camt')}
+  else if(a==='back-cpin'){go(S.cash.via==='merch'?'merch':'camt')}
   else if(a==='camt-next'){var av=amountVal();if(S.cash.via==='qr'){S.cash.qr=av;go('cin')}else go('cpin')}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
@@ -1029,7 +1042,7 @@ window.addEventListener('keydown',function(e){
   if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='merch'&&S.screen!=='lamt')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
-  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt')){pressKey('.');e.preventDefault()}
+  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt'||(S.screen==='merch'&&S.cash.fld==='amt'))){pressKey('.');e.preventDefault()}
   else if(e.key==='Enter'&&isPinScr()&&S.pin.length===6){payFn()();e.preventDefault()}
   else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
 });
