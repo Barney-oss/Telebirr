@@ -390,9 +390,9 @@ function homeHTML(){
    '<button type="button" class="hero" data-act="send" aria-label="Send money, start the prototype" style="height:64px;padding:0 14px;gap:10px">'+iSend+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Send money</span></button>'+
    '<button type="button" class="hero" data-act="airtime" style="height:64px;padding:0 14px;gap:10px">'+iAir.replace(/width="\d+" height="\d+"/,'width="28" height="28"')+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button></div>'+
    '<div class="grid4" style="gap:8px">'+htile('bank','',iBank,'To bank')+htile('sheet','cash',iCashIO,'Cash in/out')+htile('loans','',iLoan,'Loans')+htile('merch','',iMerch,'To merchant')+'</div></div>'+
-   '<div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:16px;font-weight:700">My shortcuts</h2><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:8px">'+
-   [[iBill,'Pay bills'],[iZem,'Zemen'],[iPark,'Parking']].map(function(p){return '<div class="tcol"><span class="tileb" style="background:var(--card);border:none;box-shadow:var(--cardsh)">'+p[0]+'</span><span class="t" style="white-space:nowrap">'+p[1]+'</span></div>'}).join('')+
-   '<div class="tcol"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></div></div></div>'+
+   '<div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:16px;font-weight:700">My shortcuts</h2><button type="button" class="htile" data-act="sc-edit" style="width:auto;font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px;padding:0 0 0 12px">Edit</button></div><div class="grid4" style="gap:8px">'+
+   S.sc.map(function(k){var it=SC[k];return '<button type="button" class="tcol htile" '+scAttrs(it)+' aria-label="'+it[0]+'"><span class="tileb" style="background:var(--card);border:none;box-shadow:var(--cardsh)">'+scIcon(it)+'</span><span class="t" style="white-space:nowrap">'+it[0]+'</span></button>'}).join('')+
+   (S.sc.length<4?'<button type="button" class="tcol htile" data-act="sc-edit" aria-label="Add a shortcut"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></button>':'')+'</div></div>'+
    '<div style="display:flex;flex-direction:column;gap:8px"><div class="carousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px">'+
    '<img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"><img class="banner" src="assets/banner-zemen.png" alt="Zemen Gebeya, where Ethiopia shops digitally"></div>'+
    '<div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
@@ -912,6 +912,44 @@ function appsHTML(){
    appCard('Recently used','',ARECENT)+secs+'</div>'+navBar('apps')+'</div></div>';
 }
 function appsecHTML(){var sx=ASECT[S.appsec];return topbar(sx[0],'back-apps')+'<div class="scroll"><div class="body" style="padding-top:4px">'+appCard(sx[1].length+' apps','',sx[1])+'</div></div>'}
+/* ---------- shortcuts ---------- */
+var SC={
+ bills:['Pay bills','img:assets/icon-paybills.png',['tab','pay']],
+ zemen:['Zemen','img:assets/icon-zemen.png',null],
+ park:['Parking','img:assets/icon-parking.png',['bill','traffic',4]],
+ elec:['Electricity','EE',['bill','util',0]],
+ water:['Water','AA',['bill','util',2]],
+ tel:['Ethio telecom','ET',['bill','util',1]],
+ fine:['Traffic fine','NT',['bill','traffic',0]],
+ dstv:['DStv','DS',['bill','events',11]],
+ school:['School fees','TS',['bill','edu',0]],
+ zmall:['Zmall','Z',null],
+ ride:['RIDE','R',null],
+ equb:['Digital Equb','DE',null],
+ fayda:['Fayda ID','ND',null]
+};
+var SCG=[['Bills',['bills','elec','water','tel','fine','dstv','school','park']],['Shopping &amp; apps',['zemen','zmall','ride','equb','fayda']]];
+var SC_MAX=4;
+S.sc=['bills','zemen','park'];
+function scIcon(it){return it[1].indexOf('img:')===0?'<img src="'+it[1].slice(4)+'" alt="" width="34" height="34" style="display:block;object-fit:contain">':'<span style="font-size:15px;font-weight:800;color:var(--avtx)">'+it[1]+'</span>'}
+function scAttrs(it){var a=it[2];if(!a)return 'data-act="noop"';if(a[0]==='tab')return 'data-act="tab" data-k="'+a[1]+'"';return 'data-act="bill" data-c="'+a[1]+'" data-i="'+a[2]+'"'}
+function scBadge(kind){
+  var bg=kind==='rm'?'var(--text)':kind==='add'?'#0187D0':'var(--muted)';
+  var path=kind==='rm'?'M6 12h12':kind==='add'?'M12 6v12M6 12h12':'M6 12.5l4 4 8-9';
+  return '<span aria-hidden="true" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:11px;background:'+bg+';border:2px solid var(--card);display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+(kind==='rm'?'var(--card)':'#fff')+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="'+path+'"/></svg></span>'}
+function scTile(k,kind,dis){var it=SC[k];
+  var act=kind==='rm'?'sc-rm':kind==='add'?'sc-add':'';
+  return '<'+(act?'button type="button" data-act="'+act+'" data-k="'+k+'"'+(dis?' disabled':'')+' aria-label="'+(kind==='rm'?'Remove ':'Add ')+it[0]+'"':'div aria-label="'+it[0]+', already added"')+' class="tcol" style="background:transparent;border:0;padding:0;font-family:inherit;color:var(--text);opacity:'+(dis?.4:1)+'"><span class="tileb" style="position:relative;background:var(--card);border:'+(kind==='rm'?'none':'1.5px solid var(--line)')+';box-shadow:'+(kind==='rm'?'var(--cardsh)':'none')+';border-radius:14px">'+scIcon(it)+(dis?'':scBadge(kind))+'</span><span class="t" style="white-space:nowrap">'+it[0]+'</span></'+(act?'button':'div')+'>'}
+function scHTML(){
+  var full=S.sc.length>=SC_MAX;
+  var mine=S.sc.map(function(k){return scTile(k,'rm')}).join('');
+  for(var i=S.sc.length;i<SC_MAX;i++)mine+='<div class="tcol" aria-hidden="true"><span class="tileb" style="background:transparent;border:1.5px dashed var(--line);border-radius:14px"></span><span class="t">&nbsp;</span></div>';
+  var groups=SCG.map(function(g){return '<div class="card" style="gap:14px;padding:16px 12px"><h2 style="margin:0;font-size:16px;font-weight:700;padding:0 4px">'+g[0]+'</h2><div class="grid4" style="gap:16px 8px">'+
+    g[1].map(function(k){var on=S.sc.indexOf(k)>=0;return on?scTile(k,'on'):scTile(k,'add',full)}).join('')+'</div></div>'}).join('');
+  return topbar('My shortcuts','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:12px">'+
+   '<div class="card" style="gap:14px;padding:16px 12px"><div style="display:flex;flex-direction:column;gap:2px;padding:0 4px"><h2 style="margin:0;font-size:16px;font-weight:700">On your Home</h2><span class="mut" style="font-size:13px">'+(full?'Your row is full. Remove one to add another.':'Up to '+SC_MAX+'. Tap &minus; to remove.')+'</span></div><div class="grid4" style="gap:8px">'+mine+'</div></div>'+groups+
+   '</div></div>'+btn56('Done','sc-done');
+}
 /* ---------- render ---------- */
 var phone=$('#phone');
 
@@ -1002,7 +1040,7 @@ function bankAllHTML(){
 
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,sc:scHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -1133,6 +1171,10 @@ document.addEventListener('click',function(e){
   else if(a==='back-lamt'){go('lamt')}
   else if(a==='ln-next'){go('lpin')}
   else if(a==='tab'){var tk=t.getAttribute('data-k');resetFlow();S.sheet=null;go(tk==='home'?'home':tk)}
+  else if(a==='sc-edit'){go('sc')}
+  else if(a==='sc-rm'){var rk=t.getAttribute('data-k');S.sc=S.sc.filter(function(x){return x!==rk});render(false)}
+  else if(a==='sc-add'){var ak=t.getAttribute('data-k');if(S.sc.length<SC_MAX&&S.sc.indexOf(ak)<0)S.sc.push(ak);render(false)}
+  else if(a==='sc-done'){go('home')}
   else if(a==='appsec'){S.appsec=+t.getAttribute('data-k');go('appsec')}
   else if(a==='back-apps'){go('apps')}
   else if(a==='paycat'){S.paycat=t.getAttribute('data-k');go('paycat')}
