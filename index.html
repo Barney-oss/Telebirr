@@ -847,13 +847,31 @@ var BHIST=[['Today',[[0,'10:42 AM','500'],[1,'8:15 AM','300']]],['Yesterday',[[2
 function bankName(c){for(var i=0;i<BANKS.length;i++)if(BANKS[i][0]===c)return BANKS[i][1];return ''}
 function bankShort(c){return c==='CB'?'Commercial Bank':c==='NI'?'Nib Bank':bankName(c)}
 function fmtAcc(d){return d.replace(/(\d{4})(?=\d)/g,'$1 ')}
+var BK_NAMES=['Abebe Girma','Selam Tesfaye','Dawit Bekele','Hana Alemu','Yonas Tadesse','Meron Haile','Biniam Kassa','Liya Mesfin','Tsion Getachew','Kebede Ayele','Ruth Worku','Samuel Dereje'];
+function bkVirt(){ // sample account holder for any account number (one default name per bank)
+  var bi=0;for(var j=0;j<BANKS.length;j++)if(BANKS[j][0]===S.bk.bank)bi=j;
+  var n=BK_NAMES[bi%BK_NAMES.length];return {n:n,i:n.split(' ').map(function(w){return w[0]}).join(''),b:S.bk.bank,a:S.bk.acc};
+}
+var BK_MIN=10;
 function bkState(){
   var b=S.bk,a=b.acc;
   if(!a)return {s:'none'};
-  if(a.length<12)return {s:'part'};
-  for(var i=0;i<KNOWN.length;i++)if(KNOWN[i].a===a&&KNOWN[i].b===b.bank)return {s:'ok',i:i};
-  return {s:'err',m:b.bank?'We can\'t find this account. Check the bank and number, then try again.':'Choose a bank to check this account.'};
+  for(var i=0;i<KNOWN.length;i++)if(KNOWN[i].a===a&&KNOWN[i].b===b.bank)return {s:'ok',i:i,k:KNOWN[i]};
+  if(a.length<BK_MIN||!b.looked)return {s:'part'};
+  if(!b.bank)return {s:'err',m:'Choose a bank to check this account.'};
+  return {s:'ok',k:bkVirt(),virt:true};
 }
+function bkLookup(){ // after a pause in typing: show the holder's name, then move on by itself
+  clearTimeout(S.bk.lt);clearTimeout(S.bk.gt);S.bk.looked=false;
+  var acc=S.bk.acc;if(acc.length<BK_MIN)return;
+  S.bk.lt=setTimeout(function(){
+    if(S.screen!=='bank'||S.bk.acc!==acc)return;
+    S.bk.looked=true;render(false);
+    var st=bkState();if(st.s!=='ok')return;
+    S.bk.gt=setTimeout(function(){if(S.screen==='bank'&&S.bk.acc===acc&&!S.bk.sheet)bkGo(st.k)},800);
+  },1000);
+}
+function bkGo(k){S.mode='bank';S.bk.bank=k.b;S.bk.acc=k.a;S.bk.sheet=null;S.contact={id:'bk',ini:k.i,name:k.n,num:k.a};S.amount='';S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
 function bkRow(i,sub,right){
   var k=KNOWN[i];
   return '<button type="button" class="row" data-act="bk-pick" data-i="'+i+'"><span class="av" style="width:40px;height:40px;font-size:13px">'+k.i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+k.n+'</span><span class="mut" style="font-size:13px">'+sub+'</span></span>'+(right?'<span style="font-size:15px;font-weight:600">'+right+' ETB</span>':'')+'</button>';
@@ -880,9 +898,9 @@ function bankHTML(){
   var acc='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Account number</span><div class="input'+(st.s==='ok'?' ok':'')+'" style="height:52px'+(st.s==='err'?';border-color:var(--err)':'')+'"><span class="val">'+shown+'</span>'+tail+'</div></div>';
   var below,btn='';
   if(st.s==='ok'){
-    var k=KNOWN[st.i];
-    below='<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:48px;height:48px;font-size:16px;font-weight:800;background:transparent;border:2px solid #8DC73F">'+k.i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:12px;font-weight:600;color:var(--softink)">Sending to</span><span style="font-size:20px;line-height:24px;font-weight:700">'+k.n+'</span><span class="mut" style="font-size:13px">'+bankShort(k.b)+' · ••'+k.a.slice(-4)+'</span></span></div>';
-    btn='<div class="btnwrap"><button type="button" class="btn" data-act="bk-pick" data-i="'+st.i+'">Next</button></div>';
+    var k=st.k;
+    below='<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--softbg);border:1.5px solid var(--softbd)"><span class="av" style="width:48px;height:48px;font-size:16px;font-weight:800;background:transparent;border:2px solid #8DC73F">'+k.i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:20px;line-height:24px;font-weight:700">'+k.n+'</span><span class="mut" style="font-size:13px">'+bankShort(k.b)+' · ••'+k.a.slice(-4)+'</span></span></div>';
+    btn='<div class="btnwrap"><button type="button" class="btn" data-act="bk-go">Next</button></div>';
   }else if(st.s==='err'){
     below='<div class="err" role="alert">'+I.warn+'<span>'+st.m+'</span></div>';
     btn='<div class="btnwrap"><button type="button" class="btn" disabled>Next</button></div>';
@@ -960,8 +978,8 @@ function pressKey(k){
   }else if(S.screen==='bank'){
     if(S.bk.sheet)return;
     if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
-    else if(/\d/.test(k)&&S.bk.acc.length<12){S.bk.acc+=k}
-    render(false);
+    else if(/\d/.test(k)&&S.bk.acc.length<16){S.bk.acc+=k}
+    bkLookup();render(false);
   }else if(S.screen==='merch'&&S.cash.fld==='amt'){
     var s2=S.amount;
     if(k==='b'){if(!s2){S.cash.fld='op'}else s2=s2.slice(0,-1)}
@@ -1004,7 +1022,8 @@ document.addEventListener('click',function(e){
   else if(a==='bk-sheet'){S.bk.sheet='pick';render(false)}
   else if(a==='bk-clear'){S.bk.sheet='clear';render(false)}
   else if(a==='bk-close'){S.bk.sheet=null;render(false)}
-  else if(a==='bk-bank'){S.bk.bank=t.getAttribute('data-code');S.bk.sheet=null;render(false)}
+  else if(a==='bk-bank'){S.bk.bank=t.getAttribute('data-code');S.bk.sheet=null;bkLookup();render(false)}
+  else if(a==='bk-go'){var st0=bkState();if(st0.s==='ok')bkGo(st0.k)}
   else if(a==='bk-clear-yes'){S.bkCleared=true;S.bk.sheet=null;go('bank')}
   else if(a==='bk-pick'){var kk2=KNOWN[+t.getAttribute('data-i')];S.mode='bank';S.bk.bank=kk2.b;S.bk.acc=kk2.a;S.bk.sheet=null;S.contact={id:'bk',ini:kk2.i,name:kk2.n,num:kk2.a};S.amount='';S.fresh=false;S.risePending=true;S.screen='amount';render(false)}
   else if(a==='back-number'){S.contact=null;S.amount='';S.screen='number';render(false)}
