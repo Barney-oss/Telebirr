@@ -947,6 +947,15 @@ function pressKey(k){
       if(S.digits===''){ if(k==='7'||k==='9')S.digits='0'+k; } // leading 0 is optional: +251 is already there
       else if(S.digits.length<10)S.digits+=k;
     }
+    if(validNum(S.digits)){ // full number: show who it is, then move on by itself (no extra tap needed)
+      var dd=S.digits;
+      setTimeout(function(){
+        if(S.screen!=='number'||S.digits!==dd)return;
+        if(S.pk.picking){setNum(dd);return}
+        var c=CONTACTS.filter(function(x){return x.num===dd})[0]||newContact(dd);
+        S.contact=c;S.fresh=false;S.risePending=true;S.screen='amount';render(false);
+      },700);
+    }
     render(false);
   }else if(S.screen==='bank'){
     if(S.bk.sheet)return;
