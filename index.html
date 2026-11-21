@@ -260,10 +260,9 @@ function stampHTML(){
   var d=S.paidAt||new Date(),live=(Date.now()-d.getTime())<LIVE_MS;
   var day=d.toLocaleDateString('en-GB',{weekday:'long'})+', '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   return '<span style="margin-top:6px;font-size:17px;line-height:22px;font-weight:700">'+day+'</span>'+
-   '<span style="font-size:15px;line-height:20px;font-weight:600;color:var(--muted)">'+hm(d)+'</span>'+
-   (live?'<span class="livechip" data-t="'+d.getTime()+'" style="margin-top:6px;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:15px;background:var(--softbg);border:1.5px solid var(--softbd);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums"><span class="livedot" aria-hidden="true"></span>Live <span class="livec">'+hm(new Date(),true)+'</span></span>':'');
+   (live?'<span class="livechip" data-t="'+d.getTime()+'" style="margin-top:6px;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:15px;background:var(--softbg);border:1.5px solid var(--softbd);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums"><span class="livedot" aria-hidden="true"></span>Live <span class="livec">'+hm(new Date(),true)+'</span></span>':'<span style="font-size:15px;line-height:20px;font-weight:600;color:var(--muted)">'+hm(d)+'</span>');
 }
-setInterval(function(){document.querySelectorAll('.livechip').forEach(function(el){if(Date.now()-(+el.getAttribute('data-t'))>=LIVE_MS){el.remove();return}var c=el.querySelector('.livec');if(c)c.textContent=hm(new Date(),true)})},1000);
+setInterval(function(){document.querySelectorAll('.livechip').forEach(function(el){var t0=+el.getAttribute('data-t');if(Date.now()-t0>=LIVE_MS){var x=document.createElement('span');x.style.cssText='font-size:15px;line-height:20px;font-weight:600;color:var(--muted)';x.textContent=hm(new Date(t0));el.replaceWith(x);return}var c=el.querySelector('.livec');if(c)c.textContent=hm(new Date(),true)})},1000);
 function nowStr(){var d=new Date();S.paidAt=d;return d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
 function mkTxn(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',o='DK';for(var i=0;i<8;i++)o+=c.charAt(Math.floor(Math.random()*c.length));return o}
 function recipientName(){return S.contact?S.contact.name:fmtNum(S.digits)}
