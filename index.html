@@ -354,7 +354,7 @@ function homeHTML(){
    '<div class="hacts"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
    '<button type="button" class="hero" data-act="send" aria-label="Send money, start the prototype" style="height:64px;padding:0 14px;gap:10px">'+iSend+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Send money</span></button>'+
    '<button type="button" class="hero" data-act="airtime" style="height:64px;padding:0 14px;gap:10px">'+iAir.replace(/width="\d+" height="\d+"/,'width="28" height="28"')+'<span style="flex:1;text-align:left;font-size:14px;line-height:18px;font-weight:700;color:var(--text);white-space:nowrap">Airtime &amp; data</span></button></div>'+
-   '<div class="grid4" style="gap:8px">'+htile('bank','',iBank,'To bank')+htile('sheet','cash',iCashIO,'Cash in/out')+htile('loans','',iLoan,'Loans')+htile('noop','',iMerch,'To merchant')+'</div></div>'+
+   '<div class="grid4" style="gap:8px">'+htile('bank','',iBank,'To bank')+htile('sheet','cash',iCashIO,'Cash in/out')+htile('loans','',iLoan,'Loans')+htile('merch','',iMerch,'To merchant')+'</div></div>'+
    '<div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:16px;font-weight:700">My shortcuts</h2><span style="font-size:14px;font-weight:600;color:var(--link);display:flex;align-items:center;min-height:44px">Edit</span></div><div class="grid4" style="gap:8px">'+
    [[iBill,'Pay bills'],[iZem,'Zemen'],[iPark,'Parking']].map(function(p){return '<div class="tcol"><span class="tileb" style="background:var(--card);border:none;box-shadow:var(--cardsh)">'+p[0]+'</span><span class="t" style="white-space:nowrap">'+p[1]+'</span></div>'}).join('')+
    '<div class="tcol"><span class="tileb" style="background:transparent;border:1.5px dashed var(--link);color:var(--link)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="t" style="color:var(--link)">Add</span></div></div></div>'+
@@ -617,7 +617,7 @@ IC.sms='<path d="M4 6.5Q4 4.5 6 4.5h12q2 0 2 2v8q0 2-2 2h-7l-4.5 3.5v-3.5H6q-2 0
 S.cash={tab:'agent',otab:'agent',code:'',op:'',fld:'code',qr:0,via:'agent'};
 function cashReset(){S.cash={tab:'agent',otab:'agent',code:'',op:'',fld:'code',qr:0,via:'agent'}}
 function myMasked(){var n=S.pk.num.replace(/\D/g,'');return '+251 9•• ••• '+n.slice(-3)}
-function ctabs(a,on,l1,l2){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on==='agent'?'on':'')+'" data-act="'+a+'" data-k="agent" aria-pressed="'+(on==='agent')+'">'+l1+'</button><button type="button" class="'+(on!=='agent'?'on':'')+'" data-act="'+a+'" data-k="'+(a==='cin-tab'?'voucher':'atm')+'" aria-pressed="'+(on!=='agent')+'">'+l2+'</button></div>'}
+function ctabs(a,on,l1,l2){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on==='agent'?'on':'')+'" data-act="'+a+'" data-k="agent" aria-pressed="'+(on==='agent')+'">'+l1+'</button><button type="button" class="'+(on!=='agent'?'on':'')+'" data-act="'+a+'" data-k="'+(a==='cin-tab'||a==='m-tab'?'voucher':'atm')+'" aria-pressed="'+(on!=='agent')+'">'+l2+'</button></div>'}
 function steps(title,arr){
   return '<div class="hcard" style="gap:10px"><h2>'+title+'</h2>'+arr.map(function(s,i){return '<div style="display:flex;align-items:flex-start;gap:12px"><span style="width:26px;height:26px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--tile);border:1.5px solid var(--tilebd)">'+(i+1)+'</span><span style="font-size:14px;line-height:20px;padding-top:3px">'+s+'</span></div>'}).join('')+'</div>';
 }
@@ -647,6 +647,21 @@ function cfield(k,label,ph){
   return '<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">'+label+'</span><button type="button" class="input" data-act="cfld" data-k="'+k+'" style="margin:0;width:100%;font-family:inherit;color:var(--text);text-align:left;border-color:'+(on?'var(--link)':'var(--fieldbd)')+'" aria-label="'+label+'"><span class="val">'+(v?v:'<span class="mut" style="font-weight:500;letter-spacing:0">'+ph+'</span>')+(on?'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'')+'</span>'+
     (k==='code'?'<span style="height:36px;padding:0 12px;border-radius:18px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none" aria-hidden="true">'+ico('scan',18)+'Scan</span>':'')+'</button></div>';
 }
+var MNAME='Abebe Supermarket';
+function merchOK(){return S.cash.code.length>=5}
+function merchHTML(){
+  var c=S.cash;
+  if(c.otab==='voucher'){
+    return topbar('Pay a merchant','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('m-tab','voucher','Merchant ID','With a voucher')+
+     '<div class="card" style="border-radius:28px;flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('ticket',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Pay with a voucher</span><span class="mut" style="font-size:13px;line-height:18px">Get a code, then give it to the merchant to pay.</span></span></div>'+
+     steps('How it works',['Tap Get my code. We send a code by SMS.','Give the code to the merchant.','They use it to take the payment.'])+'</div></div>'+btn56('Get my code','m-apply');
+  }
+  var ok=merchOK();
+  var found=ok?'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico('store',22)+'<span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">'+MNAME+'</span><span class="mut" style="font-size:12px">Merchant '+c.code+'</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>':'';
+  return topbar('Pay a merchant','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px;padding-bottom:90px">'+ctabs('m-tab','agent','Merchant ID','With a voucher')+
+    cfield('code','Merchant ID','e.g. 123456')+found+cfield('op','Operator ID (optional)','e.g. 12')+'</div></div>'+
+    '<div class="btnwrap"><button type="button" class="btn" data-act="m-next"'+(ok?'':' disabled')+'>Next</button></div>'+keypad('none');
+}
 function coutOK(){return S.cash.code.length>=5&&S.cash.op.length>=1}
 function coutHTML(){
   var c=S.cash;
@@ -662,18 +677,23 @@ function coutHTML(){
 }
 function camtHTML(){
   var qr=S.cash.via==='qr',a=amountVal(),f=qr?0:fee(a),tot=a+f,over=!qr&&a>0&&tot>S.balance;
-  var ctx=qr?['cin','Cash in at an agent','Shown on your QR code']:S.cash.via==='atm'?['atm','Cash out at an ATM','Code sent by SMS']:['store','Agent '+S.cash.code,'Operator '+S.cash.op];
+  var mer=S.cash.via==='merch';
+  var ctx=qr?['cin','Cash in at an agent','Shown on your QR code']:mer?['store',MNAME,'Merchant '+S.cash.code+(S.cash.op?' · Operator '+S.cash.op:'')]:S.cash.via==='atm'?['atm','Cash out at an ATM','Code sent by SMS']:['store','Agent '+S.cash.code,'Operator '+S.cash.op];
   var who='<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico(ctx[0],24)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:700">'+ctx[1]+'</span><span class="mut" style="font-size:12px">'+ctx[2]+'</span></span></div>';
   var big='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>';
   var card=qr?'<div class="card" style="border-radius:24px;gap:6px;padding:14px 16px"><span class="lbl">Amount to deposit</span>'+big+'</div>':
-    '<div class="card" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">You withdraw</span>'+big+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">'+(a>0?'Balance after':'Available')+'</span><span style="font-size:14px;font-weight:600'+(over?';color:var(--err)':'')+'">'+money(a>0?S.balance-tot:S.balance)+' ETB</span></div></div>'+
+    '<div class="card" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">'+(mer?'You pay':'You withdraw')+'</span>'+big+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">'+(a>0?'Balance after':'Available')+'</span><span style="font-size:14px;font-weight:600'+(over?';color:var(--err)':'')+'">'+money(a>0?S.balance-tot:S.balance)+' ETB</span></div></div>'+
     '<div class="dash"></div><div style="display:flex;flex-direction:column;gap:8px"><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Fee</span><span style="font-weight:600;color:var(--text)">'+money(f)+' ETB</span></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8DC73F"></span>Total to pay</span><span style="font-size:20px;font-weight:700">'+money(tot)+' ETB</span></div>'+
     (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB, so lower the amount.</span></div>':'')+'</div></div>';
-  return topbar(qr?'Cash in':'Cash out','back-camt')+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+who+card+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="camt-next"'+((a<=0||over)?' disabled':'')+'>'+(qr?'Add to my code':'Next')+'</button></div>'+keypad('amount');
+  return topbar(qr?'Cash in':mer?'Pay a merchant':'Cash out','back-camt')+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+who+card+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="camt-next"'+((a<=0||over)?' disabled':'')+'>'+(qr?'Add to my code':'Next')+'</button></div>'+keypad('amount');
 }
 function cpinHTML(){
-  var a=amountVal(),f=fee(a),tot=a+f,atm=S.cash.via==='atm';S.total=tot;
+  var a=amountVal(),f=fee(a),tot=a+f,atm=S.cash.via==='atm',mer=S.cash.via==='merch';S.total=tot;
+  if(mer)return topbar('Confirm payment','back-cpin')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('store',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+MNAME+'</span><span class="mut" style="font-size:14px">Merchant '+S.cash.code+(S.cash.op?' · Operator '+S.cash.op:'')+'</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">'+money(a)+' ETB · includes '+money(f)+' ETB fee</span></div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
   return topbar('Confirm cash out','back-cpin')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
    '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico(atm?'atm':'store',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(atm?'Cash out at an ATM':'Agent '+S.cash.code)+'</span><span class="mut" style="font-size:14px">'+(atm?'One-time code by SMS':'Operator '+S.cash.op)+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">You get '+money(a)+' ETB in cash · includes '+money(f)+' ETB fee</span></div></div>'+
@@ -684,14 +704,14 @@ function doPay3(){
   setTimeout(function(){S.balance=Math.round((S.balance-S.total)*100)/100;S.txn=mkTxn();S.time=nowStr();S.paying=false;go('cdone')},900);
 }
 function cdoneHTML(){
-  var v=S.cash.via,vch=v==='voucher',atm=v==='atm',a=amountVal();
+  var v=S.cash.via,mvch=v==='mvoucher',vch=v==='voucher'||mvch,atm=v==='atm',mer=v==='merch',a=amountVal();
   function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
   var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
   var head=vch?'<span style="margin-top:22px;font-size:24px;line-height:30px;font-weight:700">Code sent</span><span class="mut" style="font-size:14px;line-height:20px">Check your SMS for the secret code.</span>':
     '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span>';
-  var next=vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
+  var next=mvch?['ticket','Next: give the code to the merchant','They use it to take the payment.']:mer?['store','Paid to '+MNAME,'Merchant '+S.cash.code]:vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
   var nc='<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none"><span class="tbig" style="width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1.5px solid var(--tilebd)">'+ico(next[0],26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+next[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+next[2]+'</span></span></div>';
-  var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1)+line('Transaction ID',S.txn,1)+'</div>';
+  var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(mer?line('Merchant',MNAME,0)+line('Merchant ID',S.cash.code,1)+(S.cash.op?line('Operator',S.cash.op,1):'')+line('Amount',money(a)+' ETB',1):(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1))+line('Transaction ID',S.txn,1)+'</div>';
   return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+head+'</div>'+nc+det+'</div></div>'+btn56('Done','finish');
 }
 /* ---------- Loans ---------- */
@@ -852,7 +872,7 @@ function bankAllHTML(){
 
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -900,7 +920,7 @@ function pressKey(k){
     if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
     else if(/\d/.test(k)&&S.bk.acc.length<12){S.bk.acc+=k}
     render(false);
-  }else if(S.screen==='cout'){
+  }else if(S.screen==='cout'||S.screen==='merch'){
     var c=S.cash,f=c.fld,mx=f==='code'?6:4;
     if(k==='b'){if(!c[f]&&f==='op'){c.fld='code'}else c[f]=c[f].slice(0,-1)}
     else if(/\d/.test(k)&&c[f].length<mx){c[f]+=k;if(f==='code'&&c[f].length===6)c.fld='op'}
@@ -962,6 +982,10 @@ document.addEventListener('click',function(e){
   else if(a==='back-loans'){go('loans')}
   else if(a==='back-lamt'){go('lamt')}
   else if(a==='ln-next'){go('lpin')}
+  else if(a==='merch'){resetFlow();S.cash.otab='agent';go('merch')}
+  else if(a==='m-tab'){S.cash.otab=t.getAttribute('data-k');render(false)}
+  else if(a==='m-next'){if(merchOK()){S.cash.via='merch';S.amount='';go('camt')}}
+  else if(a==='m-apply'){S.cash.via='mvoucher';S.time=nowStr();go('cdone')}
   else if(a==='cash-in'){resetFlow();S.cash.tab='agent';go('cin')}
   else if(a==='cash-out'){resetFlow();S.cash.otab='agent';go('cout')}
   else if(a==='cin-tab'){S.cash.tab=t.getAttribute('data-k');render(false)}
@@ -972,7 +996,7 @@ document.addEventListener('click',function(e){
   else if(a==='cfld'){S.cash.fld=t.getAttribute('data-k');render(false)}
   else if(a==='cout-next'){if(coutOK()){S.cash.via='agent';S.amount='';go('camt')}}
   else if(a==='cout-atm'){S.cash.via='atm';S.amount='';go('camt')}
-  else if(a==='back-camt'){go(S.cash.via==='qr'?'cin':'cout')}
+  else if(a==='back-camt'){go(S.cash.via==='qr'?'cin':S.cash.via==='merch'?'merch':'cout')}
   else if(a==='back-cpin'){go('camt')}
   else if(a==='camt-next'){var av=amountVal();if(S.cash.via==='qr'){S.cash.qr=av;go('cin')}else go('cpin')}
   else if(a==='finish'){resetFlow();go('home')}
@@ -1002,7 +1026,7 @@ document.addEventListener('click',function(e){
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
-  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='lamt')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='merch'&&S.screen!=='lamt')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
   else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt'||S.screen==='lamt')){pressKey('.');e.preventDefault()}
