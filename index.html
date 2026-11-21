@@ -698,27 +698,39 @@ var LPROD=[ // bank, plain name, days to repay (for sorting), min, max, type
  ['cbe','2 months salary, 6 payments',180,1000,300000,'salary','Adrash 2 months, 6 months'],['db','2 months salary, 9 payments',270,1000,300000,'salary','Medaresha 2 months, 9 months'],['cbe','3 months salary, 9 payments',270,1000,450000,'salary','Adrash 3 months, 9 months'],
  ['db','3 months salary, 12 payments',360,1000,450000,'salary','Medaresha 3 months, 12 months'],['cbe','4 months salary, 12 payments',360,1000,600000,'salary','Adrash 4 months, 12 months'],['sq','5 months salary, 14 payments',420,1000,1000000,'salary','Wabi 5 months, 14 months']
 ];
-S.ln={tab:'short',bank:'all',p:null};
+function lnReset(){S.ln={tab:'short',bank:'all',p:null,mode:'borrow',active:{p:2,amt:300,due:addDays(4),left:4,total:7}}}
+function limOf(k){var a=S.ln&&S.ln.active;return Math.max(0,LBANK[k].lim-(a&&LPROD[a.p][0]===k?a.amt:0))}
 function k0(n){return n.toLocaleString('en-US',{maximumFractionDigits:0})}
 function blogo(b,px){return '<span style="width:'+px+'px;height:'+px+'px;border-radius:'+Math.round(px*.3)+'px;background:#FFFFFF;border:1px solid #E6E6EA;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"><img src="'+LBANK[b].img+'" alt="" style="width:'+Math.round(px*.78)+'px;height:'+Math.round(px*.78)+'px;object-fit:contain"></span>'}
 function addDays(n){var d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
 function loansHTML(){
   var L=S.ln;
-  var lim=Object.keys(LBANK).map(function(k){var b=LBANK[k],ok=b.lim>0;return '<div style="min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:18px;background:var(--card);border:1px solid var(--cardbd);box-shadow:var(--cardsh)"><div style="display:flex;align-items:center;gap:8px">'+blogo(k,32)+'<span style="font-size:13px;font-weight:700">'+b.s+'</span></div><span style="display:flex;flex-direction:column;gap:1px"><span class="lbl">'+(ok?'Available':'Not eligible yet')+'</span><span style="font-size:17px;font-weight:700'+(ok?'':';color:var(--muted)')+'">'+(ok?money(b.lim)+' <span class="mut" style="font-size:12px;font-weight:600">ETB</span>':'0.00 <span style="font-size:12px;font-weight:600">ETB</span>')+'</span></span></div>'}).join('');
+  var lim=Object.keys(LBANK).map(function(k){var b=LBANK[k],lv=limOf(k),ok=b.lim>0;return '<div style="min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:18px;background:var(--card);border:1px solid var(--cardbd);box-shadow:var(--cardsh)"><div style="display:flex;align-items:center;gap:8px">'+blogo(k,32)+'<span style="font-size:13px;font-weight:700">'+b.s+'</span></div><span style="display:flex;flex-direction:column;gap:1px"><span class="lbl">'+(ok?'Available':'Not eligible yet')+'</span><span style="font-size:17px;font-weight:700'+(ok?'':';color:var(--muted)')+'">'+(ok?money(lv)+' <span class="mut" style="font-size:12px;font-weight:600">ETB</span>':'0.00 <span style="font-size:12px;font-weight:600">ETB</span>')+'</span></span></div>'}).join('');
   var chips=['all','db','cbe','sq','aw'].map(function(k){var on=L.bank===k;return '<button type="button" class="chip'+(on?' on':'')+'" data-act="ln-bank" data-k="'+k+'" aria-pressed="'+on+'" style="height:36px;padding:0 14px;border-radius:18px;flex:none;font-size:13px;font-weight:600;font-family:inherit;color:var(--text);border:1.5px solid '+(on?'var(--selbd)':'var(--line)')+';background:'+(on?'var(--tile)':'var(--card)')+'">'+(k==='all'?'All banks':LBANK[k].s)+'</button>'}).join('');
   var list=LPROD.map(function(p,i){return [p,i]}).filter(function(x){return x[0][5]===L.tab&&(L.bank==='all'||x[0][0]===L.bank)});
   var rows=list.map(function(x,j){var p=x[0],b=LBANK[p[0]];return '<div class="prow" style="gap:12px'+(j?';border-top:1px solid var(--line)':'')+'">'+blogo(p[0],36)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:700;line-height:19px">'+p[1]+'</span><span class="mut" style="font-size:12px">'+b.s+' · '+k0(p[3])+(p[4]?' to '+k0(p[4]):'+')+' ETB</span></span><button type="button" class="buy" data-act="ln-apply" data-i="'+x[1]+'">Apply</button></div>'}).join('');
   return topbar('Loans','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+
+   (L.active?activeCard():'')+
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Your credit limits</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+lim+'</div></div>'+
-   '<button type="button" class="hcard vrow" style="padding:12px 16px" aria-label="My loans"><span class="tbig" style="width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('clock',22)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">My loans</span><span class="mut" style="font-size:12px">No active loans</span></span>'+mut('chev',20)+'</button>'+
+   (L.active?'':'<button type="button" class="hcard vrow" style="padding:12px 16px" aria-label="My loans"><span class="tbig" style="width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('clock',22)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">My loans</span><span class="mut" style="font-size:12px">No active loans</span></span>'+mut('chev',20)+'</button>')+
    '<div class="tabs" style="margin:4px 0 0"><button type="button" class="'+(L.tab==='short'?'on':'')+'" data-act="ln-tab" data-k="short">Pay back at once</button><button type="button" class="'+(L.tab==='salary'?'on':'')+'" data-act="ln-tab" data-k="salary">Pay monthly</button></div>'+
    '<div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px">'+chips+'</div>'+
    '<div class="hcard" style="padding:0 16px;gap:0">'+(rows||'<div class="mut" style="padding:24px 0;text-align:center;font-size:14px">No '+(L.tab==='short'?'pay-at-once':'monthly')+' loans from this bank</div>')+'</div>'+
    '<span class="mut" style="font-size:12px;text-align:center;line-height:16px">Limits are set by each bank from how you use telebirr.</span></div></div>';
 }
+function activeCard(){
+  var A=S.ln.active,p=LPROD[A.p],b=LBANK[p[0]],pct=Math.round((A.total-A.left)/A.total*100);
+  return '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:2px">Active loan</span><div class="card" style="border-radius:24px;gap:14px;padding:16px">'+
+   '<div style="display:flex;align-items:center;gap:12px">'+blogo(p[0],40)+'<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:15px;font-weight:700">'+p[1]+' loan</span><span class="mut" style="font-size:12px">'+b.n+'</span></span><span style="font-size:12px;font-weight:700;color:var(--softink);background:var(--totalbg);border-radius:10px;padding:4px 10px">'+A.left+' days left</span></div>'+
+   '<div style="display:flex;flex-direction:column;gap:2px"><span class="lbl">To pay back</span><span style="display:flex;align-items:baseline;gap:6px"><span style="font-size:30px;line-height:36px;font-weight:700">'+money(A.amt)+'</span><span class="mut" style="font-size:14px;font-weight:600">ETB + fees</span></span></div>'+
+   '<div style="display:flex;flex-direction:column;gap:6px"><div style="height:8px;border-radius:4px;background:var(--line);overflow:hidden" role="img" aria-label="'+(A.total-A.left)+' of '+A.total+' days passed"><div style="width:'+pct+'%;height:100%;border-radius:4px;background:#8DC73F"></div></div><div class="mut" style="display:flex;justify-content:space-between;font-size:12px"><span>Borrowed '+(A.total-A.left)+' days ago</span><span>Due '+A.due+'</span></div></div>'+
+   '<button type="button" class="btn" data-act="ln-repay" style="height:48px;border-radius:24px">Repay now</button>'+
+   '<span class="mut" style="font-size:12px;line-height:16px;text-align:center">If you don\'t repay early, '+b.s+' takes it from your balance on the due date.</span></div></div>';
+}
 function lnP(){return LPROD[S.ln.p]}
+lnReset();
 function lamtHTML(){
-  var p=lnP(),b=LBANK[p[0]],a=amountVal(),max=Math.min(b.lim,p[4]||b.lim),err='';
+  var p=lnP(),b=LBANK[p[0]],a=amountVal(),bl=limOf(p[0]),max=Math.min(bl,p[4]||bl),err='';
   if(a>0&&a>max)err=b.lim<=0?'You are not eligible for a '+b.s+' loan yet.':'This is above your limit. You can borrow up to '+money(max)+' ETB.';
   else if(a>0&&a<p[3])err='The smallest amount for this loan is '+k0(p[3])+' ETB.';
   var who='<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+blogo(p[0],32)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:700">'+p[1]+'</span><span class="mut" style="font-size:12px">'+b.n+' · '+b.b+'</span></span></div>';
@@ -730,6 +742,12 @@ function lamtHTML(){
 function lpinHTML(){
   var p=lnP(),b=LBANK[p[0]],a=amountVal();
   function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:36px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
+  var rp=S.ln.mode==='repay';
+  if(rp){var A=S.ln.active;return topbar('Repay loan','back-loans')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:12px"><div style="display:flex;align-items:center;gap:14px">'+blogo(p[0],52)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+p[1]+' loan</span><span class="mut" style="font-size:14px">'+b.n+'</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">You pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(a)+' ETB</span><span class="mut" style="font-size:13px">From your telebirr balance · plus fees set by '+b.s+'</span></div>'+
+   '<div style="display:flex;flex-direction:column;padding:0 2px">'+line('Due date',A.due,0)+line('Balance after',money(S.balance-a)+' ETB',1)+'</div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to repay':'Enter PIN to repay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');}
   return topbar('Confirm loan','back-lamt')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
    '<div class="card" style="border-radius:28px;padding:16px;gap:12px"><div style="display:flex;align-items:center;gap:14px">'+blogo(p[0],52)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+p[1]+'</span><span class="mut" style="font-size:14px">'+b.n+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">You get</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(a)+' ETB</span><span class="mut" style="font-size:13px">Added to your telebirr balance</span></div>'+
@@ -738,13 +756,19 @@ function lpinHTML(){
 }
 function doPay4(){
   if(S.paying)return; S.paying=true; render(false);
-  setTimeout(function(){var a=amountVal();S.balance=Math.round((S.balance+a)*100)/100;S.txn=mkTxn();S.time=nowStr();S.paying=false;go('ldone')},900);
+  setTimeout(function(){var a=amountVal(),rp=S.ln.mode==='repay';S.balance=Math.round((S.balance+(rp?-a:a))*100)/100;
+    if(rp)S.ln.active=null;else if(!S.ln.active){var P=LPROD[S.ln.p];S.ln.active={p:S.ln.p,amt:a,due:P[5]==='short'?addDays(P[2]):addDays(30),left:P[5]==='short'?P[2]:30,total:P[5]==='short'?P[2]:30}}
+    S.txn=mkTxn();S.time=nowStr();S.paying=false;go('ldone')},900);
 }
 function ldoneHTML(){
   var p=lnP(),b=LBANK[p[0]],a=amountVal();
   function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
   var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
-  var due=p[5]==='short'?addDays(p[2]):p[1].split(', ')[1];
+  var due=p[5]==='short'?addDays(p[2]):p[1].split(', ')[1],rp=S.ln.mode==='repay';
+  if(rp)return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
+   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
+   '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">Loan repaid</span><span class="mut" style="font-size:13px;line-height:18px">Your '+b.s+' limit is back to '+money(limOf(p[0]))+' ETB.</span></span></div>'+
+   '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+line('Loan',p[1],0)+line('Bank',b.n,1)+line('Paid from','Balance',1)+line('Transaction ID',S.txn,1)+'</div></div></div>'+btn56('Done','ln-back-hub');
   return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+
    '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">+'+money(a)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span></div>'+
    '<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none">'+blogo(p[0],48)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">Pay back by '+due+'</span><span class="mut" style="font-size:13px;line-height:18px">'+b.s+' takes it from your balance on the due date.</span></span></div>'+
@@ -923,10 +947,12 @@ document.addEventListener('click',function(e){
   else if(a==='sheet-close'){S.sheet=null;render(false)}
   else if(a==='bio'){if(!S.paying){S.pin='123456';render(false)}}
   else if(a==='pay'){if(S.pin.length===6)payFn()()}
-  else if(a==='loans'){resetFlow();S.ln={tab:'short',bank:'all',p:null};go('loans')}
+  else if(a==='loans'){resetFlow();S.ln.tab='short';S.ln.bank='all';S.ln.mode='borrow';go('loans')}
+  else if(a==='ln-repay'){S.ln.mode='repay';S.ln.p=S.ln.active.p;S.amount=String(S.ln.active.amt);go('lpin')}
+  else if(a==='ln-back-hub'){S.ln.mode='borrow';S.amount='';go('loans')}
   else if(a==='ln-tab'){S.ln.tab=t.getAttribute('data-k');render(false)}
   else if(a==='ln-bank'){S.ln.bank=t.getAttribute('data-k');render(false)}
-  else if(a==='ln-apply'){S.ln.p=+t.getAttribute('data-i');S.amount='';S.fresh=false;go('lamt')}
+  else if(a==='ln-apply'){S.ln.mode='borrow';S.ln.p=+t.getAttribute('data-i');S.amount='';S.fresh=false;go('lamt')}
   else if(a==='back-loans'){go('loans')}
   else if(a==='back-lamt'){go('lamt')}
   else if(a==='ln-next'){go('lpin')}
@@ -980,7 +1006,7 @@ window.addEventListener('keydown',function(e){
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
 render(true);
 // small test hook so the flow can be checked from the console
-window.__proto={state:S,fee:fee,render:render,go:go};
+window.__proto={state:S,fee:fee,render:render,go:go,lnReset:lnReset};
 })();
 </script>
 </body>
