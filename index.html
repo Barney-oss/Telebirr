@@ -618,15 +618,19 @@ function steps(title,arr){
 function cinHTML(){
   var c=S.cash,body;
   if(c.tab==='agent'){
-    var amt=c.qr>0?'<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:28px;line-height:34px;font-weight:700">'+money(c.qr)+'</span><span class="mut" style="font-size:14px;font-weight:600">ETB</span></div>':'';
+    var pill='height:44px;padding:0 18px;border-radius:22px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;font-family:inherit;flex:none;';
+    var plus='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    var pen='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16Z"/><path d="M13.5 6.5l4 4"/></svg>';
+    var amt=c.qr>0?'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:28px;line-height:34px;font-weight:700">'+money(c.qr)+'</span><span class="mut" style="font-size:14px;font-weight:600">ETB</span><button type="button" data-act="cin-clear" style="height:44px;padding:0 10px;margin-right:-10px;background:transparent;border:0;font-family:inherit;font-size:13px;font-weight:600;color:var(--link)">Clear</button></div>':'';
     body='<div class="card" style="border-radius:28px;align-items:center;text-align:center;gap:12px;padding:20px 16px">'+
       '<span style="font-size:15px;font-weight:700">Show this code to the agent</span>'+amt+
       '<span style="width:196px;height:196px;padding:14px;border-radius:20px;background:#FFFFFF;border:2.5px solid #8DC73F;display:flex;box-sizing:border-box">'+qrSVG('telebirr:cashin:'+S.pk.num.replace(/\D/g,'')+(c.qr?':'+c.qr:''),164)+'</span>'+
       '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Nardos</span><span class="mut" style="font-size:13px">'+myMasked()+'</span></span>'+
-      '<span class="tl2" style="pointer-events:none;color:var(--link)" aria-hidden="true">'+I.dl+'Save image</span></div>'+
-      '<button type="button" class="hcard vrow" data-act="cin-amt"><span class="tbig" style="width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('cin',24)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">'+(c.qr?'Change amount':'Add an amount')+'</span><span class="mut" style="font-size:12px">Optional. The agent sees it when they scan.</span></span>'+(c.qr?'<span role="button" tabindex="0" data-act="cin-clear" style="font-size:13px;font-weight:600;color:var(--link);padding:8px">Clear</span>':mut('chev',20))+'</button>'+
+      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-top:2px"><button type="button" data-act="cin-amt" style="'+pill+'background:var(--card);border:1.5px solid var(--link);color:var(--link)">'+(c.qr?pen:plus)+(c.qr?'Edit amount':'Add amount')+'</button>'+
+      '<span style="'+pill+'background:var(--tile);border:1.5px solid var(--tilebd);color:var(--text)" aria-hidden="true">'+I.dl+'Save image</span></div>'+
+      (c.qr?'':'<span class="mut" style="font-size:12px;line-height:16px">Amount is optional. The agent can type it in.</span>')+'</div>'+
       steps('How it works',['Give the agent your cash.','They scan your code and send the money.','You get an SMS when it reaches your balance.']);
-    return topbar('Cash in','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('cin-tab','agent','At an agent','With a voucher')+body+'</div></div>'+btn56('Done','finish');
+    return topbar('Cash in','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('cin-tab','agent','At an agent','With a voucher')+body+'</div></div>';
   }
   body='<div class="card" style="border-radius:28px;flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('ticket',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Deposit with a voucher</span><span class="mut" style="font-size:13px;line-height:18px">Get a secret code first, then deposit at any agent.</span></span></div>'+
     steps('How it works',['Tap Get my code. We send a secret code by SMS.','Give the agent the code and your cash.','The money reaches your balance and you get an SMS.']);
@@ -861,7 +865,7 @@ document.addEventListener('click',function(e){
   else if(a==='cash-out'){resetFlow();S.cash.otab='agent';go('cout')}
   else if(a==='cin-tab'){S.cash.tab=t.getAttribute('data-k');render(false)}
   else if(a==='cout-tab'){S.cash.otab=t.getAttribute('data-k');render(false)}
-  else if(a==='cin-clear'){e.stopPropagation();S.cash.qr=0;render(false)}
+  else if(a==='cin-clear'){S.cash.qr=0;render(false)}
   else if(a==='cin-amt'){S.cash.via='qr';S.amount=S.cash.qr?String(S.cash.qr):'';S.fresh=!!S.cash.qr;go('camt')}
   else if(a==='cin-apply'){S.cash.via='voucher';S.time=nowStr();go('cdone')}
   else if(a==='cfld'){S.cash.fld=t.getAttribute('data-k');render(false)}
