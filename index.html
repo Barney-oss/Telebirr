@@ -274,6 +274,7 @@ function keypad(kind){
   for(var i=1;i<=9;i++)h+='<button type="button" class="key" data-act="key" data-k="'+i+'" aria-label="'+i+'">'+i+'</button>';
   if(kind==='amount') h+='<button type="button" class="key acc" data-act="key" data-k="." aria-label="Decimal point">.</button>';
   else if(kind==='pin') h+='<button type="button" class="key acc" data-act="bio" aria-label="Use fingerprint (prototype shortcut)">'+I.finger+'</button>';
+  else if(kind==='none') h+='<span aria-hidden="true"></span>';
   else if(kind==='acc') h+='<span class="key acc" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="3" style="fill:var(--icfill)"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></svg></span>';
   else h+='<button type="button" class="key acc" disabled aria-label="Plus (not available in prototype)">+</button>';
   h+='<button type="button" class="key" data-act="key" data-k="0" aria-label="0">0</button>';
@@ -291,12 +292,12 @@ function sheetHTML(){
   if(!S.sheet)return '';
   function ic(inner){return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+inner+'</svg>'}
   var chev='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
-  function row(i,t,sub){return '<div style="display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 4px"><span style="width:48px;height:48px;border-radius:16px;background:var(--tile);border:1.5px solid var(--tilebd);display:flex;align-items:center;justify-content:center;flex:none">'+i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+t+'</span><span class="mut" style="font-size:13px">'+sub+'</span></span>'+chev+'</div>'}
+  function row(i,t,sub,act){return '<'+(act?'button type="button" data-act="'+act+'"':'div')+' style="display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 4px;width:100%;background:transparent;border:0;text-align:left;font-family:inherit;color:inherit"><span style="width:48px;height:48px;border-radius:16px;background:var(--tile);border:1.5px solid var(--tilebd);display:flex;align-items:center;justify-content:center;flex:none">'+i+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+t+'</span><span class="mut" style="font-size:13px">'+sub+'</span></span>'+chev+'</'+(act?'button':'div')+'>'}
   var line='<div style="height:1px;background:var(--line)"></div>',inn;
   if(S.sheet==='cash'){
-    inn='<h2 style="margin:0;font-size:18px;font-weight:700">Cash in &amp; out</h2><span class="mut" style="font-size:13px;margin-top:-6px">Use a telebirr agent to put money in or take it out.</span><div style="display:flex;flex-direction:column;margin-top:4px">'+
-      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 16.5v-9M12 16.5l-3-3M12 16.5l3-3"/>'),'Cash in','Add money to your balance at an agent')+line+
-      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 7.5v9M12 7.5l-3 3M12 7.5l3 3"/>'),'Cash out','Withdraw money from your balance at an agent')+line+
+    inn='<h2 style="margin:0;font-size:18px;font-weight:700">Cash in &amp; out</h2><span class="mut" style="font-size:13px;margin-top:-6px">Put money in or take it out at an agent, ATM or with a voucher.</span><div style="display:flex;flex-direction:column;margin-top:4px">'+
+      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 16.5v-9M12 16.5l-3-3M12 16.5l3-3"/>'),'Cash in','Add money at an agent or with a voucher','cash-in')+line+
+      row(ic('<circle cx="12" cy="12" r="9.5" style="fill:var(--icfill)"/><path d="M12 7.5v9M12 7.5l-3 3M12 7.5l3 3"/>'),'Cash out','Take cash at an agent or an ATM','cash-out')+line+
       row(ic('<circle cx="11" cy="11" r="6.5" style="fill:var(--icfill)"/><path d="M20.5 20.5 16 16"/>'),'Find an agent','See agents near you on the map')+'</div>';
   }else{
     function mt(i,l){return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0"><span style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;box-sizing:border-box;background:var(--tile);border:1.5px solid var(--tilebd);border-radius:18px">'+i+'</span><span style="font-size:12px;line-height:15px;font-weight:600;text-align:center">'+l+'</span></div>'}
@@ -600,6 +601,89 @@ function pkgDoneHTML(){
    '<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(it.e?line('Expires',it.e,0):'')+line(credit?'Added to':'Paid with',credit?'Balance':(p.method==='rew'?'Reward balance':'Balance'),it.e?1:0)+line('Transaction ID',S.txn,2)+'</div></div></div>'+btn56('Done','finish2');
 }
 
+/* ---------- Cash in / out ---------- */
+IC.cin='<circle cx="12" cy="12" r="8.5" class="f"/><path d="M12 16.5v-9M12 16.5l-3-3M12 16.5l3-3"/>';
+IC.cout='<circle cx="12" cy="12" r="8.5" class="f"/><path d="M12 7.5v9M12 7.5l-3 3M12 7.5l3 3"/>';
+IC.store='<path d="M5.5 12.5v7q0 1 1 1h11q1 0 1-1v-7"/><path d="M3.5 9.5 5 4.5h14l1.5 5a2.83 2.83 0 0 1-5.67 0 2.83 2.83 0 0 1-5.66 0 2.83 2.83 0 0 1-5.67 0Z" class="f"/><path d="M10 20.5v-3.2a2 2 0 0 1 4 0v3.2"/>';
+IC.atm='<rect x="3.5" y="4" width="17" height="10" rx="3" class="f"/><path d="M7 14v6.5h10V14M10 17.5h4M8 8.5h8"/>';
+IC.ticket='<path d="M3.5 8a2 2 0 0 0 0 4v0a2 2 0 0 1 0 4V18q0 1.5 1.5 1.5h14q1.5 0 1.5-1.5v-2a2 2 0 0 1 0-4 2 2 0 0 1 0-4V6q0-1.5-1.5-1.5H5Q3.5 4.5 3.5 6Z" class="f"/><path d="M14.5 5v14" stroke-dasharray="2 2.5"/>';
+IC.sms='<path d="M4 6.5Q4 4.5 6 4.5h12q2 0 2 2v8q0 2-2 2h-7l-4.5 3.5v-3.5H6q-2 0-2-2Z" class="f"/><path d="M8.5 10.5h7"/>';
+S.cash={tab:'agent',otab:'agent',code:'',op:'',fld:'code',qr:0,via:'agent'};
+function cashReset(){S.cash={tab:'agent',otab:'agent',code:'',op:'',fld:'code',qr:0,via:'agent'}}
+function myMasked(){var n=S.pk.num.replace(/\D/g,'');return '+251 9•• ••• '+n.slice(-3)}
+function ctabs(a,on,l1,l2){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on==='agent'?'on':'')+'" data-act="'+a+'" data-k="agent" aria-pressed="'+(on==='agent')+'">'+l1+'</button><button type="button" class="'+(on!=='agent'?'on':'')+'" data-act="'+a+'" data-k="'+(a==='cin-tab'?'voucher':'atm')+'" aria-pressed="'+(on!=='agent')+'">'+l2+'</button></div>'}
+function steps(title,arr){
+  return '<div class="hcard" style="gap:10px"><h2>'+title+'</h2>'+arr.map(function(s,i){return '<div style="display:flex;align-items:flex-start;gap:12px"><span style="width:26px;height:26px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--tile);border:1.5px solid var(--tilebd)">'+(i+1)+'</span><span style="font-size:14px;line-height:20px;padding-top:3px">'+s+'</span></div>'}).join('')+'</div>';
+}
+function cinHTML(){
+  var c=S.cash,body;
+  if(c.tab==='agent'){
+    var amt=c.qr>0?'<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:28px;line-height:34px;font-weight:700">'+money(c.qr)+'</span><span class="mut" style="font-size:14px;font-weight:600">ETB</span></div>':'';
+    body='<div class="card" style="border-radius:28px;align-items:center;text-align:center;gap:12px;padding:20px 16px">'+
+      '<span style="font-size:15px;font-weight:700">Show this code to the agent</span>'+amt+
+      '<span style="width:196px;height:196px;padding:14px;border-radius:20px;background:#FFFFFF;border:2.5px solid #8DC73F;display:flex;box-sizing:border-box">'+qrSVG('telebirr:cashin:'+S.pk.num.replace(/\D/g,'')+(c.qr?':'+c.qr:''),164)+'</span>'+
+      '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Nardos</span><span class="mut" style="font-size:13px">'+myMasked()+'</span></span>'+
+      '<span class="tl2" style="pointer-events:none;color:var(--link)" aria-hidden="true">'+I.dl+'Save image</span></div>'+
+      '<button type="button" class="hcard vrow" data-act="cin-amt"><span class="tbig" style="width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('cin',24)+'</span><span style="flex:1;display:flex;flex-direction:column;text-align:left"><span style="font-size:15px;font-weight:700">'+(c.qr?'Change amount':'Add an amount')+'</span><span class="mut" style="font-size:12px">Optional. The agent sees it when they scan.</span></span>'+(c.qr?'<span role="button" tabindex="0" data-act="cin-clear" style="font-size:13px;font-weight:600;color:var(--link);padding:8px">Clear</span>':mut('chev',20))+'</button>'+
+      steps('How it works',['Give the agent your cash.','They scan your code and send the money.','You get an SMS when it reaches your balance.']);
+    return topbar('Cash in','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('cin-tab','agent','At an agent','With a voucher')+body+'</div></div>'+btn56('Done','finish');
+  }
+  body='<div class="card" style="border-radius:28px;flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('ticket',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Deposit with a voucher</span><span class="mut" style="font-size:13px;line-height:18px">Get a secret code first, then deposit at any agent.</span></span></div>'+
+    steps('How it works',['Tap Get my code. We send a secret code by SMS.','Give the agent the code and your cash.','The money reaches your balance and you get an SMS.']);
+  return topbar('Cash in','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('cin-tab','voucher','At an agent','With a voucher')+body+'</div></div>'+btn56('Get my code','cin-apply');
+}
+function cfield(k,label,ph){
+  var c=S.cash,on=c.fld===k,v=c[k];
+  return '<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">'+label+'</span><button type="button" class="input" data-act="cfld" data-k="'+k+'" style="margin:0;width:100%;font-family:inherit;color:var(--text);text-align:left;border-color:'+(on?'var(--link)':'var(--fieldbd)')+'" aria-label="'+label+'"><span class="val">'+(v?v:'<span class="mut" style="font-weight:500;letter-spacing:0">'+ph+'</span>')+(on?'<span class="caret" style="height:22px;vertical-align:-4px"></span>':'')+'</span>'+
+    (k==='code'?'<span style="height:36px;padding:0 12px;border-radius:18px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none" aria-hidden="true">'+ico('scan',18)+'Scan</span>':'')+'</button></div>';
+}
+function coutOK(){return S.cash.code.length>=5&&S.cash.op.length>=1}
+function coutHTML(){
+  var c=S.cash;
+  if(c.otab==='agent'){
+    return topbar('Cash out','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px;padding-bottom:90px">'+ctabs('cout-tab','agent','At an agent','At an ATM')+
+      cfield('code','Agent short code','e.g. 123456')+cfield('op','Operator ID','e.g. 12')+
+      '<span class="mut" style="font-size:13px;line-height:18px;padding:0 2px">Ask the agent for both, or scan the QR code at their counter.</span></div></div>'+
+      '<div class="btnwrap"><button type="button" class="btn" data-act="cout-next"'+(coutOK()?'':' disabled')+'>Next</button></div>'+keypad('none');
+  }
+  return topbar('Cash out','back-home')+'<div class="scroll"><div class="body" style="padding-top:4px">'+ctabs('cout-tab','atm','At an agent','At an ATM')+
+    '<div class="card" style="border-radius:28px;flex-direction:row;align-items:center;gap:14px;padding:16px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico('atm',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:17px;font-weight:700">Cash out at an ATM</span><span class="mut" style="font-size:13px;line-height:18px">No card needed. You use a one-time code.</span></span></div>'+
+    steps('How it works',['Choose the amount and confirm with your PIN.','We send a one-time code by SMS.','Enter the code at a supported ATM and take your cash.'])+'</div></div>'+btn56('Choose amount','cout-atm');
+}
+function camtHTML(){
+  var qr=S.cash.via==='qr',a=amountVal(),f=qr?0:fee(a),tot=a+f,over=!qr&&a>0&&tot>S.balance;
+  var ctx=qr?['cin','Cash in at an agent','Shown on your QR code']:S.cash.via==='atm'?['atm','Cash out at an ATM','Code sent by SMS']:['store','Agent '+S.cash.code,'Operator '+S.cash.op];
+  var who='<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:16px;background:var(--softbg);border:1.5px solid var(--softbd)">'+ico(ctx[0],24)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:700">'+ctx[1]+'</span><span class="mut" style="font-size:12px">'+ctx[2]+'</span></span></div>';
+  var big='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:38px;line-height:44px;font-weight:700;letter-spacing:-.5px">'+(S.amount===''?'<span style="color:var(--dot)">0</span>':amountDisplay())+'<span class="caret" style="height:34px;vertical-align:-5px"></span></span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>';
+  var card=qr?'<div class="card" style="border-radius:24px;gap:6px;padding:14px 16px"><span class="lbl">Amount to deposit</span>'+big+'</div>':
+    '<div class="card" style="border-radius:24px;gap:10px;padding:14px 16px"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span class="lbl">You withdraw</span>'+big+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:6px"><span class="lbl">'+(a>0?'Balance after':'Available')+'</span><span style="font-size:14px;font-weight:600'+(over?';color:var(--err)':'')+'">'+money(a>0?S.balance-tot:S.balance)+' ETB</span></div></div>'+
+    '<div class="dash"></div><div style="display:flex;flex-direction:column;gap:8px"><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Fee</span><span style="font-weight:600;color:var(--text)">'+money(f)+' ETB</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8DC73F"></span>Total to pay</span><span style="font-size:20px;font-weight:700">'+money(tot)+' ETB</span></div>'+
+    (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB, so lower the amount.</span></div>':'')+'</div></div>';
+  return topbar(qr?'Cash in':'Cash out','back-camt')+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+who+card+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="camt-next"'+((a<=0||over)?' disabled':'')+'>'+(qr?'Add to my code':'Next')+'</button></div>'+keypad('amount');
+}
+function cpinHTML(){
+  var a=amountVal(),f=fee(a),tot=a+f,atm=S.cash.via==='atm';S.total=tot;
+  return topbar('Confirm cash out','back-cpin')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:4px 16px 16px;min-height:100%">'+
+   '<div class="card" style="border-radius:28px;padding:16px;gap:14px"><div style="display:flex;align-items:center;gap:14px"><span class="tbig" style="display:flex;align-items:center;justify-content:center;background:var(--tile);border:1.5px solid var(--tilebd)">'+ico(atm?'atm':'store',28)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(atm?'Cash out at an ATM':'Agent '+S.cash.code)+'</span><span class="mut" style="font-size:14px">'+(atm?'One-time code by SMS':'Operator '+S.cash.op)+'</span></span></div>'+
+   '<div style="background:var(--totalbg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">You get '+money(a)+' ETB in cash · includes '+money(f)+' ETB fee</span></div></div>'+
+   '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap ✓ to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
+}
+function doPay3(){
+  if(S.paying)return; S.paying=true; render(false);
+  setTimeout(function(){S.balance=Math.round((S.balance-S.total)*100)/100;S.txn=mkTxn();S.time=nowStr();S.paying=false;go('cdone')},900);
+}
+function cdoneHTML(){
+  var v=S.cash.via,vch=v==='voucher',atm=v==='atm',a=amountVal();
+  function line(l,r,i){return '<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;'+(i?'border-top:1px solid var(--line)':'')+'"><span class="mut" style="font-size:14px">'+l+'</span><span style="font-size:14px;font-weight:600">'+r+'</span></div>'}
+  var chk='<span style="width:68px;height:68px;border-radius:34px;background:var(--icfill);border:2.5px solid var(--icst);box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:none;'+(S.theme==='dark'?'box-shadow:0 0 22px 4px rgba(141,199,63,.36),0 0 40px 8px rgba(141,199,63,.14)':'box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32)')+'"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>';
+  var head=vch?'<span style="margin-top:22px;font-size:24px;line-height:30px;font-weight:700">Code sent</span><span class="mut" style="font-size:14px;line-height:20px">Check your SMS for the secret code.</span>':
+    '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div><span class="mut" style="font-size:12px;line-height:16px">'+S.time+'</span>';
+  var next=vch?['ticket','Next: go to an agent','Give them the code and your cash.']:atm?['sms','Your ATM code is on its way','Enter it at a supported ATM to take '+money(a)+' ETB.']:['store','Collect your cash','The agent hands you '+money(a)+' ETB.'];
+  var nc='<div class="card" style="border-radius:24px;flex-direction:row;align-items:center;gap:14px;background:var(--softbg);border:1.5px solid var(--softbd);box-shadow:none"><span class="tbig" style="width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1.5px solid var(--tilebd)">'+ico(next[0],26)+'</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:700">'+next[1]+'</span><span class="mut" style="font-size:13px;line-height:18px">'+next[2]+'</span></span></div>';
+  var det=vch?'':'<div class="card" style="border-radius:24px;padding:4px 16px;gap:0">'+(atm?line('Cash out at','ATM',0):line('Agent',S.cash.code,0)+line('Operator',S.cash.op,1))+line('Cash',money(a)+' ETB',1)+line('Transaction ID',S.txn,1)+'</div>';
+  return '<div style="height:60px;flex:none"></div><div class="scroll"><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 16px"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px">'+chk+head+'</div>'+nc+det+'</div></div>'+btn56('Done','finish');
+}
 /* ---------- render ---------- */
 var phone=$('#phone');
 
@@ -672,7 +756,7 @@ function bankAllHTML(){
 
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -683,7 +767,7 @@ function render(anim){
   if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
 }
 function go(screen){S.screen=screen;S.pin='';S.sheet=null;render(true)}
-function resetFlow(){S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin=''}
+function resetFlow(){cashReset();S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin=''}
 
 function doPay(){
   if(S.paying)return; S.paying=true; render(false);
@@ -701,8 +785,10 @@ function doPay2(){
     S.txn=mkTxn();S.time=nowStr();S.paying=false;go('pkgdone');
   },900);
 }
+function payFn(){return S.screen==='pin'?doPay:S.screen==='confirm'?doPay2:doPay3}
+function isPinScr(){return S.screen==='pin'||S.screen==='confirm'||S.screen==='cpin'}
 function pressKey(k){
-  if(S.screen==='pin'||S.screen==='confirm'){
+  if(isPinScr()){
     if(S.paying)return;
     if(k==='b'){S.pin=S.pin.slice(0,-1)}
     else if(/\d/.test(k)&&S.pin.length<6){S.pin+=k}
@@ -718,7 +804,12 @@ function pressKey(k){
     if(k==='b'){S.bk.acc=S.bk.acc.slice(0,-1)}
     else if(/\d/.test(k)&&S.bk.acc.length<12){S.bk.acc+=k}
     render(false);
-  }else if(S.screen==='amount'){
+  }else if(S.screen==='cout'){
+    var c=S.cash,f=c.fld,mx=f==='code'?6:4;
+    if(k==='b'){if(!c[f]&&f==='op'){c.fld='code'}else c[f]=c[f].slice(0,-1)}
+    else if(/\d/.test(k)&&c[f].length<mx){c[f]+=k;if(f==='code'&&c[f].length===6)c.fld='op'}
+    render(false);
+  }else if(S.screen==='amount'||S.screen==='camt'){
     var s=S.fresh?'':S.amount;
     if(k==='b'){s=(S.fresh?S.amount:s).slice(0,-1)}
     else if(k==='.'){if(s.indexOf('.')<0)s=(s===''?'0':s)+'.'}
@@ -765,7 +856,20 @@ document.addEventListener('click',function(e){
   else if(a==='sheet'){S.sheet=t.getAttribute('data-k');render(false)}
   else if(a==='sheet-close'){S.sheet=null;render(false)}
   else if(a==='bio'){if(!S.paying){S.pin='123456';render(false)}}
-  else if(a==='pay'){if(S.pin.length===6)(S.screen==='pin'?doPay:doPay2)()}
+  else if(a==='pay'){if(S.pin.length===6)payFn()()}
+  else if(a==='cash-in'){resetFlow();S.cash.tab='agent';go('cin')}
+  else if(a==='cash-out'){resetFlow();S.cash.otab='agent';go('cout')}
+  else if(a==='cin-tab'){S.cash.tab=t.getAttribute('data-k');render(false)}
+  else if(a==='cout-tab'){S.cash.otab=t.getAttribute('data-k');render(false)}
+  else if(a==='cin-clear'){e.stopPropagation();S.cash.qr=0;render(false)}
+  else if(a==='cin-amt'){S.cash.via='qr';S.amount=S.cash.qr?String(S.cash.qr):'';S.fresh=!!S.cash.qr;go('camt')}
+  else if(a==='cin-apply'){S.cash.via='voucher';S.time=nowStr();go('cdone')}
+  else if(a==='cfld'){S.cash.fld=t.getAttribute('data-k');render(false)}
+  else if(a==='cout-next'){if(coutOK()){S.cash.via='agent';S.amount='';go('camt')}}
+  else if(a==='cout-atm'){S.cash.via='atm';S.amount='';go('camt')}
+  else if(a==='back-camt'){go(S.cash.via==='qr'?'cin':'cout')}
+  else if(a==='back-cpin'){go('camt')}
+  else if(a==='camt-next'){var av=amountVal();if(S.cash.via==='qr'){S.cash.qr=av;go('cin')}else go('cpin')}
   else if(a==='finish'){resetFlow();go('home')}
   else if(a==='airtime'){S.pk.tab='freq';go('pkg')}
   else if(a==='tab-air'){go('air')}
@@ -793,11 +897,11 @@ document.addEventListener('click',function(e){
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
-  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&S.screen!=='pin'&&S.screen!=='confirm')return;
+  if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
   else if(e.key==='Backspace'){pressKey('b');e.preventDefault()}
-  else if(e.key==='.'&&S.screen==='amount'){pressKey('.');e.preventDefault()}
-  else if(e.key==='Enter'&&(S.screen==='pin'||S.screen==='confirm')&&S.pin.length===6){(S.screen==='pin'?doPay:doPay2)();e.preventDefault()}
+  else if(e.key==='.'&&(S.screen==='amount'||S.screen==='camt')){pressKey('.');e.preventDefault()}
+  else if(e.key==='Enter'&&isPinScr()&&S.pin.length===6){payFn()();e.preventDefault()}
   else if(e.key==='Enter'&&S.screen==='amount'){var a=amountVal();if(a>0&&a+fee(a)<=S.balance){go('pin');e.preventDefault()}}
 });
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
