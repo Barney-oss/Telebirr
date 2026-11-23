@@ -1350,7 +1350,7 @@ function welcomeHTML(){
   return hero+'<div class="lgcard"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 24px 8px;text-align:center">'+
    '<button type="button" data-act="fp-ok" aria-label="Log in with fingerprint (tap to simulate)" class="fpbtn'+(ok?' ok':'')+'"><span class="fpring" aria-hidden="true"></span>'+(ok?'<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':sv(AI.finger,52))+'</button>'+
    '<span style="font-size:18px;line-height:24px;font-weight:700;margin-top:6px">'+(ok?'Fingerprint recognised':'Touch the sensor to log in')+'</span><span class="mut" style="font-size:13px;margin-top:-8px">'+(ok?'Opening telebirr...':'Prototype: tap the fingerprint to simulate')+'</span></div>'+
-   '<div class="btnwrap" style="padding:8px 16px 24px"><button type="button" class="btn" data-act="lg-pin" style="background:transparent;color:var(--link);border:1.5px solid var(--link)">Use PIN instead</button></div></div>'+lgLangSheet()+toastHTML();
+   (ok?'<div style="height:84px;flex:none"></div></div>':'<div class="btnwrap" style="padding:8px 16px 24px"><button type="button" class="btn" data-act="lg-pin" style="background:transparent;color:var(--link);border:1.5px solid var(--link)">Use PIN instead</button></div></div>')+lgLangSheet()+toastHTML();
 }
 function doLogin(){
   if(S.paying)return;S.paying=true;render(false);
