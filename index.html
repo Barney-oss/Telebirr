@@ -81,6 +81,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:60px;flex:none}
 .back{width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;margin-left:-4px;padding:0}
 .topbar h1{margin:0;font-size:18px;font-weight:700;flex:1}
+.tin{flex:1;min-width:0;height:100%;border:0;background:transparent;outline:none;padding:0;font-family:inherit;font-size:15px;font-weight:500;color:var(--text)}
+.tin::placeholder{color:var(--muted);font-weight:400;font-size:14px}
+.tin::-webkit-search-cancel-button{-webkit-appearance:none}
 .grpchip{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px 0 10px;margin-right:4px;border-radius:18px;background:var(--card);border:1px solid var(--tilebd);box-shadow:var(--cardsh);font-family:inherit;font-size:13px;font-weight:600;color:var(--text);flex:none;cursor:pointer}
 .tabs{margin:8px 16px 0;background:var(--card);border-radius:24px;padding:3px;display:flex;gap:2px;box-shadow:var(--tabsh);border:1px solid var(--tabbd);flex:none}
 .tabs span{flex:1;display:flex;align-items:center;justify-content:center;height:40px;border-radius:20px;font-size:14px;font-weight:600;color:var(--muted);border:1.5px solid transparent}
@@ -277,7 +280,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'welcome',lg:{num:'912345678',mode:'fp',loading:false,fpok:false,saved:true},digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false,lang:'en',bio:{login:true,pay:false},cp:{step:0,nw:'',err:''},faq:0,tx:{tab:'main',type:'all',days:'30',sel:0,back:'back-txns'},txf:{type:'all',days:'30'},toast:'',torch:false};
+var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'welcome',lg:{num:'912345678',mode:'fp',loading:false,fpok:false,saved:true},digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false,lang:'en',bio:{login:true,pay:false},cp:{step:0,nw:'',err:''},faq:0,tx:{tab:'main',type:'all',days:'30',sel:0,back:'back-txns'},txf:{type:'all',days:'30'},toast:'',torch:false,txt:{}};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -507,7 +510,7 @@ function amountHTML(){
     '<div class="dash"></div><div style="display:flex;flex-direction:column;gap:8px"><div class="mut" style="display:flex;justify-content:space-between;font-size:14px"><span>Fee</span><span style="font-weight:600;color:var(--text)">'+(a>0?money(f)+' ETB':'0.00 ETB')+'</span></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8DC73F"></span>Total to pay</span><span style="font-size:20px;font-weight:700">'+money(tot)+' ETB</span></div>'+
     (over?'<div class="err" role="alert">'+I.warn+'<span>Not enough balance. You have '+money(S.balance)+' ETB, so lower the amount.</span></div>':'')+'</div></div>';
-  var reason='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Payment reason</span><div style="display:flex;align-items:center;height:46px;padding:0 16px;border-radius:14px;background:var(--field);border:1.5px solid var(--fieldbd)"><span style="flex:1;font-size:16px;font-weight:500">Personal transfer</span></div></div>';
+  var reason='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Payment reason</span><label style="display:flex;align-items:center;height:46px;padding:0 16px;border-radius:14px;background:var(--field);border:1.5px solid var(--fieldbd);cursor:text">'+tin('reason','Add a reason','Personal transfer')+'</label></div>';
   return (isBank()?topbar('To bank','back-bank'):sendTop('back-number'))+'<div class="scroll"><div class="body" style="padding-bottom:90px">'+field+who+card+reason+'</div></div><div class="btnwrap"><button type="button" class="btn" data-act="next"'+((a<=0||over)?' disabled':'')+'>Next</button></div>'+keypad('amount');
 }
 
@@ -522,7 +525,7 @@ function pinHTML(){
   return topbar('Confirm payment','back-amount')+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:12px 16px 16px;min-height:100%">'+
    '<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl" style="padding-left:4px">Sending to</span><div class="card" style="border-radius:28px;padding:20px 18px 18px;gap:18px"><div style="display:flex;align-items:center;gap:16px">'+avatar(S.contact,56,18)+'<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;line-height:24px;font-weight:700">'+(S.contact?S.contact.name:'New recipient')+'</span><span class="mut" style="font-size:14px">'+recipientSub()+'</span></span></div>'+
    '<div style="background:var(--totalbg);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:600;color:var(--softink)">Total to pay</span><span style="font-size:32px;line-height:38px;font-weight:700">'+money(tot)+' ETB</span><span class="mut" style="font-size:13px">Includes '+money(f)+' ETB fee</span></div>'+
-   '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">Personal transfer</span></div></div></div>'+
+   '<div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><span class="lbl">Reason</span><span style="font-size:17px;font-weight:600">'+reasonTxt()+'</span></div></div></div>'+
    '<div style="margin-top:auto"><div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:16px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap \u2713 to pay':'Enter PIN to pay')+'</span>'+pinDots()+'<span style="font-size:13px;font-weight:500;color:var(--muted)">Forgot PIN?</span></div></div></div></div>'+keypad('pin');
 }
 
@@ -543,7 +546,7 @@ function doneHTML(){
   '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 4px 8px"><div style="display:flex;align-items:center;gap:12px"><span style="width:68px;height:68px;box-sizing:border-box;border-radius:34px;'+(S.theme==='dark'?'background:#2F4F1E;border:2.5px solid #8DC73F;color:#E6F2D5;box-shadow:0 0 18px 3px rgba(141,199,63,.34),0 0 34px 6px rgba(141,199,63,.14);':'background:#B3DE7D;border:2.5px solid #2F6B12;color:#2F6B12;box-shadow:0 0 0 9px rgba(141,199,63,.14),0 6px 20px rgba(141,199,63,.32);')+'display:flex;align-items:center;justify-content:center;flex:none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span></div>'+
   '<div style="margin-top:22px;display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.5px">-'+money(S.total)+'</span><span class="mut" style="font-size:16px;font-weight:600">ETB</span></div>'+stampHTML()+'</div>'+
   '<div class="card" style="border-radius:24px;gap:14px"><div style="display:flex;align-items:center;gap:12px">'+avatar(S.contact,44,15)+'<span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:20px;line-height:24px;font-weight:700">'+recipientName()+'</span>'+(isBank()?'<span class="mut" style="font-size:13px">'+recipientSub()+'</span>':(S.contact?'<span class="mut" style="font-size:14px;font-weight:500;font-variant-numeric:tabular-nums">'+intlNum(S.contact.num)+'</span>':''))+'</span></div></div>'+
-  '<div class="card" style="border-radius:24px;gap:14px;margin-top:-4px"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Reason','Personal transfer')+col('Transaction number',S.txn)+'<span class="mut" style="font-size:12px;line-height:16px">Scan to this QR code to confirm this payment</span></div>'+
+  '<div class="card" style="border-radius:24px;gap:14px;margin-top:-4px"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:14px">'+col('Reason',reasonTxt())+col('Transaction number',S.txn)+'<span class="mut" style="font-size:12px;line-height:16px">Scan to this QR code to confirm this payment</span></div>'+
   '<span style="flex:none;width:124px;height:124px;padding:12px;border-radius:16px;background:#FFFFFF;border:1.5px solid #E6E6EA;display:flex">'+qrSVG(S.txn,100)+'</span></div></div>'+
   '<div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;border-radius:20px;overflow:hidden"><img class="banner" src="assets/banner-fayda.png" alt="Link your telebirr with FAYDA"></div><div style="display:flex;justify-content:center;align-items:center;gap:6px;height:8px" aria-hidden="true"><span style="width:18px;height:6px;border-radius:3px;background:#0187D0"></span><span style="width:6px;height:6px;border-radius:3px;background:var(--dot)"></span></div></div>'+
   '</div></div><div class="btnwrap" style="padding:8px 16px 28px"><button type="button" class="btn" data-act="finish">Finished</button></div>';
@@ -622,7 +625,7 @@ function openConfirm(it,from){S.pk.item=it;S.pk.from=from;S.pk.method='bal';S.pk
 
 function tgl(on){return '<div class="tabs" style="margin:0"><button type="button" class="'+(on===0?'on':'')+'" data-act="tab-air">Airtime</button><button type="button" class="'+(on===1?'on':'')+'" data-act="tab-pkg">Packages</button></div>'}
 function numfield(){return '<div class="input" style="border-color:var(--tilebd);margin:0">'+avatar(S.pk.who,36,13)+'<span class="val">'+S.pk.num+'</span><button type="button" data-act="chg" style="height:32px;padding:0 14px;border-radius:16px;display:flex;align-items:center;font-size:13px;font-weight:600;background:var(--tile);border:1.5px solid var(--tilebd);flex:none">Change</button></div>'}
-function searchbar(ph){return '<div class="input" style="height:48px;border-radius:24px;border-color:var(--tilebd);padding:0 16px;margin:0;flex:none">'+ico('search',20)+'<span class="mut" style="font-size:14px">'+ph+'</span></div>'}
+function searchbar(ph){return '<label class="input" style="height:48px;border-radius:24px;border-color:var(--tilebd);padding:0 16px;margin:0;flex:none;cursor:text">'+ico('search',20)+tin('s:'+S.screen+':'+ph,ph,'','search')+'</label>'}
 function btn56(label,act){return '<div class="btnwrap" style="padding:12px 16px 24px"><button type="button" class="btn" style="height:56px;border-radius:28px;font-size:18px;box-shadow:0 8px 16px rgba(1,135,208,.30)" data-act="'+act+'">'+label+'</button></div>'}
 function buyRow(it,i,fromTab,tag){
   return '<div class="prow"'+(i?' style="border-top:1px solid var(--line)"':'')+'><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:17px;font-weight:800;line-height:21px;display:flex;align-items:center">'+it.n+(tag?'<span class="tag">'+tag+'</span>':'')+'</span><span class="mut" style="font-size:12px">'+it.line+'</span></span><span style="font-size:15px;font-weight:800">'+it.p+' ETB</span><button type="button" class="buy" data-act="buy" data-src="'+fromTab+'" data-i="'+i+'">Buy</button></div>'}
@@ -924,7 +927,10 @@ var PCATS=[
 var PRECENT=[['util',0,'Electricity'],['util',1,'Ethio telecom'],['util',2,'Water'],['traffic',0,'Traffic fine']];
 function bInit(n){var w=n.replace(/&amp;|&#39;/g,'').split(/\s+/).filter(function(x){return /^[A-Za-z]/.test(x)&&!/^(of|and|by|the)$/i.test(x)});return ((w[0]||'?')[0]+(w[1]?w[1][0]:'')).toUpperCase()}
 function pcat(id){return PCATS.filter(function(c){return c[0]===id})[0]}
-function searchBox(ph){return '<div aria-hidden="true" style="display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--card);box-shadow:var(--cardsh);padding:0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span class="mut" style="font-size:14px">'+ph+'</span></div>'}
+function hesc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function tin(key,ph,def,type){var v=S.txt[key];if(v==null)v=def||'';return '<input class="tin" data-tk="'+key+'" type="'+(type||'text')+'" value="'+hesc(v)+'" placeholder="'+hesc(ph||'')+'" aria-label="'+hesc(ph||key)+'" autocomplete="off" enterkeyhint="'+(type==='search'?'search':'done')+'">'}
+function reasonTxt(){var v=S.txt.reason;return hesc(v==null||v.trim()===''?'Personal transfer':v)}
+function searchBox(ph){return '<label style="display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--card);box-shadow:var(--cardsh);padding:0 16px;cursor:text"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg>'+tin('s:'+S.screen+':'+ph,ph,'','search')+'</label>'}
 function tabHead(t,right){return '<div style="display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:8px 16px 0"><h1 style="margin:0;font-size:24px;font-weight:700">'+t+'</h1>'+(right||'')+'</div>'}
 var BELL='<button type="button" class="ibtn" data-act="notif" aria-label="Notifications, 4 new" style="position:relative;border:0;padding:0;pointer-events:auto;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15Z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg><span style="position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:5px;background:#E5484D;border:2px solid var(--iconbtn)"></span></button>';
 function payHTML(){
@@ -1069,7 +1075,7 @@ function bankSheet(){
   if(sh==='pick'){
     var grid=BANKS.map(function(b){return '<button type="button" data-act="bk-bank" data-code="'+b[0]+'" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:96px;padding:0 6px;border-radius:18px;background:var(--card);border:1.5px solid '+(S.bk.bank===b[0]?'var(--green)':'var(--line)')+';font-family:inherit;color:var(--text)"><span class="av" style="width:40px;height:40px;border-radius:13px;font-size:13px">'+b[0]+'</span><span style="font-size:12px;font-weight:600;text-align:center;line-height:15px">'+b[1]+'</span></button>'}).join('');
     return '<button type="button" class="scrim" data-act="bk-close" aria-label="Close bank list"></button><div class="sheetp" style="top:112px"><span style="align-self:center;width:40px;height:5px;border-radius:3px;background:var(--line)"></span><span style="text-align:center;font-size:16px;font-weight:700">Choose bank</span>'+
-      '<div aria-hidden="true" style="flex:none;display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--field);border:1.5px solid var(--link);padding:0 16px;box-sizing:border-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span class="mut" style="font-size:14px">Search banks</span></div>'+
+      '<label style="flex:none;display:flex;align-items:center;gap:10px;height:48px;border-radius:24px;background:var(--field);border:1.5px solid var(--link);padding:0 16px;box-sizing:border-box;cursor:text"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--icst)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg>'+tin('s:banks','Search banks','','search')+'</label>'+
       '<div style="flex:1;min-height:0;overflow-y:auto;scrollbar-width:none"><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-bottom:24px">'+grid+'</div></div></div>';
   }
   return '<button type="button" class="scrim" data-act="bk-close" aria-label="Cancel"></button><div class="sheetp" style="padding-bottom:28px;gap:16px"><span style="align-self:center;width:40px;height:5px;border-radius:3px;background:var(--line)"></span><div style="display:flex;flex-direction:column;gap:6px;padding-top:6px"><span style="font-size:20px;line-height:24px;font-weight:700">Clear sent before?</span><span class="mut" style="font-size:14px;line-height:20px">This removes the list of accounts you sent to. Your Favorites and transaction history stay as they are.</span></div><div style="display:flex;flex-direction:column;gap:10px"><button type="button" class="btn danger" data-act="bk-clear-yes">Clear list</button><button type="button" class="btn ghost" data-act="bk-close">Cancel</button></div></div>';
@@ -1376,10 +1382,9 @@ function render(anim){
   while(phone.firstChild)wrap.appendChild(phone.firstChild);
   phone.appendChild(wrap); phone.dataset.s=S.screen;
   var nsc=phone.querySelector('.scroll'); if(nsc&&same&&!anim)nsc.scrollTop=top;
-  if(S.screen==='amount'&&!same&&nsc){var wh=nsc.querySelector('#who');if(wh)nsc.scrollTop=Math.max(0,wh.getBoundingClientRect().top-nsc.getBoundingClientRect().top-4)}
 }
 function go(screen){S.screen=screen;S.pin='';S.sheet=null;render(true)}
-function resetFlow(){cashReset();S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin=''}
+function resetFlow(){cashReset();S.mode='send';S.bk={bank:null,acc:'',sheet:null};S.digits='';S.contact=null;S.amount='';S.fresh=false;S.paying=false;S.pin='';delete S.txt.reason}
 
 function doPay(){
   if(S.paying)return; S.paying=true; render(false);
@@ -1595,8 +1600,11 @@ document.addEventListener('click',function(e){
   else if(a==='method'){S.pk.method=t.getAttribute('data-k');S.pk.err='';render(false)}
   else if(a==='finish2'){resetFlow();go('home')}
 });
+document.addEventListener('input',function(e){var t=e.target;if(t&&t.classList&&t.classList.contains('tin'))S.txt[t.getAttribute('data-tk')]=t.value});
+document.addEventListener('keydown',function(e){var t=e.target;if(t&&t.classList&&t.classList.contains('tin')&&e.key==='Enter')t.blur()},true);
 window.addEventListener('keydown',function(e){
   if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.target&&e.target.classList&&e.target.classList.contains('tin'))return;
   if(e.key==='Escape'&&S.sheet){S.sheet=null;render(false);return}
   if(S.screen!=='number'&&S.screen!=='amount'&&S.screen!=='bank'&&!isPinScr()&&S.screen!=='camt'&&S.screen!=='cout'&&S.screen!=='merch'&&S.screen!=='bill'&&S.screen!=='lamt')return;
   if(/^\d$/.test(e.key)){pressKey(e.key);e.preventDefault()}
