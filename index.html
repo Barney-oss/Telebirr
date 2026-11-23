@@ -251,7 +251,7 @@ img.banner{display:block;height:auto;aspect-ratio:auto;object-fit:cover;padding:
   <aside class="side">
     <h1>telebirr redesign<br><span class="t2">Send money prototype</span></h1>
     <p>Tap <b>Send money</b> on the home screen to start. Type a number like <b>0911 2</b> to see matching contacts, then change the amount to see the fee update.</p>
-    <p>Switch between light and dark in <b>Account &rsaquo; Appearance</b>.</p>
+    <p>Switch between light and dark with <b>Dark mode</b> in Account.</p>
     <div class="note">Unofficial concept, not affiliated with Ethio telecom. All names, numbers and balances are made up. Fees follow Ethio telecom's published P2P tariff.</div>
   </aside>
   <main class="phone" id="phone" aria-label="Prototype phone screen"></main>
@@ -1162,20 +1162,10 @@ function acctHTML(){
    lcard('Account',[lrow('id','Verify or upgrade with Fayda','','soon','','Link your national ID to raise your limits'),lrow('coupon','My coupons','','soon')])+
    lcard('Security',[lrow('pin','Change PIN','','chpin'),lrow('finger','Fingerprint',(S.bio.login||S.bio.pay)?'On':'Off','biom'),lrow('shield','Security question','','soon')])+
    lcard('Payments',[lrow('verify','Verify a payment','','soon','','Check a receipt is real'),lrow('split','Bill share history','','soon')])+
-   lcard('App',[lrow('theme','Appearance',S.theme==='dark'?'Dark':'Light','appear'),lrow('lang','Language',langName(),'lang'),lrow('wifi','Access on Wi-Fi','','soon'),lrow('share','Share telebirr','','soon')])+
+   lcard('App',['<button type="button" class="row" data-act="theme-tog" role="switch" aria-checked="'+(S.theme==='dark')+'" style="min-height:60px;font-family:inherit;color:var(--text)">'+tileIc('theme')+'<span style="flex:1;font-size:15px;line-height:19px;font-weight:600;text-align:left">Dark mode</span>'+sw(S.theme==='dark')+'</button>',lrow('lang','Language',langName(),'lang'),lrow('wifi','Access on Wi-Fi','','soon'),lrow('share','Share telebirr','','soon')])+
    lcard('Help',[lrow('faq','FAQ','','faq'),lrow('phone','Contact us','','contact'),lrow('chat','Feedback','','soon'),lrow('info','About telebirr','','about')])+
    '<button type="button" class="btn" data-act="logout" style="background:transparent;color:var(--text);border:1.5px solid var(--tilebd);gap:10px">'+sv('<path d="M10 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h3"/><path d="M14.5 8l4 4-4 4M18.5 12h-9"/>',20)+'Log out</button>'+
    '</div>'+navBar('acct')+'</div></div>'+toastHTML();
-}
-function appearHTML(){
-  function opt(v,label){var on=S.theme===v,dk=v==='dark';
-    return '<button type="button" data-act="theme" data-theme-val="'+v+'" aria-pressed="'+on+'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 10px 16px;border-radius:22px;background:var(--card);border:2px solid '+(on?'#8DC73F':'var(--line)')+';box-shadow:var(--cardsh);font-family:inherit;color:var(--text)">'+
-     '<span aria-hidden="true" style="width:96px;height:150px;border-radius:16px;box-sizing:border-box;padding:10px 8px;display:flex;flex-direction:column;gap:6px;background:'+(dk?'#0E120F':'#F5F5F7')+';border:1px solid '+(dk?'#2A332C':'#E2E4E8')+'">'+
-     '<span style="height:34px;border-radius:9px;background:'+(dk?'linear-gradient(145deg,#23441A,#152B10)':'linear-gradient(140deg,#A5DB5E,#6DBB2C)')+'"></span>'+
-     '<span style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">'+[0,0,0,0].map(function(){return '<span style="height:14px;border-radius:5px;background:'+(dk?'#1F2A22':'#FFFFFF')+'"></span>'}).join('')+'</span>'+
-     '<span style="flex:1;border-radius:9px;background:'+(dk?'#1A211C':'#FFFFFF')+'"></span></span>'+
-     '<span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><span class="radio'+(on?' on':'')+'"></span>'+label+'</span></button>'}
-  return topbar('Appearance','back-acct')+'<div class="scroll"><div class="body" style="padding-top:4px;gap:16px"><div style="display:flex;gap:12px">'+opt('light','Light')+opt('dark','Dark')+'</div><span class="mut" style="font-size:13px;line-height:18px;padding:0 4px">Dark saves battery on many phones and is easier on the eyes at night.</span></div></div>';
 }
 function langHTML(){
   var rows=LANGS.map(function(l){var on=S.lang===l[0];return '<button type="button" class="row" data-act="lang-set" data-k="'+l[0]+'" aria-pressed="'+on+'" style="min-height:60px;font-family:inherit;color:var(--text)"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:16px;line-height:20px;font-weight:600">'+l[1]+'</span>'+(l[1]!==l[2]?'<span class="mut" style="font-size:12px">'+l[2]+'</span>':'')+'</span><span class="radio'+(on?' on':'')+'" aria-hidden="true"></span></button>'});
@@ -1372,7 +1362,7 @@ function doLogin(){
 }
 function render(anim){
   var sc=phone.querySelector('.scroll'), top=sc?sc.scrollTop:0, same=phone.dataset.s===S.screen;
-  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,sc:scHTML,scall:scAllHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML,acct:acctHTML,appear:appearHTML,lang:langHTML,bio:bioHTML,chpin:chpinHTML,faq:faqHTML,contact:contactHTML,about:aboutHTML,scan:scanHTML,txns:txnsHTML,txd:txdHTML,notif:notifHTML,notifl:notiflHTML,login:loginHTML,welcome:welcomeHTML}[S.screen]();
+  var html={home:homeHTML,number:numberHTML,history:historyHTML,bank:bankHTML,bankall:bankAllHTML,amount:amountHTML,pin:pinHTML,done:doneHTML,pkg:pkgHTML,type:typeHTML,air:airHTML,voucher:voucherHTML,favs:favsHTML,confirm:confirmHTML,pkgdone:pkgDoneHTML,cin:cinHTML,cout:coutHTML,camt:camtHTML,cpin:cpinHTML,cdone:cdoneHTML,merch:merchHTML,pay:payHTML,paycat:paycatHTML,bill:billHTML,apps:appsHTML,sc:scHTML,scall:scAllHTML,appsec:appsecHTML,loans:loansHTML,lamt:lamtHTML,lpin:lpinHTML,ldone:ldoneHTML,acct:acctHTML,lang:langHTML,bio:bioHTML,chpin:chpinHTML,faq:faqHTML,contact:contactHTML,about:aboutHTML,scan:scanHTML,txns:txnsHTML,txd:txdHTML,notif:notifHTML,notifl:notiflHTML,login:loginHTML,welcome:welcomeHTML}[S.screen]();
   phone.innerHTML=html;
   var el=phone.firstElementChild;
   // wrap into a screen container so the fade only runs on screen changes
@@ -1523,7 +1513,7 @@ document.addEventListener('click',function(e){
   else if(a==='soon'){toast('Not in this prototype yet')}
   else if(a==='back-acct'){S.cp={step:0,nw:'',err:''};go('acct')}
   else if(a==='biom'){go('bio')}
-  else if(a==='appear'){go('appear')}
+  else if(a==='theme-tog'){setTheme(S.theme==='dark'?'light':'dark')}
   else if(a==='lang'||a==='faq'||a==='contact'||a==='about'){go(a)}
   else if(a==='chpin'){S.cp={step:0,nw:'',err:''};go('chpin')}
   else if(a==='lang-set'){S.lang=t.getAttribute('data-k');S.screen='acct';toast('Language set to '+langName())}
