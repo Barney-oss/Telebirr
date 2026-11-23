@@ -98,6 +98,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.rise{animation:none}}
 .divider{height:1px;background:var(--line)}
+:root{--lgpill:rgba(255,255,255,.32);--lgpillbd:rgba(255,255,255,.45);--lgav:rgba(255,255,255,.6);--lgavbd:rgba(255,255,255,.85)}
+[data-theme="dark"]{--lgpill:rgba(255,255,255,.10);--lgpillbd:rgba(255,255,255,.18);--lgav:rgba(141,199,63,.22);--lgavbd:rgba(141,199,63,.55)}
+.lghero{background:var(--balbg);color:var(--balink);padding:8px 16px 48px;display:flex;flex-direction:column;position:relative;overflow:hidden;flex:none}
+.lglogo{width:auto;flex:none}[data-theme="dark"] .lglogo{filter:invert(1)}
+.lgcard{flex:1;min-height:0;margin-top:-28px;border-radius:28px 28px 0 0;background:var(--bg);position:relative;display:flex;flex-direction:column;box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+.fpbtn{position:relative;width:120px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--tile);border:1.5px solid var(--tilebd);cursor:pointer}
+.fpbtn.ok{background:#8DC73F;border-color:#8DC73F}
+.fpring{position:absolute;inset:-12px;border-radius:50%;border:2px solid #8DC73F;opacity:.5;animation:fpp 1.8s ease-out infinite}
+.fpbtn.ok .fpring{display:none}
+@keyframes fpp{0%{transform:scale(.88);opacity:.6}100%{transform:scale(1.18);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fpring{animation:none}}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:sp .8s linear infinite;margin-right:10px;flex:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spin{animation:none}}
@@ -263,7 +274,7 @@ var CONTACTS=[
  {id:'ba',name:'Biruk Assefa',ini:'BA',num:'0977402563'}
 ];
 var FAVS=['ak','st','mg'], RECENT=['ak','st'];
-var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'login',lg:{num:'912345678',mode:'fp',loading:false,fpok:false},digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false,lang:'en',bio:{login:true,pay:false},cp:{step:0,nw:'',err:''},faq:0,tx:{tab:'main',type:'all',days:'30',sel:0,back:'back-txns'},txf:{type:'all',days:'30'},toast:'',torch:false};
+var S={sheet:null,pin:'',show:{bal:false,end:false,rew:false},theme:'light',screen:'welcome',lg:{num:'912345678',mode:'fp',loading:false,fpok:false,saved:true},digits:'',contact:null,amount:'',fresh:false,balance:12480,paying:false,txn:'',time:'',total:0,mode:'send',bk:{bank:null,acc:'',sheet:null},bkCleared:false,lang:'en',bio:{login:true,pay:false},cp:{step:0,nw:'',err:''},faq:0,tx:{tab:'main',type:'all',days:'30',sel:0,back:'back-txns'},txf:{type:'all',days:'30'},toast:'',torch:false};
 
 /* ---------- helpers ---------- */
 function $(s){return document.querySelector(s)}
@@ -1305,37 +1316,41 @@ function lgLangSheet(){
   var rows=LANGS.map(function(l){var on=S.lang===l[0];return '<button type="button" class="row" data-act="lg-lang-set" data-k="'+l[0]+'" aria-pressed="'+on+'" style="min-height:56px;font-family:inherit;color:var(--text)"><span style="flex:1;font-size:16px;font-weight:600;text-align:left">'+l[1]+(l[1]!==l[2]?' <span class="mut" style="font-size:13px;font-weight:500">· '+l[2]+'</span>':'')+'</span><span class="radio'+(on?' on':'')+'" aria-hidden="true"></span></button>'});
   return '<button type="button" class="scrim" data-act="sheet-close" aria-label="Close"></button><div class="sheetp" style="padding:10px 20px 24px;gap:8px;background:var(--card)"><span style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line)"></span><h2 style="margin:6px 0 0;font-size:18px;font-weight:700">Language</h2>'+rows.join('<div class="divider"></div>')+'</div>';
 }
+function lgName(){return S.lg.num==='912345678'?'Nardos':'Abebe'}
+function lgTop(back){
+  var lp='height:40px;padding:0 10px 0 12px;border-radius:20px;background:var(--lgpill);border:1px solid var(--lgpillbd);display:flex;align-items:center;gap:6px;font-family:inherit;font-size:14px;font-weight:600;color:var(--balink)';
+  return '<div style="position:relative;display:flex;align-items:center;justify-content:space-between;min-height:48px">'+
+   (back?'<button type="button" class="back" data-act="lg-back" aria-label="Back" style="color:var(--balink);margin-left:-6px">'+I.back+'</button>':'<span style="display:flex;align-items:center;gap:8px"><img class="lglogo" src="assets/logo-telebirr-black.png" alt="" style="height:30px"><span style="font-size:20px;font-weight:700;letter-spacing:-.2px">telebirr</span></span>')+
+   '<button type="button" data-act="lg-lang" aria-haspopup="dialog" style="'+lp+'">'+sv(AI.lang,18).replace(/var\(--icst\)/g,'var(--balink)').replace(/var\(--icfill\)/g,'rgba(255,255,255,.5)')+langName()+CHDN.replace('var(--muted)','var(--balink)')+'</button></div>';
+}
+function lgRings(){return '<span aria-hidden="true" style="position:absolute;right:-70px;top:-60px;width:240px;height:240px;border-radius:50%;border:28px solid rgba(255,255,255,.14)"></span><span aria-hidden="true" style="position:absolute;left:-60px;bottom:-90px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.10)"></span>'}
 function loginHTML(){
   var d=S.lg.num,ok=d.length===9;
   var pre='<span style="font-weight:600;color:var(--muted);margin-right:8px;padding-right:10px;border-right:1.5px solid var(--line)">+251</span>';
   var car='<span class="caret" style="height:22px;vertical-align:-4px"></span>';
   var shown=pre+(d?lgNum(d)+car:car+'<span class="mut" style="font-weight:500;margin-left:4px">9XX XXX XXX</span>');
   var field='<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl">Mobile number</span><div class="input'+(ok?' ok':'')+'"><span class="val">'+shown+'</span>'+(ok?'<span style="width:28px;height:28px;border-radius:14px;background:#8DC73F;display:flex;align-items:center;justify-content:center;flex:none">'+I.check+'</span>':'')+'</div></div>';
-  var pill='min-height:44px;padding:0 18px;border-radius:22px;background:var(--card);box-shadow:var(--cardsh);border:1px solid var(--cardbd);font-family:inherit;font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px';
-  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;min-height:60px;flex:none"><span style="display:flex;align-items:center;gap:8px"><img class="hlogo" src="assets/logo-telebirr-black.png" alt="" style="height:32px"><span style="font-size:21px;font-weight:700;letter-spacing:-.2px">telebirr</span></span><button type="button" data-act="lg-lang" aria-haspopup="dialog" style="height:44px;padding:0 10px 0 14px;border-radius:22px;background:var(--iconbtn);border:0;display:flex;align-items:center;gap:6px;font-family:inherit;font-size:14px;font-weight:600;color:var(--text)">'+sv(AI.lang,20)+langName()+CHDN+'</button></div>'+
-   '<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:20px 16px 12px;min-height:100%;box-sizing:border-box"><div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:700">Welcome to telebirr</h1><span class="mut" style="font-size:15px;line-height:21px">Log in with your mobile number</span></div>'+field+
-   '<div style="display:flex;flex-direction:column;gap:12px"><button type="button" class="btn" data-act="lg-next"'+(ok&&!S.lg.loading?'':' disabled')+'>'+(S.lg.loading?'<span class="spin" aria-hidden="true"></span>':'')+'Next</button><span class="mut" style="font-size:12.5px;line-height:17px;text-align:center">By continuing you agree to the <button type="button" data-act="soon" style="background:transparent;border:0;padding:0;font:inherit;color:var(--link);font-weight:600">Terms and Conditions</button></span></div>'+
-   '<div style="margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:14px">New to telebirr? <button type="button" data-act="soon" style="background:transparent;border:0;padding:0;min-height:44px;font:inherit;font-weight:700;color:var(--link)">Create account</button></span><div style="display:flex;gap:10px"><button type="button" data-act="soon" style="'+pill+'">'+sv(AI.web,18)+'teleHub</button><button type="button" data-act="soon" style="'+pill+'">'+sv(AI.faq,18)+'Help</button></div></div></div></div>'+keypad('none')+lgLangSheet()+toastHTML();
-}
-function fpSheet(){
-  if(S.sheet!=='fp')return '';var ok=S.lg.fpok;
-  return '<button type="button" class="scrim" data-act="sheet-close" aria-label="Close"></button><div class="sheetp" style="padding:10px 20px 20px;gap:14px;background:var(--card);align-items:center;text-align:center"><span style="width:40px;height:4px;border-radius:2px;background:var(--line)"></span>'+
-   '<img class="hlogo" src="assets/logo-telebirr-black.png" alt="telebirr" style="height:26px;margin-top:6px"><span style="font-size:18px;line-height:24px;font-weight:700">Log in to telebirr</span><span class="mut" style="font-size:14px;margin-top:-8px">'+(ok?'Fingerprint recognised':'Touch the fingerprint sensor')+'</span>'+
-   '<button type="button" data-act="fp-ok" aria-label="Simulate a fingerprint scan" style="width:88px;height:88px;border-radius:44px;margin:6px 0;display:flex;align-items:center;justify-content:center;padding:0;background:'+(ok?'#8DC73F':'var(--tile)')+';border:1.5px solid '+(ok?'#8DC73F':'var(--tilebd)')+'">'+(ok?'<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':sv(AI.finger,44))+'</button>'+
-   '<span style="font-size:12.5px;font-weight:600;color:var(--softink);background:var(--totalbg);border-radius:10px;padding:6px 12px">Prototype: tap the fingerprint to simulate</span>'+
-   '<div style="display:flex;gap:10px;width:100%;margin-top:4px"><button type="button" data-act="sheet-close" class="btn" style="flex:1;background:transparent;color:var(--link);border:1.5px solid var(--link)">Cancel</button><button type="button" data-act="lg-pin" class="btn" style="flex:1">Use PIN</button></div></div>';
+  return '<div class="lghero">'+lgRings()+lgTop(S.lg.saved)+
+   '<div style="position:relative;display:flex;flex-direction:column;gap:6px;margin-top:22px"><h1 style="margin:0;font-size:30px;line-height:36px;font-weight:800;letter-spacing:-.4px">'+(S.lg.saved?'Switch account':'Welcome to telebirr')+'</h1><span style="font-size:15px;line-height:21px;color:var(--balsub)">'+(S.lg.saved?'Log in with a different mobile number':'Send, pay and buy, all in one app')+'</span></div></div>'+
+   '<div class="lgcard"><div class="scroll"><div style="display:flex;flex-direction:column;gap:16px;padding:24px 16px 12px">'+field+
+   '<button type="button" class="btn" data-act="lg-next"'+(ok&&!S.lg.loading?'':' disabled')+'>'+(S.lg.loading?'<span class="spin" aria-hidden="true"></span>':'')+'Next</button>'+
+   '<span class="mut" style="font-size:12.5px;line-height:17px;text-align:center;margin-top:-4px">By continuing you agree to the <button type="button" data-act="soon" style="background:transparent;border:0;padding:0;font:inherit;color:var(--link);font-weight:600">Terms and Conditions</button></span>'+
+   '<span style="font-size:14px;text-align:center">New to telebirr? <button type="button" data-act="soon" style="background:transparent;border:0;padding:0;min-height:40px;font:inherit;font-weight:700;color:var(--link)">Create account</button></span></div></div></div>'+keypad('none')+lgLangSheet()+toastHTML();
 }
 function welcomeHTML(){
-  var back='<div class="topbar"><button type="button" class="back" data-act="lg-back" aria-label="Back">'+I.back+'</button></div>';
-  if(S.lg.mode==='pin'){
-    return back+'<div class="scroll"><div style="display:flex;flex-direction:column;gap:18px;padding:0 16px 16px;min-height:100%;box-sizing:border-box">'+
-     '<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span class="av" style="width:56px;height:56px;font-size:19px">N</span><span class="mut" style="font-size:15px;font-variant-numeric:tabular-nums">'+lgMask()+'</span></div>'+
-     '<div style="margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center"><span style="font-size:20px;line-height:26px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap ✓ to log in':'Enter your PIN')+'</span>'+pinDots()+'<button type="button" data-act="soon" style="background:transparent;border:0;min-height:44px;padding:0 12px;font-family:inherit;font-size:14px;font-weight:600;color:var(--link)">Forgot PIN?</button></div></div></div>'+keypad('lgpin');
+  var pin=S.lg.mode==='pin',ok=S.lg.fpok,nm=lgName();
+  var sw='<button type="button" data-act="lg-switch" style="margin-top:'+(pin?'10':'14')+'px;height:36px;padding:0 14px;border-radius:18px;background:var(--lgpill);border:1px solid var(--lgpillbd);font-family:inherit;font-size:13px;font-weight:700;color:var(--balink)">Not you? Switch account</button>';
+  var hero='<div class="lghero" style="padding-bottom:'+(pin?'36':'48')+'px">'+lgRings()+lgTop(false)+
+   '<div style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-top:'+(pin?'6':'26')+'px"><span class="av" style="width:'+(pin?56:76)+'px;height:'+(pin?56:76)+'px;font-size:'+(pin?20:28)+'px;background:var(--lgav);border:2px solid var(--lgavbd);color:var(--balink)">'+nm[0]+'</span>'+
+   '<h1 style="margin:'+(pin?'6':'12')+'px 0 0;font-size:'+(pin?22:26)+'px;line-height:30px;font-weight:800;letter-spacing:-.3px">Welcome back, '+nm+'</h1><span style="font-size:15px;color:var(--balsub);font-variant-numeric:tabular-nums">'+lgMask()+'</span>'+sw+'</div></div>';
+  if(pin){
+    return hero+'<div class="lgcard"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px 16px 8px;text-align:center"><span style="font-size:18px;line-height:24px;font-weight:700">'+(S.pin.length===6&&!S.paying?'Tap ✓ to log in':'Enter your PIN')+'</span>'+pinDots()+
+     '<button type="button" data-act="soon" style="background:transparent;border:0;min-height:36px;padding:0 12px;font-family:inherit;font-size:14px;font-weight:600;color:var(--link)">Forgot PIN?</button></div></div>'+keypad('lgpin')+lgLangSheet()+toastHTML();
   }
-  return back+'<div class="scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 24px;min-height:100%;box-sizing:border-box;text-align:center">'+
-   '<span class="av" style="width:88px;height:88px;font-size:32px">N</span><h1 style="margin:10px 0 0;font-size:26px;line-height:32px;font-weight:700">Welcome back, Nardos</h1><span class="mut" style="font-size:16px;font-variant-numeric:tabular-nums">'+lgMask()+'</span>'+
-   '<button type="button" data-act="lg-fp" aria-label="Log in with fingerprint" style="margin-top:34px;width:112px;height:112px;border-radius:56px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--tile);border:1.5px solid var(--tilebd)">'+sv(AI.finger,56)+'</button><span style="font-size:15px;font-weight:600">Touch to log in with fingerprint</span></div></div>'+
-   '<div class="btnwrap" style="padding:8px 16px 24px"><button type="button" class="btn" data-act="lg-pin" style="background:transparent;color:var(--link);border:1.5px solid var(--link)">Log in with PIN</button></div>'+fpSheet()+toastHTML();
+  return hero+'<div class="lgcard"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 24px 8px;text-align:center">'+
+   '<button type="button" data-act="fp-ok" aria-label="Log in with fingerprint (tap to simulate)" class="fpbtn'+(ok?' ok':'')+'"><span class="fpring" aria-hidden="true"></span>'+(ok?'<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1C2E12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':sv(AI.finger,52))+'</button>'+
+   '<span style="font-size:18px;line-height:24px;font-weight:700;margin-top:6px">'+(ok?'Fingerprint recognised':'Touch the sensor to log in')+'</span><span class="mut" style="font-size:13px;margin-top:-8px">'+(ok?'Opening telebirr...':'Prototype: tap the fingerprint to simulate')+'</span></div>'+
+   '<div class="btnwrap" style="padding:8px 16px 24px"><button type="button" class="btn" data-act="lg-pin" style="background:transparent;color:var(--link);border:1.5px solid var(--link)">Use PIN instead</button></div></div>'+lgLangSheet()+toastHTML();
 }
 function doLogin(){
   if(S.paying)return;S.paying=true;render(false);
@@ -1484,12 +1499,13 @@ document.addEventListener('click',function(e){
   else if(a==='due-pay'){resetFlow();S.paycat='util';S.biller={c:'util',n:pcat('util')[4][0]};S.cash.code='1234567';S.cash.fld='amt';S.amount='845.60';go('bill')}
   else if(a==='lg-lang'){S.sheet='lglang';render(false)}
   else if(a==='lg-lang-set'){S.lang=t.getAttribute('data-k');S.sheet=null;render(false)}
-  else if(a==='lg-next'){if(S.lg.num.length===9&&!S.lg.loading){S.lg.loading=true;render(false);setTimeout(function(){S.lg.loading=false;S.lg.mode=S.bio.login?'fp':'pin';go('welcome');if(S.lg.mode==='fp'){S.sheet='fp'}render(false)},900)}}
-  else if(a==='lg-back'){if(S.lg.mode==='pin'&&S.bio.login){S.lg.mode='fp';S.pin='';S.paying=false;render(false)}else{S.pin='';S.paying=false;go('login')}}
-  else if(a==='lg-pin'){S.lg.mode='pin';S.sheet=null;S.pin='';render(false)}
-  else if(a==='lg-fp'){S.lg.mode='fp';S.pin='';S.sheet='fp';render(false)}
-  else if(a==='fp-ok'){if(!S.lg.fpok){S.lg.fpok=true;render(false);setTimeout(function(){S.lg.fpok=false;S.sheet=null;go('home')},700)}}
-  else if(a==='logout'){resetFlow();S.lg.mode=S.bio.login?'fp':'pin';S.lg.loading=false;S.lg.fpok=false;go('login')}
+  else if(a==='lg-next'){if(S.lg.num.length===9&&!S.lg.loading){S.lg.loading=true;render(false);setTimeout(function(){S.lg.loading=false;S.lg.saved=true;S.lg.mode=S.bio.login?'fp':'pin';go('welcome')},900)}}
+  else if(a==='lg-switch'){S.lg.prev=S.lg.num;S.lg.num='';S.pin='';go('login')}
+  else if(a==='lg-back'){if(S.lg.prev)S.lg.num=S.lg.prev;S.lg.mode=S.bio.login?'fp':'pin';go('welcome')}
+  else if(a==='lg-pin'){S.lg.mode='pin';S.pin='';render(false)}
+  else if(a==='lg-fp'){S.lg.mode='fp';S.pin='';render(false)}
+  else if(a==='fp-ok'){if(!S.lg.fpok){S.lg.fpok=true;render(false);setTimeout(function(){S.lg.fpok=false;go('home')},800)}}
+  else if(a==='logout'){resetFlow();S.lg.mode=S.bio.login?'fp':'pin';S.lg.loading=false;S.lg.fpok=false;go('welcome')}
   else if(a==='soon'){toast('Not in this prototype yet')}
   else if(a==='back-acct'){S.cp={step:0,nw:'',err:''};go('acct')}
   else if(a==='biom'){go('bio')}
