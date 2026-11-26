@@ -1558,7 +1558,7 @@ document.addEventListener('click',function(e){
   else if(a==='lg-back'){if(S.lg.prev)S.lg.num=S.lg.prev;S.lg.mode=S.bio.login?'fp':'pin';go('welcome')}
   else if(a==='lg-pin'){S.lg.mode='pin';S.pin='';render(false)}
   else if(a==='lg-fp'){S.lg.mode='fp';S.pin='';render(false)}
-  else if(a==='fp-ok'){if(!S.lg.fpok){S.lg.fpok=true;render(false);setTimeout(function(){S.lg.fpok=false;go('home')},800)}}
+  else if(a==='fp-ok'){S.lg.fpok=false;go('home')}
   else if(a==='logout'){resetFlow();S.lg.mode=S.bio.login?'fp':'pin';S.lg.loading=false;S.lg.fpok=false;go('welcome')}
   else if(a==='group'){resetFlow();S.txt['s:group']='';go('group')}
   else if(a==='grp-pick'){var gk=t.getAttribute('data-k');var g=GROUPS.filter(function(x){return x.id===gk})[0];resetFlow();S.grp=g;S.contact={id:'grp',name:g.name,ini:g.ini,num:''};S.amount='';S.screen='amount';render(true)}
